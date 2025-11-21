@@ -1,17 +1,50 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface HandDrawnCircleProps {
   className?: string;
   size?: number;
   strokeWidth?: number;
+  animate?: boolean;
 }
 
 export function HandDrawnCircle({ 
   className,
   size = 48,
-  strokeWidth = 2.5
+  strokeWidth = 2.5,
+  animate = false
 }: HandDrawnCircleProps) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pathLength, setPathLength] = useState(0);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  useEffect(() => {
+    if (pathRef.current) {
+      const length = pathRef.current.getTotalLength();
+      setPathLength(length);
+      // Trigger animation after path length is calculated
+      if (animate && length > 0) {
+        setShouldAnimate(true);
+      }
+    }
+  }, [animate]);
+
+  // Reset animation when animate prop changes
+  useEffect(() => {
+    if (animate) {
+      setShouldAnimate(false);
+      // Small delay to ensure path is rendered
+      const timer = setTimeout(() => {
+        setShouldAnimate(true);
+      }, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [animate]);
+
+  // Approximate path length for the circle (used as fallback)
+  const approximateLength = 120; // Approximate circumference for the hand-drawn circle
+  const length = pathLength || approximateLength;
+
   // Hand-drawn circle with organic, imperfect curves
   // Path with intentional variations in each quadrant to simulate hand-drawn effect
   return (
@@ -23,8 +56,26 @@ export function HandDrawnCircle({
       xmlns="http://www.w3.org/2000/svg"
       className={cn('absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2', className)}
     >
+      <style>
+        {`
+          @keyframes drawCircle {
+            from {
+              stroke-dashoffset: ${length};
+            }
+            to {
+              stroke-dashoffset: 0;
+            }
+          }
+          .drawing-path {
+            stroke-dasharray: ${length};
+            stroke-dashoffset: ${length};
+            animation: drawCircle 0.6s ease-out forwards;
+          }
+        `}
+      </style>
       {/* Hand-drawn circle with organic variations - imperfect curves like drawn by hand */}
       <path
+        ref={pathRef}
         d="M24 9.8 
            C16.5 10.2, 9.5 16.8, 9.8 24.2
            C10.1 31.5, 17.3 38.1, 24.5 38.3
@@ -35,6 +86,7 @@ export function HandDrawnCircle({
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
+        className={shouldAnimate ? 'drawing-path' : ''}
       />
     </svg>
   );

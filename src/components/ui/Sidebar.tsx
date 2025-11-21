@@ -173,8 +173,10 @@ export function Sidebar() {
                   <div className="relative flex items-center justify-center w-12 h-12">
                   {isActive && (
                       <HandDrawnCircle 
+                        key={`circle-${item.path}-${location.pathname}`}
                         size={60} 
                         strokeWidth={1.5}
+                        animate={true}
                         className="text-accent-primary dark:text-dark-accent-primary" 
                       />
                   )}
