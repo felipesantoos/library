@@ -15,6 +15,7 @@ import { ArrowLeft, BookOpen, Edit, Calendar, FileText, TrendingUp, Archive, Rot
 import { cn } from '@/lib/utils';
 import { deleteBook } from '@/hooks/useBooks';
 import { invoke } from '@tauri-apps/api/core';
+import { toast } from '@/utils/toast';
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -110,9 +111,10 @@ export function BookDetailsPage() {
     if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
       try {
         await deleteBook(book.id!);
+        toast.success(`"${book.title}" deleted successfully`);
         navigate('/library');
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Failed to delete book');
+        toast.handleError(err, 'Failed to delete book');
       }
     }
   };
@@ -152,9 +154,10 @@ export function BookDetailsPage() {
                           is_archived: !book.is_archived,
                         };
                         await invoke('update_book', { bookDto: updatedBook });
+                        toast.success(book.is_archived ? 'Book restored to library' : 'Book archived');
                         refresh();
                       } catch (err) {
-                        alert(err instanceof Error ? err.message : 'Failed to update book');
+                        toast.handleError(err, 'Failed to update book');
                       }
                     }}
                     className="p-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
@@ -375,8 +378,9 @@ export function BookDetailsPage() {
                               await refreshReadings();
                               await refreshCurrentReading();
                               await refresh();
+                              toast.success('New reading cycle started');
                             } catch (err) {
-                              alert(err instanceof Error ? err.message : 'Failed to start reread');
+                              toast.handleError(err, 'Failed to start reread');
                             }
                           }
                         }}

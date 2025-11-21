@@ -138,6 +138,7 @@ export function ProgressCorrectionPage() {
       if (newErrors.size > 0) {
         setErrors(newErrors);
         setSaving(false);
+        toast.warning('Please fix validation errors before saving', `Found ${newErrors.size} error(s)`);
         return;
       }
 
@@ -165,9 +166,10 @@ export function ProgressCorrectionPage() {
       setEditingSessions(new Map());
       setDeletingSessions(new Set());
       await refresh();
+      toast.success('Progress corrections saved successfully');
       navigate(`/book/${bookId}`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to save changes');
+      toast.handleError(err, 'Failed to save changes');
     } finally {
       setSaving(false);
     }
@@ -194,9 +196,9 @@ export function ProgressCorrectionPage() {
       // Update book progress (this would require an update_book command)
       // For now, we'll just refresh and let the backend handle it
       await refresh();
-      alert('Progress will be recalculated after saving all sessions');
+      toast.info('Progress will be recalculated after saving all sessions');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to recalculate progress');
+      toast.handleError(err, 'Failed to recalculate progress');
     }
   };
 
