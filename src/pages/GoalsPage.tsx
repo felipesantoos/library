@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGoals, useStatistics, createGoal, deleteGoal, CreateGoalCommand } from '@/hooks/useGoals';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
-import { Target, Plus, TrendingUp, BookOpen, Calendar, Trash2 } from 'lucide-react';
+import { Target, Plus, BookOpen, Trash2, Trophy, Award, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function GoalsPage() {
   const [showForm, setShowForm] = useState(false);
@@ -36,10 +37,36 @@ export function GoalsPage() {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
-  // Get monthly goal if exists
-  const monthlyGoal = goals.find(
-    (g) => g.goal_type === 'pages_monthly' && g.period_year === currentYear && g.period_month === currentMonth
+  // Group goals by type
+  const goalsByType = useMemo(() => {
+    const monthly = goals.filter((g) => g.goal_type === 'pages_monthly');
+    const yearly = goals.filter((g) => g.goal_type === 'books_yearly');
+    const daily = goals.filter((g) => g.goal_type === 'minutes_daily');
+    return { monthly, yearly, daily };
+  }, [goals]);
+
+  // Get current month/year goals
+  const currentMonthlyGoal = goalsByType.monthly.find(
+    (g) => g.period_year === currentYear && g.period_month === currentMonth
   );
+  const currentYearlyGoal = goalsByType.yearly.find(
+    (g) => g.period_year === currentYear
+  );
+  const currentDailyGoal = goalsByType.daily.find(() => true); // Daily goals don't have period
+
+  // Calculate rankings from statistics
+  const rankings = useMemo(() => {
+    if (!statistics) return null;
+
+    // Best months (from pages_per_month)
+    const bestMonths = [...statistics.pages_per_month]
+      .sort((a, b) => b.pages - a.pages)
+      .slice(0, 3);
+
+    return {
+      bestMonths,
+    };
+  }, [statistics]);
 
   return (
     <Container>
@@ -101,28 +128,106 @@ export function GoalsPage() {
             </Section>
           ) : null}
 
-          {/* Current Monthly Goal */}
-          {monthlyGoal && (
+          {/* Current Goals Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {currentMonthlyGoal && (
+              <Section padding="md" className="bg-accent-primary/10 border-accent-primary/30">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-2">
+                    <BookOpen className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4} className="text-base">Monthly Pages</Heading>
+                  </div>
+                  <MetaText className="text-xs">
+                    {new Date(currentYear, currentMonth - 1).toLocaleString('en-US', { month: 'long' })} {currentYear}
+                  </MetaText>
+                  <ProgressBar
+                    value={currentMonthlyGoal.progress_percentage}
+                    label={`${currentMonthlyGoal.current_progress} / ${currentMonthlyGoal.target_value} pages`}
+                    size="md"
+                  />
+                  <Paragraph variant="secondary" className="text-xs">
+                    {Math.round(currentMonthlyGoal.progress_percentage)}% complete
+                  </Paragraph>
+                </Stack>
+              </Section>
+            )}
+
+            {currentYearlyGoal && (
+              <Section padding="md" className="bg-accent-secondary/10 border-accent-secondary/30">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="w-5 h-5 text-accent-secondary" />
+                    <Heading level={4} className="text-base">Yearly Books</Heading>
+                  </div>
+                  <MetaText className="text-xs">{currentYear}</MetaText>
+                  <ProgressBar
+                    value={currentYearlyGoal.progress_percentage}
+                    label={`${currentYearlyGoal.current_progress} / ${currentYearlyGoal.target_value} books`}
+                    size="md"
+                  />
+                  <Paragraph variant="secondary" className="text-xs">
+                    {Math.round(currentYearlyGoal.progress_percentage)}% complete
+                  </Paragraph>
+                </Stack>
+              </Section>
+            )}
+
+            {currentDailyGoal && (
+              <Section padding="md" className="bg-semantic-success/10 border-semantic-success/30">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5 text-semantic-success" />
+                    <Heading level={4} className="text-base">Daily Minutes</Heading>
+                  </div>
+                  <MetaText className="text-xs">Today</MetaText>
+                  <ProgressBar
+                    value={currentDailyGoal.progress_percentage}
+                    label={`${currentDailyGoal.current_progress} / ${currentDailyGoal.target_value} minutes`}
+                    size="md"
+                  />
+                  <Paragraph variant="secondary" className="text-xs">
+                    {Math.round(currentDailyGoal.progress_percentage)}% complete
+                  </Paragraph>
+                </Stack>
+              </Section>
+            )}
+          </div>
+
+          {/* Rankings */}
+          {rankings && rankings.bestMonths.length > 0 && (
             <Section padding="md">
               <Stack spacing="sm">
-                <div className="flex items-center justify-between">
-                  <Heading level={4}>Current Monthly Goal</Heading>
-                  <button
-                    onClick={() => handleDelete(monthlyGoal.id!)}
-                    className="p-2 text-text-secondary hover:text-semantic-error transition-colors"
-                    aria-label="Delete goal"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-accent-primary" />
+                  <Heading level={3}>Best Months</Heading>
                 </div>
-                <ProgressBar
-                  value={monthlyGoal.progress_percentage}
-                  label={`${monthlyGoal.current_progress} / ${monthlyGoal.target_value} pages`}
-                  size="md"
-                />
-                <Paragraph variant="secondary" className="text-sm">
-                  {monthlyGoal.target_value - monthlyGoal.current_progress} pages remaining this month
-                </Paragraph>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {rankings.bestMonths.map((month, index) => {
+                    const monthName = new Date(2000, month.month - 1).toLocaleString('en-US', { month: 'long' });
+                    return (
+                      <div
+                        key={`${month.year}-${month.month}`}
+                        className="p-3 rounded-md bg-background-surface border border-background-border"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-text-primary">
+                            #{index + 1}
+                          </span>
+                          <Trophy
+                            className={cn(
+                              "w-4 h-4",
+                              index === 0 && "text-yellow-500",
+                              index === 1 && "text-gray-400",
+                              index === 2 && "text-amber-600"
+                            )}
+                          />
+                        </div>
+                        <Paragraph className="text-sm font-medium">{monthName} {month.year}</Paragraph>
+                        <MetaText className="text-xs">{month.pages} pages</MetaText>
+                      </div>
+                    );
+                  })}
+                </div>
               </Stack>
             </Section>
           )}
@@ -159,11 +264,59 @@ export function GoalsPage() {
               </div>
             </Section>
           ) : (
-            <Stack spacing="sm">
-              <Heading level={3}>Active Goals</Heading>
-              {goals.map((goal) => (
-                <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} />
-              ))}
+            <Stack spacing="lg">
+              {/* Monthly Goals */}
+              {goalsByType.monthly.length > 0 && (
+                <Stack spacing="sm">
+                  <Heading level={3} className="flex items-center space-x-2">
+                    <BookOpen className="w-5 h-5 text-accent-primary" />
+                    <span>Monthly Goals</span>
+                  </Heading>
+                  <Stack spacing="sm">
+                    {goalsByType.monthly
+                      .sort((a, b) => {
+                        const yearCompare = (b.period_year || 0) - (a.period_year || 0);
+                        if (yearCompare !== 0) return yearCompare;
+                        return (b.period_month || 0) - (a.period_month || 0);
+                      })
+                      .map((goal) => (
+                        <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} />
+                      ))}
+                  </Stack>
+                </Stack>
+              )}
+
+              {/* Yearly Goals */}
+              {goalsByType.yearly.length > 0 && (
+                <Stack spacing="sm">
+                  <Heading level={3} className="flex items-center space-x-2">
+                    <Trophy className="w-5 h-5 text-accent-secondary" />
+                    <span>Yearly Goals</span>
+                  </Heading>
+                  <Stack spacing="sm">
+                    {goalsByType.yearly
+                      .sort((a, b) => (b.period_year || 0) - (a.period_year || 0))
+                      .map((goal) => (
+                        <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} />
+                      ))}
+                  </Stack>
+                </Stack>
+              )}
+
+              {/* Daily Goals */}
+              {goalsByType.daily.length > 0 && (
+                <Stack spacing="sm">
+                  <Heading level={3} className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5 text-semantic-success" />
+                    <span>Daily Goals</span>
+                  </Heading>
+                  <Stack spacing="sm">
+                    {goalsByType.daily.map((goal) => (
+                      <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} />
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
             </Stack>
           )}
         </Stack>
@@ -189,20 +342,40 @@ function GoalCard({
     } else if (goal.period_year) {
       return `${goal.period_year}`;
     }
-    return 'No period';
+    return 'Daily';
   };
 
-  const formatType = () => {
+  const formatLabel = () => {
     switch (goal.goal_type) {
       case 'pages_monthly':
-        return 'Pages (Monthly)';
+        return `${goal.current_progress} / ${goal.target_value} pages`;
       case 'books_yearly':
-        return 'Books (Yearly)';
+        return `${goal.current_progress} / ${goal.target_value} books`;
       case 'minutes_daily':
-        return 'Minutes (Daily)';
+        return `${goal.current_progress} / ${goal.target_value} minutes`;
       default:
-        return goal.goal_type;
+        return `${goal.current_progress} / ${goal.target_value}`;
     }
+  };
+
+  const getIcon = () => {
+    switch (goal.goal_type) {
+      case 'pages_monthly':
+        return <BookOpen className="w-5 h-5 text-accent-primary" />;
+      case 'books_yearly':
+        return <Trophy className="w-5 h-5 text-accent-secondary" />;
+      case 'minutes_daily':
+        return <Clock className="w-5 h-5 text-semantic-success" />;
+      default:
+        return <Target className="w-5 h-5 text-accent-primary" />;
+    }
+  };
+
+  const getProgressColor = () => {
+    if (goal.progress_percentage >= 100) return 'text-semantic-success';
+    if (goal.progress_percentage >= 75) return 'text-accent-primary';
+    if (goal.progress_percentage >= 50) return 'text-semantic-warning';
+    return 'text-text-secondary';
   };
 
   return (
@@ -211,31 +384,31 @@ function GoalCard({
         <div className="flex-1">
           <Stack spacing="sm">
             <div className="flex items-center space-x-3">
-              <Target className="w-5 h-5 text-accent-primary" />
-              <div>
-                <Heading level={4} className="text-base">
-                  {formatType()}
-                </Heading>
-                <MetaText className="text-xs">{formatPeriod()}</MetaText>
+              {getIcon()}
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <Heading level={4} className="text-base">
+                    {formatPeriod()}
+                  </Heading>
+                  <MetaText className={cn("text-xs font-medium", getProgressColor())}>
+                    {Math.round(goal.progress_percentage)}%
+                  </MetaText>
+                </div>
               </div>
             </div>
 
             <ProgressBar
               value={goal.progress_percentage}
-              label={`${goal.current_progress} / ${goal.target_value}`}
+              label={formatLabel()}
               size="sm"
             />
-
-            <Paragraph variant="secondary" className="text-sm">
-              {Math.round(goal.progress_percentage)}% complete
-            </Paragraph>
           </Stack>
         </div>
 
         {goal.id && (
           <button
             onClick={() => onDelete(goal.id!)}
-            className="p-2 text-text-secondary hover:text-semantic-error transition-colors"
+            className="p-2 text-text-secondary hover:text-semantic-error transition-colors ml-4"
             aria-label="Delete goal"
           >
             <Trash2 className="w-4 h-4" />
@@ -346,6 +519,14 @@ function GoalForm({
                 />
               </div>
             )}
+
+            {goalType === 'minutes_daily' && (
+              <div>
+                <MetaText className="text-xs text-text-secondary">
+                  Daily goals track minutes read each day. No period selection needed.
+                </MetaText>
+              </div>
+            )}
           </div>
 
           <div>
@@ -359,7 +540,13 @@ function GoalForm({
               value={targetValue}
               onChange={(e) => setTargetValue(parseInt(e.target.value))}
               className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              placeholder={goalType === 'pages_monthly' ? 'Pages' : goalType === 'books_yearly' ? 'Books' : 'Minutes'}
+              placeholder={
+                goalType === 'pages_monthly'
+                  ? 'e.g., 500 pages'
+                  : goalType === 'books_yearly'
+                  ? 'e.g., 24 books'
+                  : 'e.g., 60 minutes'
+              }
             />
           </div>
 
