@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* Base styles with theme tokens */
+:root {
+  --font-size-multiplier: 1;
+}
+
+[data-font-size="small"] {
+  --font-size-multiplier: 0.875;
+}
+
+[data-font-size="large"] {
+  --font-size-multiplier: 1.125;
+}
+
+/* High Focus Mode - hides decorative elements */
+[data-high-focus="true"] .decorative {
+  display: none;
+}
+
+/* Antique theme base styles */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F8F3E8; /* Parchment Light */
+  color: #3C2F2F; /* Deep Sepia */
+  line-height: 1.75;
+}
+
+/* Dark mode overrides */
+.dark body {
+  background-color: #1A1410; /* Night Leather */
+  color: #EDE5CF; /* Aged Ivory */
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+

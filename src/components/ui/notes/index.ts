@@ -1,0 +1,2 @@
+export { SentimentBadge } from './SentimentBadge';
+
