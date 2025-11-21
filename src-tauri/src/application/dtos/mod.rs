@@ -8,6 +8,7 @@ pub mod collection_dto;
 pub mod journal_entry_dto;
 pub mod agenda_block_dto;
 pub mod reading_dto;
+pub mod book_summary_dto;
 
 pub use book_dto::*;
 pub use session_dto::*;
@@ -16,3 +17,7 @@ pub use goal_dto::*;
 pub use setting_dto::*;
 pub use tag_dto::*;
 pub use collection_dto::*;
+pub use journal_entry_dto::*;
+pub use agenda_block_dto::*;
+pub use reading_dto::*;
+pub use book_summary_dto::*;

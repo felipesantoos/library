@@ -1,6 +1,6 @@
-use crate::application::dtos::{BookDto, CreateBookCommand, UpdateBookCommand};
-use crate::application::use_cases::books::{CreateBookUseCase, GetBookUseCase, ListBooksUseCase, UpdateBookUseCase, DeleteBookUseCase};
-use crate::infrastructure::repositories::SqliteBookRepository;
+use crate::application::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto};
+use crate::application::use_cases::books::{CreateBookUseCase, GetBookUseCase, ListBooksUseCase, UpdateBookUseCase, DeleteBookUseCase, GenerateBookSummaryUseCase};
+use crate::infrastructure::repositories::{SqliteBookRepository, SqliteNoteRepository};
 use crate::adapters::tauri::AppState;
 
 /// Tauri command: Create a new book
@@ -74,5 +74,23 @@ pub fn delete_book(
     
     let use_case = DeleteBookUseCase::new(&repository);
     use_case.execute(id)
+}
+
+/// Tauri command: Generate automatic book summary from notes and highlights
+#[tauri::command]
+pub fn generate_book_summary(
+    book_id: i64,
+    state: tauri::State<AppState>,
+) -> Result<BookSummaryDto, String> {
+    let db_conn = state.db_connection.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let sqlite_conn = db_conn.get_connection();
+    
+    let book_repository = SqliteBookRepository::new(sqlite_conn.clone());
+    let note_repository = SqliteNoteRepository::new(sqlite_conn);
+    
+    let use_case = GenerateBookSummaryUseCase::new(&book_repository, &note_repository);
+    let summary = use_case.execute(book_id)?;
+    
+    Ok(summary.into())
 }
 

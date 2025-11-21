@@ -33,6 +33,7 @@ use adapters::tauri::commands::{
     create_reading, list_readings, get_reading, get_current_reading,
     register_backup, get_last_backup_date, get_backup_metadata,            validate_backup_json,
            check_integrity,
+           generate_book_summary,
        };
 
 pub fn run() {
@@ -109,6 +110,7 @@ pub fn run() {
             get_backup_metadata,
                    validate_backup_json,
                    check_integrity,
+                   generate_book_summary,
                ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

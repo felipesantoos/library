@@ -6,12 +6,13 @@ import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { useCollections } from '@/hooks/useCollections';
 import { useReadings, useCurrentReading, createReading } from '@/hooks/useReadings';
+import { useBookSummary } from '@/hooks/useBookSummary';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar, HybridProgressBar } from '@/components/ui/data-display';
 import { Tag } from '@/components/ui/tags';
 import { FolderKanban } from 'lucide-react';
-import { ArrowLeft, BookOpen, Edit, Calendar, FileText, TrendingUp, Archive, RotateCcw, Settings, Repeat } from 'lucide-react';
+import { ArrowLeft, BookOpen, Edit, Calendar, FileText, TrendingUp, Archive, RotateCcw, Settings, Repeat, FileText as FileTextIcon, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { deleteBook } from '@/hooks/useBooks';
 import { invoke } from '@tauri-apps/api/core';
@@ -29,8 +30,9 @@ export function BookDetailsPage() {
   const { collections } = useCollections(bookId ?? undefined);
   const { readings, loading: readingsLoading, refresh: refreshReadings } = useReadings(bookId);
   const { reading: currentReading, refresh: refreshCurrentReading } = useCurrentReading(bookId);
+  const { summary, loading: summaryLoading, error: summaryError, refresh: refreshSummary } = useBookSummary(bookId);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'notes'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'notes' | 'summary'>('overview');
   const [selectedReadingId, setSelectedReadingId] = useState<number | null>(null);
 
   // Sort sessions by date (newest first)
@@ -442,6 +444,20 @@ export function BookDetailsPage() {
                 <span>Notes ({notes.length})</span>
               </div>
             </button>
+            <button
+              onClick={() => setActiveTab('summary')}
+              className={cn(
+                "px-4 py-2 font-medium text-sm transition-colors",
+                activeTab === 'summary'
+                  ? 'text-accent-primary border-b-2 border-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary'
+              )}
+            >
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-4 h-4" />
+                <span>Summary</span>
+              </div>
+            </button>
           </div>
 
           {/* Tab Content */}
@@ -570,6 +586,120 @@ export function BookDetailsPage() {
                   </Section>
                 ))
               )}
+            </Stack>
+          )}
+
+          {activeTab === 'summary' && (
+            <Stack spacing="md">
+              {summaryLoading ? (
+                <Section padding="lg">
+                  <div className="text-center py-12">
+                    <Paragraph>Generating summary...</Paragraph>
+                  </div>
+                </Section>
+              ) : summaryError ? (
+                <Section padding="lg">
+                  <div className="text-center py-12">
+                    <Paragraph variant="secondary" className="text-semantic-error">
+                      Error: {summaryError}
+                    </Paragraph>
+                  </div>
+                </Section>
+              ) : summary ? (
+                <>
+                  {/* Summary Header */}
+                  <Section padding="md">
+                    <Stack spacing="sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="w-5 h-5 text-accent-primary" />
+                          <Heading level={3}>Book Summary</Heading>
+                        </div>
+                        <MetaText className="text-xs">
+                          Generated {new Date(summary.generated_at).toLocaleDateString()}
+                        </MetaText>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-4">
+                        <div>
+                          <MetaText>Total Notes</MetaText>
+                          <Paragraph className="text-2xl font-bold mt-1">{summary.total_notes}</Paragraph>
+                        </div>
+                        <div>
+                          <MetaText>Total Highlights</MetaText>
+                          <Paragraph className="text-2xl font-bold mt-1">{summary.total_highlights}</Paragraph>
+                        </div>
+                      </div>
+                    </Stack>
+                  </Section>
+
+                  {/* Key Themes */}
+                  {summary.key_themes.length > 0 && (
+                    <Section padding="md">
+                      <Stack spacing="sm">
+                        <Heading level={4}>Key Themes</Heading>
+                        <div className="flex flex-wrap gap-2">
+                          {summary.key_themes.map((theme, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 rounded-full bg-accent-primary/20 text-accent-primary border border-accent-primary/30 text-sm"
+                            >
+                              {theme}
+                            </span>
+                          ))}
+                        </div>
+                      </Stack>
+                    </Section>
+                  )}
+
+                  {/* Notes Summary */}
+                  {summary.notes_summary && summary.notes_summary !== "No notes recorded for this book." && (
+                    <Section padding="md">
+                      <Stack spacing="sm">
+                        <Heading level={4}>Notes Summary</Heading>
+                        <div className="p-4 rounded-md bg-background-surface border border-background-border">
+                          <Paragraph className="whitespace-pre-line text-sm">
+                            {summary.notes_summary}
+                          </Paragraph>
+                        </div>
+                      </Stack>
+                    </Section>
+                  )}
+
+                  {/* Highlights */}
+                  {summary.highlights_text.length > 0 && (
+                    <Section padding="md">
+                      <Stack spacing="sm">
+                        <Heading level={4}>Highlights</Heading>
+                        <div className="space-y-3">
+                          {summary.highlights_text.map((highlight, index) => (
+                            <div
+                              key={index}
+                              className="p-3 rounded-md bg-background-surface border-l-4 border-accent-secondary"
+                            >
+                              <Paragraph variant="secondary" className="text-sm italic">
+                                {highlight}
+                              </Paragraph>
+                            </div>
+                          ))}
+                        </div>
+                      </Stack>
+                    </Section>
+                  )}
+
+                  {/* Empty State */}
+                  {summary.total_notes === 0 && summary.total_highlights === 0 && (
+                    <Section padding="lg">
+                      <div className="text-center py-12">
+                        <Sparkles className="w-16 h-16 mx-auto text-text-secondary mb-4" />
+                        <Heading level={3}>No Summary Available</Heading>
+                        <Paragraph variant="secondary" className="mt-2">
+                          Add notes or highlights to generate an automatic summary
+                        </Paragraph>
+                      </div>
+                    </Section>
+                  )}
+                </>
+              ) : null}
             </Stack>
           )}
         </Stack>
