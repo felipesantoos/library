@@ -7,6 +7,7 @@ pub mod setting;
 pub mod tag;
 pub mod collection;
 pub mod journal_entry;
+pub mod agenda_block;
 
 pub use book::*;
 pub use session::*;
@@ -16,3 +17,5 @@ pub use reading::*;
 pub use setting::*;
 pub use tag::*;
 pub use collection::*;
+pub use journal_entry::*;
+pub use agenda_block::*;
