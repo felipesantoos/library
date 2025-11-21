@@ -3,6 +3,7 @@ import { Search, Plus, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { HandDrawnBorder } from '@/components/ui/HandDrawnBorder';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { Button } from '@/components/ui/Button';
 
 export function TopBar() {
   const navigate = useNavigate();
@@ -66,21 +67,25 @@ export function TopBar() {
 
       {/* Actions */}
       <div className="flex items-center space-x-3 ml-4">
-        <button
+        <Button
           onClick={() => navigate('/session/new')}
-          className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-background-surface dark:text-dark-text-primary hover:bg-accent-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out"
+          variant="primary"
+          showBorder={false}
           title="Start a new reading session"
+          className="flex items-center space-x-2"
         >
           <Play className="w-4 h-4" />
           <span className="hidden sm:inline">Start Session</span>
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => navigate('/book/new')}
-          className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-background-surface dark:text-dark-text-primary hover:bg-accent-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out"
+          variant="primary"
+          showBorder={false}
+          className="flex items-center space-x-2"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Add Book</span>
-        </button>
+        </Button>
       </div>
 
       {/* Today's Progress Indicator (placeholder) */}

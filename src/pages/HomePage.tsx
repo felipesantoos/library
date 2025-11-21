@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/ui/data-display';
 import { BookOpen, Play, Target, TrendingUp, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { Button } from '@/components/ui/Button';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -229,24 +230,30 @@ export function HomePage() {
                   <Stack spacing="sm">
                     <Heading level={4}>Quick Actions</Heading>
                     <div className="space-y-2 pt-2">
-                      <button
+                      <Button
                         onClick={() => navigate('/book/new')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
+                        variant="outline"
+                        fullWidth
+                        className="text-left justify-start"
                       >
                         Add New Book
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => navigate('/session/new')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
+                        variant="outline"
+                        fullWidth
+                        className="text-left justify-start"
                       >
                         Start Session
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => navigate('/library')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
+                        variant="outline"
+                        fullWidth
+                        className="text-left justify-start"
                       >
                         View Library
-                      </button>
+                      </Button>
                     </div>
                   </Stack>
                 </Section>
