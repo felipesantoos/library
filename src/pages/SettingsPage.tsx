@@ -2,13 +2,26 @@ import React, { useState } from 'react';
 import { useTheme } from '@/theme';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard } from 'lucide-react';
+import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2 } from 'lucide-react';
 import { setSetting } from '@/hooks/useSettings';
 import { invoke } from '@tauri-apps/api/core';
 import { defaultShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export function SettingsPage() {
-  const { theme, setTheme, fontSize, setFontSize, highFocusMode, setHighFocusMode } = useTheme();
+  const { 
+    theme, 
+    setTheme, 
+    fontSize, 
+    setFontSize, 
+    highFocusMode, 
+    setHighFocusMode,
+    lineSpacing,
+    setLineSpacing,
+    highContrast,
+    setHighContrast,
+    reducedMotion,
+    setReducedMotion,
+  } = useTheme();
   const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'shortcuts'>('appearance');
   const [exporting, setExporting] = useState(false);
 
@@ -26,6 +39,21 @@ export function SettingsPage() {
   const handleHighFocusModeChange = (enabled: boolean) => {
     setHighFocusMode(enabled);
     setSetting('highFocusMode', enabled.toString()).catch(console.error);
+  };
+
+  const handleLineSpacingChange = (spacing: 'tight' | 'normal' | 'relaxed' | 'loose') => {
+    setLineSpacing(spacing);
+    setSetting('lineSpacing', spacing).catch(console.error);
+  };
+
+  const handleHighContrastChange = (enabled: boolean) => {
+    setHighContrast(enabled);
+    setSetting('highContrast', enabled.toString()).catch(console.error);
+  };
+
+  const handleReducedMotionChange = (enabled: boolean) => {
+    setReducedMotion(enabled);
+    setSetting('reducedMotion', enabled.toString()).catch(console.error);
   };
 
   const handleExportData = async () => {
@@ -201,6 +229,58 @@ export function SettingsPage() {
                 </Stack>
               </Section>
 
+              {/* Line Spacing */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Type className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Line Spacing</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Adjust line spacing for reading comfort
+                  </Paragraph>
+                  <div className="flex items-center space-x-4 pt-2">
+                    {(['tight', 'normal', 'relaxed', 'loose'] as const).map((spacing) => (
+                      <button
+                        key={spacing}
+                        onClick={() => handleLineSpacingChange(spacing)}
+                        className={`px-4 py-2 rounded-md border transition-colors capitalize ${
+                          lineSpacing === spacing
+                            ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
+                            : 'border-background-border text-text-secondary hover:bg-background-surface'
+                        }`}
+                      >
+                        {spacing}
+                      </button>
+                    ))}
+                  </div>
+                </Stack>
+              </Section>
+
+              {/* High Contrast Mode */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Contrast className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>High Contrast Mode</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Increase contrast for better visibility and accessibility
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={highContrast}
+                        onChange={(e) => handleHighContrastChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Enable High Contrast Mode</span>
+                    </label>
+                  </div>
+                </Stack>
+              </Section>
+
               {/* High Focus Mode */}
               <Section padding="md">
                 <Stack spacing="sm">
@@ -220,6 +300,30 @@ export function SettingsPage() {
                         className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
                       />
                       <span className="text-sm">Enable High Focus Mode</span>
+                    </label>
+                  </div>
+                </Stack>
+              </Section>
+
+              {/* Reduced Motion */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Minimize2 className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Reduced Motion</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Disable animations and transitions for users sensitive to motion
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={reducedMotion}
+                        onChange={(e) => handleReducedMotionChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Enable Reduced Motion</span>
                     </label>
                   </div>
                 </Stack>

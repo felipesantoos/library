@@ -18,6 +18,94 @@
   display: none;
 }
 
+/* Line Spacing */
+:root {
+  --line-height-base: 1.75;
+}
+
+[data-line-spacing="tight"] {
+  --line-height-base: 1.5;
+}
+
+[data-line-spacing="normal"] {
+  --line-height-base: 1.75;
+}
+
+[data-line-spacing="relaxed"] {
+  --line-height-base: 2;
+}
+
+[data-line-spacing="loose"] {
+  --line-height-base: 2.25;
+}
+
+/* Apply line spacing to reading areas */
+[data-line-spacing="tight"] p,
+[data-line-spacing="tight"] .reading-area {
+  line-height: 1.5;
+}
+
+[data-line-spacing="normal"] p,
+[data-line-spacing="normal"] .reading-area {
+  line-height: 1.75;
+}
+
+[data-line-spacing="relaxed"] p,
+[data-line-spacing="relaxed"] .reading-area {
+  line-height: 2;
+}
+
+[data-line-spacing="loose"] p,
+[data-line-spacing="loose"] .reading-area {
+  line-height: 2.25;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --text-primary: #000000;
+  --text-secondary: #1a1a1a;
+  --background-primary: #ffffff;
+  --background-surface: #f5f5f5;
+  --background-border: #000000;
+  --accent-primary: #0066cc;
+  --semantic-success: #006600;
+  --semantic-error: #cc0000;
+  --semantic-warning: #cc6600;
+}
+
+.dark.high-contrast {
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --background-primary: #000000;
+  --background-surface: #1a1a1a;
+  --background-border: #ffffff;
+  --accent-primary: #3399ff;
+  --semantic-success: #00cc00;
+  --semantic-error: #ff3333;
+  --semantic-warning: #ff9933;
+}
+
+/* Reduced Motion */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Antique theme base styles */
 body {
   font-family: 'Inter', system-ui, sans-serif;

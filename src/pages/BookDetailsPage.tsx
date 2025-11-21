@@ -5,12 +5,13 @@ import { useSessions, SessionDto } from '@/hooks/useSessions';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { useCollections } from '@/hooks/useCollections';
+import { useReadings, useCurrentReading, createReading } from '@/hooks/useReadings';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar, HybridProgressBar } from '@/components/ui/data-display';
 import { Tag } from '@/components/ui/tags';
 import { FolderKanban } from 'lucide-react';
-import { ArrowLeft, BookOpen, Edit, Calendar, FileText, TrendingUp, Archive, RotateCcw, Settings } from 'lucide-react';
+import { ArrowLeft, BookOpen, Edit, Calendar, FileText, TrendingUp, Archive, RotateCcw, Settings, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { deleteBook } from '@/hooks/useBooks';
 import { invoke } from '@tauri-apps/api/core';
@@ -25,13 +26,26 @@ export function BookDetailsPage() {
   const { notes } = useNotes({ book_id: bookId ?? undefined });
   const { tags } = useTags(bookId ?? undefined);
   const { collections } = useCollections(bookId ?? undefined);
+  const { readings, loading: readingsLoading, refresh: refreshReadings } = useReadings(bookId);
+  const { reading: currentReading, refresh: refreshCurrentReading } = useCurrentReading(bookId);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'notes'>('overview');
+  const [selectedReadingId, setSelectedReadingId] = useState<number | null>(null);
 
   // Sort sessions by date (newest first)
-  const sortedSessions = [...sessions].sort((a, b) => 
-    b.session_date.localeCompare(a.session_date)
-  );
+  const sortedSessions = React.useMemo(() => {
+    return [...sessions].sort((a, b) => 
+      b.session_date.localeCompare(a.session_date)
+    );
+  }, [sessions]);
+
+  // Filter sessions by selected reading (if any)
+  const filteredSessions = React.useMemo(() => {
+    if (selectedReadingId === null) {
+      return sortedSessions;
+    }
+    return sortedSessions.filter(s => s.reading_id === selectedReadingId);
+  }, [sortedSessions, selectedReadingId]);
 
   // Calculate progress over time for chart
   const progressData = React.useMemo(() => {
@@ -246,7 +260,14 @@ export function BookDetailsPage() {
                     </div>
                     <div>
                       <MetaText>Status</MetaText>
-                      <Paragraph className="mt-0.5 capitalize">{book.status}</Paragraph>
+                      <Paragraph className="mt-0.5 capitalize">
+                        {book.status}
+                        {readings.length > 0 && (
+                          <span className="text-accent-primary ml-2">
+                            ({readings.length + 1}x)
+                          </span>
+                        )}
+                      </Paragraph>
                     </div>
                   </div>
 
@@ -285,15 +306,86 @@ export function BookDetailsPage() {
                     </div>
                   )}
 
+                  {/* Reading Cycles */}
+                  {readings.length > 0 && (
+                    <div>
+                      <MetaText className="mb-2 block">Reading Cycles</MetaText>
+                      <div className="space-y-2">
+                        <div
+                          className={cn(
+                            "flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors",
+                            selectedReadingId === null
+                              ? "bg-accent-primary/20 border-accent-primary"
+                              : "bg-background-surface border-background-border hover:bg-background-surface/80"
+                          )}
+                          onClick={() => setSelectedReadingId(null)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <BookOpen className="w-4 h-4 text-accent-primary" />
+                            <span className="text-sm font-medium">First Reading</span>
+                          </div>
+                          <MetaText className="text-xs">
+                            {sessions.filter(s => s.reading_id === null).length} sessions
+                          </MetaText>
+                        </div>
+                        {readings.map((reading) => (
+                          <div
+                            key={reading.id}
+                            className={cn(
+                              "flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors",
+                              selectedReadingId === reading.id
+                                ? "bg-accent-primary/20 border-accent-primary"
+                                : "bg-background-surface border-background-border hover:bg-background-surface/80"
+                            )}
+                            onClick={() => setSelectedReadingId(reading.id)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <Repeat className="w-4 h-4 text-accent-secondary" />
+                              <span className="text-sm font-medium">
+                                Reading #{reading.reading_number}
+                              </span>
+                              {reading.status === 'completed' && (
+                                <span className="text-xs text-semantic-success">✓</span>
+                              )}
+                            </div>
+                            <MetaText className="text-xs">
+                              {sessions.filter(s => s.reading_id === reading.id).length} sessions
+                            </MetaText>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Actions */}
-                  <div className="flex items-center space-x-3 pt-4">
+                  <div className="flex items-center space-x-3 pt-4 flex-wrap gap-2">
                     <button
-                      onClick={() => navigate(`/session/new?bookId=${book.id}`)}
+                      onClick={() => navigate(`/session/new?bookId=${book.id}${selectedReadingId ? `&readingId=${selectedReadingId}` : ''}`)}
                       className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
                     >
                       <Calendar className="w-4 h-4" />
                       <span>Start Session</span>
                     </button>
+                    {book.status === 'completed' && (
+                      <button
+                        onClick={async () => {
+                          if (confirm(`Start reading this book again? This will create reading cycle #${readings.length + 2}.`)) {
+                            try {
+                              await createReading({ book_id: book.id! });
+                              await refreshReadings();
+                              await refreshCurrentReading();
+                              await refresh();
+                            } catch (err) {
+                              alert(err instanceof Error ? err.message : 'Failed to start reread');
+                            }
+                          }
+                        }}
+                        className="flex items-center space-x-2 px-4 py-2 rounded-md border border-accent-secondary text-accent-secondary hover:bg-accent-secondary/10 transition-colors"
+                      >
+                        <Repeat className="w-4 h-4" />
+                        <span>Start Reread</span>
+                      </button>
+                    )}
                   </div>
                 </Stack>
               </Section>
@@ -324,7 +416,12 @@ export function BookDetailsPage() {
             >
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
-                <span>Sessions ({sessions.length})</span>
+                <span>
+                  Sessions ({filteredSessions.length}
+                  {selectedReadingId !== null && sessions.length > filteredSessions.length && (
+                    <span className="text-text-secondary"> / {sessions.length}</span>
+                  )})
+                </span>
               </div>
             </button>
             <button
@@ -394,7 +491,7 @@ export function BookDetailsPage() {
 
           {activeTab === 'sessions' && (
             <Stack spacing="sm">
-              {sortedSessions.length === 0 ? (
+              {filteredSessions.length === 0 ? (
                 <Section padding="lg">
                   <div className="text-center py-12">
                     <Calendar className="w-16 h-16 mx-auto text-text-secondary mb-4" />
@@ -407,7 +504,7 @@ export function BookDetailsPage() {
               ) : (
                 <>
                   {/* Progress Correction Button */}
-                  {sortedSessions.length > 0 && (
+                  {filteredSessions.length > 0 && (
                     <Section padding="sm">
                       <button
                         onClick={() => navigate(`/book/${book.id}/progress-correction`)}
@@ -420,7 +517,7 @@ export function BookDetailsPage() {
                   )}
 
                   {/* Sessions List */}
-                  {sortedSessions.map((session) => (
+                  {filteredSessions.map((session) => (
                     <SessionCardInDetails
                       key={session.id}
                       session={session}

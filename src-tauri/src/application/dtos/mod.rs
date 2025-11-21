@@ -7,6 +7,7 @@ pub mod tag_dto;
 pub mod collection_dto;
 pub mod journal_entry_dto;
 pub mod agenda_block_dto;
+pub mod reading_dto;
 
 pub use book_dto::*;
 pub use session_dto::*;

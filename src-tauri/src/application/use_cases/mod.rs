@@ -10,4 +10,5 @@ pub mod tags;
 pub mod collections;
 pub mod journal;
 pub mod agenda;
+pub mod readings;
 

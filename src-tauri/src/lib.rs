@@ -30,6 +30,8 @@ use adapters::tauri::commands::{
     get_journal_entry, list_journal_entries,
     create_agenda_block, update_agenda_block, delete_agenda_block,
     get_agenda_block, list_agenda_blocks, mark_agenda_block_completed,
+    create_reading, list_readings, get_reading, get_current_reading,
+    register_backup, get_last_backup_date, get_backup_metadata, validate_backup_json,
 };
 
 pub fn run() {
@@ -97,6 +99,14 @@ pub fn run() {
             get_agenda_block,
             list_agenda_blocks,
             mark_agenda_block_completed,
+            create_reading,
+            list_readings,
+            get_reading,
+            get_current_reading,
+            register_backup,
+            get_last_backup_date,
+            get_backup_metadata,
+            validate_backup_json,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

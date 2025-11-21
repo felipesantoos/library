@@ -96,3 +96,4 @@ export const tokens = {
 
 export type ThemeMode = 'light' | 'dark';
 export type FontSize = 'small' | 'standard' | 'large';
+export type LineSpacing = 'tight' | 'normal' | 'relaxed' | 'loose';
