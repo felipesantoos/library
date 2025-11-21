@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useTheme } from '@/theme';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2 } from 'lucide-react';
+import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen } from 'lucide-react';
 import { setSetting } from '@/hooks/useSettings';
 import { invoke } from '@tauri-apps/api/core';
 import { defaultShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useLastBackupDate, registerBackup, validateBackupJson, BackupMetadata } from '@/hooks/useBackup';
+import { useBooks } from '@/hooks/useBooks';
+import { useSessions } from '@/hooks/useSessions';
+import { useNotes } from '@/hooks/useNotes';
 
 export function SettingsPage() {
   const { 
@@ -24,6 +28,11 @@ export function SettingsPage() {
   } = useTheme();
   const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'shortcuts'>('appearance');
   const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const { lastBackupDate, refresh: refreshLastBackup } = useLastBackupDate('full');
+  const { books } = useBooks({});
+  const { sessions } = useSessions({});
+  const { notes } = useNotes({});
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
@@ -93,12 +102,251 @@ export function SettingsPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
+      // Register backup in database
+      const fileName = `reading-backup-${new Date().toISOString().split('T')[0]}.json`;
+      const metadata: BackupMetadata = {
+        backup_type: 'full',
+        book_count: books.length,
+        session_count: sessions.length,
+        note_count: notes.length,
+      };
+      
+      try {
+        await registerBackup('', fileName, 'full', metadata);
+        await refreshLastBackup();
+      } catch (err) {
+        console.error('Failed to register backup:', err);
+      }
+
       alert('Backup exported successfully!');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to export backup');
       console.error('Export error:', err);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleExportYearStats = async (year: number) => {
+    try {
+      setExporting(true);
+      
+      // Get sessions for the year
+      const yearSessions = sessions.filter(s => {
+        const sessionYear = new Date(s.session_date).getFullYear();
+        return sessionYear === year;
+      });
+
+      // Get books completed in the year
+      const yearBooks = books.filter(b => {
+        if (b.status === 'completed' && b.status_changed_at) {
+          const completedYear = new Date(b.status_changed_at).getFullYear();
+          return completedYear === year;
+        }
+        return false;
+      });
+
+      const backupData = {
+        version: '1.0',
+        exported_at: new Date().toISOString(),
+        type: 'year_stats',
+        year,
+        data: {
+          sessions: yearSessions,
+          books_completed: yearBooks,
+          statistics: {
+            total_sessions: yearSessions.length,
+            total_books_completed: yearBooks.length,
+            total_pages_read: yearSessions.reduce((sum, s) => sum + (s.pages_read || 0), 0),
+            total_minutes_read: yearSessions.reduce((sum, s) => sum + (s.minutes_read || 0), 0),
+          },
+        },
+      };
+
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reading-year-stats-${year}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Register backup
+      const metadata: BackupMetadata = {
+        backup_type: 'year_stats',
+        year,
+        session_count: yearSessions.length,
+        book_count: yearBooks.length,
+      };
+      
+      try {
+        await registerBackup('', link.download, 'year_stats', metadata);
+      } catch (err) {
+        console.error('Failed to register backup:', err);
+      }
+
+      alert(`Year ${year} statistics exported successfully!`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to export year statistics');
+      console.error('Export error:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportSingleBook = async (bookId: number) => {
+    try {
+      setExporting(true);
+      
+      const book = books.find(b => b.id === bookId);
+      if (!book) {
+        alert('Book not found');
+        return;
+      }
+
+      const bookSessions = sessions.filter(s => s.book_id === bookId);
+      const bookNotes = notes.filter(n => n.book_id === bookId);
+
+      const backupData = {
+        version: '1.0',
+        exported_at: new Date().toISOString(),
+        type: 'single_book',
+        data: {
+          book,
+          sessions: bookSessions,
+          notes: bookNotes,
+        },
+      };
+
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reading-book-${book.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${book.id}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Register backup
+      const metadata: BackupMetadata = {
+        backup_type: 'single_book',
+        book_id: bookId,
+        session_count: bookSessions.length,
+        note_count: bookNotes.length,
+      };
+      
+      try {
+        await registerBackup('', link.download, 'single_book', metadata);
+      } catch (err) {
+        console.error('Failed to register backup:', err);
+      }
+
+      alert(`Book data exported successfully!`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to export book data');
+      console.error('Export error:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportNotes = async () => {
+    try {
+      setExporting(true);
+      
+      const backupData = {
+        version: '1.0',
+        exported_at: new Date().toISOString(),
+        type: 'notes',
+        data: {
+          notes,
+        },
+      };
+
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reading-notes-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Register backup
+      const metadata: BackupMetadata = {
+        backup_type: 'notes',
+        note_count: notes.length,
+      };
+      
+      try {
+        await registerBackup('', link.download, 'notes', metadata);
+      } catch (err) {
+        console.error('Failed to register backup:', err);
+      }
+
+      alert(`Notes exported successfully!`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to export notes');
+      console.error('Export error:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImportBackup = async () => {
+    try {
+      setImporting(true);
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const jsonString = event.target?.result as string;
+            
+            // Validate backup structure
+            await validateBackupJson(jsonString);
+            
+            const backupData = JSON.parse(jsonString);
+            
+            // Show preview
+            const preview = `This backup contains:\n` +
+              `- Books: ${backupData.data?.books?.length || 0}\n` +
+              `- Sessions: ${backupData.data?.sessions?.length || 0}\n` +
+              `- Notes: ${backupData.data?.notes?.length || 0}\n` +
+              `- Goals: ${backupData.data?.goals?.length || 0}\n\n` +
+              `What would you like to do?`;
+            
+            const action = confirm(preview + '\n\nOK = Merge with existing data\nCancel = Overwrite all data');
+            
+            // TODO: Implement merge/overwrite logic
+            alert('Import functionality will be implemented in the next phase');
+          } catch (err) {
+            alert('Invalid backup file: ' + (err instanceof Error ? err.message : 'Unknown error'));
+          } finally {
+            setImporting(false);
+          }
+        };
+        
+        reader.readAsText(file);
+      };
+      
+      input.click();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to import backup');
+      setImporting(false);
     }
   };
 
@@ -334,15 +582,30 @@ export function SettingsPage() {
           {/* Data Tab */}
           {activeTab === 'data' && (
             <Stack spacing="md">
-              {/* Export Backup */}
+              {/* Last Backup Date */}
+              {lastBackupDate && (
+                <Section padding="md">
+                  <Stack spacing="sm">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="w-5 h-5 text-accent-primary" />
+                      <Heading level={4}>Last Backup</Heading>
+                    </div>
+                    <MetaText className="text-sm">
+                      Last full backup: {new Date(lastBackupDate).toLocaleString()}
+                    </MetaText>
+                  </Stack>
+                </Section>
+              )}
+
+              {/* Export Full Backup */}
               <Section padding="md">
                 <Stack spacing="sm">
                   <div className="flex items-center space-x-3">
                     <Download className="w-5 h-5 text-accent-primary" />
-                    <Heading level={4}>Export Backup</Heading>
+                    <Heading level={4}>Export Full Backup</Heading>
                   </div>
                   <Paragraph variant="secondary" className="text-sm">
-                    Create a full backup of all your data (books, sessions, notes, goals)
+                    Create a complete backup of all your data (books, sessions, notes, goals, journal, agenda)
                   </Paragraph>
                   <div className="pt-2">
                     <button
@@ -356,6 +619,113 @@ export function SettingsPage() {
                   </div>
                   <MetaText className="text-xs text-text-secondary">
                     The backup will be saved as a JSON file containing all your reading data
+                  </MetaText>
+                </Stack>
+              </Section>
+
+              {/* Partial Exports */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <FileText className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Partial Exports</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Export specific data for research, sharing, or analysis
+                  </Paragraph>
+                  
+                  <div className="pt-2 space-y-3">
+                    {/* Export Year Statistics */}
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                      <div>
+                        <Paragraph className="text-sm font-medium">Export Year Statistics</Paragraph>
+                        <MetaText className="text-xs">Sessions and books completed in a specific year</MetaText>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const currentYear = new Date().getFullYear();
+                          const yearInput = prompt(`Enter year to export:`, currentYear.toString());
+                          if (yearInput) {
+                            const year = parseInt(yearInput);
+                            if (!isNaN(year)) {
+                              handleExportYearStats(year);
+                            }
+                          }
+                        }}
+                        disabled={exporting}
+                        className="px-3 py-1 rounded-md border border-background-border text-text-secondary hover:bg-background-surface/80 transition-colors disabled:opacity-50"
+                      >
+                        <Calendar className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Export Single Book */}
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                      <div>
+                        <Paragraph className="text-sm font-medium">Export Single Book</Paragraph>
+                        <MetaText className="text-xs">Book data, sessions, and notes for research</MetaText>
+                      </div>
+                      <select
+                        onChange={(e) => {
+                          const bookId = parseInt(e.target.value);
+                          if (bookId) {
+                            handleExportSingleBook(bookId);
+                          }
+                        }}
+                        disabled={exporting}
+                        className="px-3 py-1 rounded-md border border-background-border text-sm bg-background-primary disabled:opacity-50"
+                        defaultValue=""
+                      >
+                        <option value="">Select book...</option>
+                        {books.map((book) => (
+                          <option key={book.id} value={book.id}>
+                            {book.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Export Notes */}
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                      <div>
+                        <Paragraph className="text-sm font-medium">Export Notes</Paragraph>
+                        <MetaText className="text-xs">All your notes and highlights</MetaText>
+                      </div>
+                      <button
+                        onClick={handleExportNotes}
+                        disabled={exporting}
+                        className="flex items-center space-x-2 px-3 py-1 rounded-md border border-background-border text-text-secondary hover:bg-background-surface/80 transition-colors disabled:opacity-50"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>Export</span>
+                      </button>
+                    </div>
+                  </div>
+                </Stack>
+              </Section>
+
+              {/* Import Backup */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Upload className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Import Backup</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Restore data from a backup file
+                  </Paragraph>
+                  <div className="pt-2">
+                    <button
+                      onClick={handleImportBackup}
+                      disabled={importing || exporting}
+                      className="flex items-center space-x-2 px-4 py-2 rounded-md border border-accent-primary text-accent-primary hover:bg-accent-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>{importing ? 'Importing...' : 'Import Backup'}</span>
+                    </button>
+                  </div>
+                  <MetaText className="text-xs text-semantic-warning">
+                    ⚠️ Import functionality will validate the backup and allow you to merge or overwrite data
                   </MetaText>
                 </Stack>
               </Section>
