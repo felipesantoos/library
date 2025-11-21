@@ -1,12 +1,10 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBooks } from '@/hooks/useBooks';
 import { useSessions } from '@/hooks/useSessions';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
-import { BookOpen, Play, Target, TrendingUp, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { BookOpen, Play, Target, TrendingUp, Calendar, Plus, Library } from 'lucide-react';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 import { Button } from '@/components/ui/Button';
 
@@ -229,29 +227,35 @@ export function HomePage() {
                 <Section padding="md">
                   <Stack spacing="sm">
                     <Heading level={4}>Quick Actions</Heading>
-                    <div className="space-y-2 pt-2">
+                    <div className="space-y-1 pt-2">
                       <Button
                         onClick={() => navigate('/book/new')}
-                        variant="outline"
+                        variant="ghost"
                         fullWidth
+                        showBorder={false}
                         className="text-left justify-start"
                       >
+                        <Plus className="w-4 h-4 mr-2" />
                         Add New Book
                       </Button>
                       <Button
                         onClick={() => navigate('/session/new')}
-                        variant="outline"
+                        variant="ghost"
                         fullWidth
+                        showBorder={false}
                         className="text-left justify-start"
                       >
+                        <Play className="w-4 h-4 mr-2" />
                         Start Session
                       </Button>
                       <Button
                         onClick={() => navigate('/library')}
-                        variant="outline"
+                        variant="ghost"
                         fullWidth
+                        showBorder={false}
                         className="text-left justify-start"
                       >
+                        <Library className="w-4 h-4 mr-2" />
                         View Library
                       </Button>
                     </div>

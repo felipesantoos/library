@@ -29,7 +29,7 @@ export function Button({
   const variantStyles = {
     primary: 'bg-accent-primary text-background-surface dark:text-dark-text-primary hover:bg-accent-primary/90 text-accent-primary',
     secondary: 'bg-accent-secondary text-text-primary dark:text-dark-text-primary hover:bg-accent-secondary/90 text-accent-secondary',
-    outline: 'bg-transparent border-0 text-text-primary dark:text-dark-text-primary hover:bg-background-surface dark:hover:bg-dark-background-surface text-background-border dark:text-dark-background-border',
+    outline: 'bg-transparent border border-background-border dark:border-dark-background-border text-text-primary dark:text-dark-text-primary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50',
     ghost: 'bg-transparent border-0 text-text-secondary dark:text-dark-text-secondary hover:bg-accent-primary/15 hover:text-accent-primary dark:hover:text-dark-accent-primary',
   };
 
@@ -43,6 +43,19 @@ export function Button({
       ? 'transparent'
       : undefined; // Use currentColor for primary/secondary too
 
+  // Generate torn paper edge clip-path for outline variant
+  const getTornEdgeClipPath = () => {
+    if (variant !== 'outline' || showBorder) return undefined;
+    
+    // Create irregular torn edge pattern for left and right sides
+    // Left edge: alternating between 0 and 6-8px to create torn effect
+    // Right edge: alternating between 100% and calc(100% - 6-8px)
+    return `polygon(
+      7px 0%, 0% 6%, 8px 12%, 0% 20%, 6px 28%, 0% 36%, 7px 44%, 0% 52%, 8px 60%, 0% 68%, 6px 76%, 0% 84%, 7px 92%, 0% 100%,
+      calc(100% - 7px) 100%, 100% 94%, calc(100% - 8px) 88%, 100% 80%, calc(100% - 6px) 72%, 100% 64%, calc(100% - 7px) 56%, 100% 48%, calc(100% - 8px) 40%, 100% 32%, calc(100% - 6px) 24%, 100% 16%, calc(100% - 7px) 8%, 100% 0%, calc(100% - 7px) 0%
+    )`;
+  };
+
   const buttonElement = (
     <button
       className={cn(
@@ -52,8 +65,16 @@ export function Button({
         fullWidth && 'w-full',
         'hover:scale-[1.02] active:scale-[0.98]',
         !showBorder && 'rounded-md',
+        variant === 'outline' && !showBorder && 'relative',
         className
       )}
+      style={
+        variant === 'outline' && !showBorder
+          ? {
+              clipPath: getTornEdgeClipPath(),
+            }
+          : undefined
+      }
       {...props}
     >
       {children}
