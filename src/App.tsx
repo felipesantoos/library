@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { AppShell } from "./components/ui/AppShell";
 import { Container } from "./components/ui/layout";
 import { Heading } from "./components/ui/typography";
@@ -31,6 +32,14 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster 
+        position="top-right" 
+        richColors 
+        closeButton 
+        duration={3000}
+        expand={true}
+        gap={0}
+      />
       <KeyboardShortcutsHandler />
       <AppShell>
         <Routes>

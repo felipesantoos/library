@@ -127,3 +127,24 @@ body {
   transition-duration: 150ms;
 }
 
+/* Sonner toast styles */
+[data-sonner-toaster] {
+  overflow: visible !important;
+  gap: 0px !important;
+  row-gap: 0px !important;
+  column-gap: 0px !important;
+}
+
+[data-sonner-toaster] > * {
+  margin: 0 !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast] {
+  position: relative !important;
+  overflow: visible !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+

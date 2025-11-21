@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@/theme';
+import { toast } from '@/utils/toast';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen, Settings, Bell, Clock } from 'lucide-react';
@@ -204,9 +205,9 @@ export function SettingsPage() {
         console.error('Failed to register backup:', err);
       }
 
-      alert('Backup exported successfully!');
+      toast.success('Backup exported successfully!');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to export backup');
+      toast.handleError(err, 'Failed to export backup');
       console.error('Export error:', err);
     } finally {
       setExporting(false);
