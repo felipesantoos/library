@@ -47,7 +47,7 @@ export function CollectionsPage() {
 
   return (
     <Container>
-      <div className="py-8 max-w-4xl">
+      <div className="py-8">
         <Stack spacing="lg">
           {/* Header */}
           <div className="flex items-center justify-between">

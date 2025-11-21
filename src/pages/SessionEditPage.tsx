@@ -100,7 +100,7 @@ export function SessionEditPage() {
 
   return (
     <Container>
-      <div className="py-8 max-w-2xl">
+      <div className="py-8">
         <Stack spacing="lg">
           {/* Header */}
           <div className="flex items-center space-x-4">
