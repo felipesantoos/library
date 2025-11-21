@@ -22,24 +22,22 @@ export function HandDrawnCircle({
     if (pathRef.current) {
       const length = pathRef.current.getTotalLength();
       setPathLength(length);
-      // Trigger animation after path length is calculated
-      if (animate && length > 0) {
-        setShouldAnimate(true);
-      }
     }
-  }, [animate]);
+  }, []);
 
   // Reset animation when animate prop changes
   useEffect(() => {
-    if (animate) {
+    if (animate && pathLength > 0) {
       setShouldAnimate(false);
-      // Small delay to ensure path is rendered
+      // Small delay to ensure path is rendered and styles are applied
       const timer = setTimeout(() => {
         setShouldAnimate(true);
       }, 10);
       return () => clearTimeout(timer);
+    } else {
+      setShouldAnimate(false);
     }
-  }, [animate]);
+  }, [animate, pathLength]);
 
   // Approximate path length for the circle (used as fallback)
   const approximateLength = 120; // Approximate circumference for the hand-drawn circle
@@ -67,8 +65,6 @@ export function HandDrawnCircle({
             }
           }
           .drawing-path {
-            stroke-dasharray: ${length};
-            stroke-dashoffset: ${length};
             animation: drawCircle 0.6s ease-out forwards;
           }
         `}
@@ -86,6 +82,14 @@ export function HandDrawnCircle({
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
+        style={
+          animate
+            ? {
+                strokeDasharray: length,
+                strokeDashoffset: length,
+              }
+            : undefined
+        }
         className={shouldAnimate ? 'drawing-path' : ''}
       />
     </svg>

@@ -1,5 +1,5 @@
 import { useLocation, useParams } from "react-router-dom";
-import { BookPageTransition } from "./BookPageTransition";
+import { DrawingPageTransition } from "./DrawingPageTransition";
 import { HomePage } from "../../pages/HomePage";
 import { LibraryPage } from "../../pages/LibraryPage";
 import { BookFormPage } from "../../pages/BookFormPage";
@@ -45,9 +45,9 @@ function RouteContent() {
 
 export function BookPageTransitionWrapper() {
   return (
-    <BookPageTransition>
+    <DrawingPageTransition>
       <RouteContent />
-    </BookPageTransition>
+    </DrawingPageTransition>
   );
 }
 

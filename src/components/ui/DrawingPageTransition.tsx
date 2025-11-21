@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
-interface BookPageTransitionProps {
+interface DrawingPageTransitionProps {
   children: React.ReactNode;
 }
 
-export function BookPageTransition({ children }: BookPageTransitionProps) {
+export function DrawingPageTransition({ children }: DrawingPageTransitionProps) {
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayChildren, setDisplayChildren] = useState(children);
