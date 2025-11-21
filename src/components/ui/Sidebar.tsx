@@ -174,6 +174,7 @@ export function Sidebar() {
                   {isActive && (
                       <HandDrawnCircle 
                         size={60} 
+                        strokeWidth={1.5}
                         className="text-accent-primary dark:text-dark-accent-primary" 
                       />
                   )}

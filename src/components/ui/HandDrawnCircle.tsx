@@ -4,11 +4,13 @@ import { cn } from '@/lib/utils';
 interface HandDrawnCircleProps {
   className?: string;
   size?: number;
+  strokeWidth?: number;
 }
 
 export function HandDrawnCircle({ 
   className,
-  size = 48 
+  size = 48,
+  strokeWidth = 2.5
 }: HandDrawnCircleProps) {
   // Hand-drawn circle with organic, imperfect curves
   // Path with intentional variations in each quadrant to simulate hand-drawn effect
@@ -29,7 +31,7 @@ export function HandDrawnCircle({
            C31.9 38.0, 38.3 31.2, 38.1 24.0
            C37.8 16.8, 31.0 9.5, 24 9.8 Z"
         stroke="currentColor"
-        strokeWidth="2.5"
+        strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
