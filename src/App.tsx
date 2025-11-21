@@ -19,12 +19,16 @@ import { CollectionsPage } from "./pages/CollectionsPage";
 import { JournalPage } from "./pages/JournalPage";
 import { AgendaPage } from "./pages/AgendaPage";
 import { KeyboardShortcutsHandler } from "./components/KeyboardShortcutsHandler";
+import { useSettingsLoader } from "./hooks/useSettingsLoader";
 
 // ArchivePage and WishlistPage are imported above
 
 // SettingsPage is imported above
 
 function App() {
+  // Load settings from backend on app startup
+  useSettingsLoader();
+
   return (
     <BrowserRouter>
       <KeyboardShortcutsHandler />

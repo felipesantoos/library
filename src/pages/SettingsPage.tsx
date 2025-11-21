@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@/theme';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen } from 'lucide-react';
+import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen, Settings, Bell, Clock } from 'lucide-react';
 import { setSetting } from '@/hooks/useSettings';
 import { invoke } from '@tauri-apps/api/core';
 import { defaultShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -10,6 +10,7 @@ import { useLastBackupDate, registerBackup, validateBackupJson, BackupMetadata }
 import { useBooks } from '@/hooks/useBooks';
 import { useSessions } from '@/hooks/useSessions';
 import { useNotes } from '@/hooks/useNotes';
+import { useSettings } from '@/hooks/useSettings';
 
 export function SettingsPage() {
   const { 
@@ -26,13 +27,62 @@ export function SettingsPage() {
     reducedMotion,
     setReducedMotion,
   } = useTheme();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'shortcuts'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'behavior' | 'notifications' | 'data' | 'shortcuts'>('appearance');
+  const { settings } = useSettings();
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const { lastBackupDate, refresh: refreshLastBackup } = useLastBackupDate('full');
   const { books } = useBooks({});
   const { sessions } = useSessions({});
   const { notes } = useNotes({});
+  
+  // Helper to get setting value from backend or localStorage
+  const getSettingValue = (key: string, defaultValue: string): string => {
+    const setting = settings.find(s => s.key === key);
+    if (setting) {
+      localStorage.setItem(key, setting.value); // Sync to localStorage
+      return setting.value;
+    }
+    return localStorage.getItem(key) || defaultValue;
+  };
+
+  // Behavior settings
+  const [defaultProgressUnit, setDefaultProgressUnit] = useState<'page' | 'percentage'>(() => {
+    const value = getSettingValue('defaultProgressUnit', 'page');
+    return (value === 'page' || value === 'percentage') ? value : 'page';
+  });
+  const [autoOpenTimer, setAutoOpenTimer] = useState<boolean>(() => {
+    return getSettingValue('autoOpenTimer', 'false') === 'true';
+  });
+  const [defaultStartPage, setDefaultStartPage] = useState<string>(() => {
+    return getSettingValue('defaultStartPage', '1');
+  });
+
+  // Notification settings
+  const [dailyReminder, setDailyReminder] = useState<boolean>(() => {
+    return getSettingValue('dailyReminder', 'false') === 'true';
+  });
+  const [readingPrompt, setReadingPrompt] = useState<boolean>(() => {
+    return getSettingValue('readingPrompt', 'false') === 'true';
+  });
+  const [goalReminders, setGoalReminders] = useState<boolean>(() => {
+    return getSettingValue('goalReminders', 'false') === 'true';
+  });
+
+  // Sync settings from backend when they load
+  useEffect(() => {
+    if (settings.length > 0) {
+      const progressUnit = getSettingValue('defaultProgressUnit', 'page');
+      if (progressUnit === 'page' || progressUnit === 'percentage') {
+        setDefaultProgressUnit(progressUnit);
+      }
+      setAutoOpenTimer(getSettingValue('autoOpenTimer', 'false') === 'true');
+      setDefaultStartPage(getSettingValue('defaultStartPage', '1'));
+      setDailyReminder(getSettingValue('dailyReminder', 'false') === 'true');
+      setReadingPrompt(getSettingValue('readingPrompt', 'false') === 'true');
+      setGoalReminders(getSettingValue('goalReminders', 'false') === 'true');
+    }
+  }, [settings]);
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
@@ -63,6 +113,42 @@ export function SettingsPage() {
   const handleReducedMotionChange = (enabled: boolean) => {
     setReducedMotion(enabled);
     setSetting('reducedMotion', enabled.toString()).catch(console.error);
+  };
+
+  const handleProgressUnitChange = (unit: 'page' | 'percentage') => {
+    setDefaultProgressUnit(unit);
+    localStorage.setItem('defaultProgressUnit', unit);
+    setSetting('defaultProgressUnit', unit).catch(console.error);
+  };
+
+  const handleAutoOpenTimerChange = (enabled: boolean) => {
+    setAutoOpenTimer(enabled);
+    localStorage.setItem('autoOpenTimer', enabled.toString());
+    setSetting('autoOpenTimer', enabled.toString()).catch(console.error);
+  };
+
+  const handleDefaultStartPageChange = (page: string) => {
+    setDefaultStartPage(page);
+    localStorage.setItem('defaultStartPage', page);
+    setSetting('defaultStartPage', page).catch(console.error);
+  };
+
+  const handleDailyReminderChange = (enabled: boolean) => {
+    setDailyReminder(enabled);
+    localStorage.setItem('dailyReminder', enabled.toString());
+    setSetting('dailyReminder', enabled.toString()).catch(console.error);
+  };
+
+  const handleReadingPromptChange = (enabled: boolean) => {
+    setReadingPrompt(enabled);
+    localStorage.setItem('readingPrompt', enabled.toString());
+    setSetting('readingPrompt', enabled.toString()).catch(console.error);
+  };
+
+  const handleGoalRemindersChange = (enabled: boolean) => {
+    setGoalReminders(enabled);
+    localStorage.setItem('goalReminders', enabled.toString());
+    setSetting('goalReminders', enabled.toString()).catch(console.error);
   };
 
   const handleExportData = async () => {
@@ -378,6 +464,32 @@ export function SettingsPage() {
               </div>
             </button>
             <button
+              onClick={() => setActiveTab('behavior')}
+              className={`px-4 py-2 font-medium text-sm transition-colors ${
+                activeTab === 'behavior'
+                  ? 'text-accent-primary border-b-2 border-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Settings className="w-4 h-4" />
+                <span>Behavior</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`px-4 py-2 font-medium text-sm transition-colors ${
+                activeTab === 'notifications'
+                  ? 'text-accent-primary border-b-2 border-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Bell className="w-4 h-4" />
+                <span>Notifications</span>
+              </div>
+            </button>
+            <button
               onClick={() => setActiveTab('data')}
               className={`px-4 py-2 font-medium text-sm transition-colors ${
                 activeTab === 'data'
@@ -574,6 +686,182 @@ export function SettingsPage() {
                       <span className="text-sm">Enable Reduced Motion</span>
                     </label>
                   </div>
+                </Stack>
+              </Section>
+            </Stack>
+          )}
+
+          {/* Behavior Tab */}
+          {activeTab === 'behavior' && (
+            <Stack spacing="md">
+              {/* Default Progress Unit */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Type className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Default Progress Unit</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Choose how progress is displayed by default (pages or percentage)
+                  </Paragraph>
+                  <div className="flex items-center space-x-4 pt-2">
+                    <button
+                      onClick={() => handleProgressUnitChange('page')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        defaultProgressUnit === 'page'
+                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
+                          : 'border-background-border text-text-secondary hover:bg-background-surface'
+                      }`}
+                    >
+                      Pages
+                    </button>
+                    <button
+                      onClick={() => handleProgressUnitChange('percentage')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        defaultProgressUnit === 'percentage'
+                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
+                          : 'border-background-border text-text-secondary hover:bg-background-surface'
+                      }`}
+                    >
+                      Percentage
+                    </button>
+                  </div>
+                </Stack>
+              </Section>
+
+              {/* Default Session Behavior */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Clock className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Default Session Behavior</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Configure how new reading sessions behave
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoOpenTimer}
+                        onChange={(e) => handleAutoOpenTimerChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Open timer automatically when starting a session</span>
+                    </label>
+                  </div>
+                </Stack>
+              </Section>
+
+              {/* Default Start Page */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <BookOpen className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Default Start Page</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Set the default starting page when creating a new book
+                  </Paragraph>
+                  <div className="pt-2">
+                    <input
+                      type="number"
+                      min="1"
+                      value={defaultStartPage}
+                      onChange={(e) => handleDefaultStartPageChange(e.target.value)}
+                      className="px-3 py-2 rounded-md border border-background-border bg-background-primary text-text-primary focus:ring-2 focus:ring-accent-primary focus:border-accent-primary w-32"
+                      placeholder="1"
+                    />
+                    <MetaText className="text-xs text-text-secondary mt-1 block">
+                      Usually 1, but you can set a different default if needed
+                    </MetaText>
+                  </div>
+                </Stack>
+              </Section>
+            </Stack>
+          )}
+
+          {/* Notifications Tab */}
+          {activeTab === 'notifications' && (
+            <Stack spacing="md">
+              {/* Daily Reminder */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Bell className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Daily Reminder</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Receive a daily reminder to read
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={dailyReminder}
+                        onChange={(e) => handleDailyReminderChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Enable daily reading reminder</span>
+                    </label>
+                  </div>
+                  <MetaText className="text-xs text-text-secondary">
+                    Note: Notification implementation will be added in a future update
+                  </MetaText>
+                </Stack>
+              </Section>
+
+              {/* Reading Prompt */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Bell className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Reading Prompt</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Get prompted if you haven't read today
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={readingPrompt}
+                        onChange={(e) => handleReadingPromptChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Show prompt if you haven't read today</span>
+                    </label>
+                  </div>
+                  <MetaText className="text-xs text-text-secondary">
+                    A gentle reminder will appear if no reading session was recorded today
+                  </MetaText>
+                </Stack>
+              </Section>
+
+              {/* Goal Reminders */}
+              <Section padding="md">
+                <Stack spacing="sm">
+                  <div className="flex items-center space-x-3">
+                    <Bell className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Goal Reminders</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Receive reminders about your reading goals
+                  </Paragraph>
+                  <div className="pt-2">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={goalReminders}
+                        onChange={(e) => handleGoalRemindersChange(e.target.checked)}
+                        className="w-5 h-5 rounded border-background-border text-accent-primary focus:ring-2 focus:ring-accent-primary"
+                      />
+                      <span className="text-sm">Enable goal progress reminders</span>
+                    </label>
+                  </div>
+                  <MetaText className="text-xs text-text-secondary">
+                    Get notified about your progress toward monthly and yearly goals
+                  </MetaText>
                 </Stack>
               </Section>
             </Stack>
