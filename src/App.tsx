@@ -18,6 +18,7 @@ import { WishlistPage } from "./pages/WishlistPage";
 import { CollectionsPage } from "./pages/CollectionsPage";
 import { JournalPage } from "./pages/JournalPage";
 import { AgendaPage } from "./pages/AgendaPage";
+import { KeyboardShortcutsHandler } from "./components/KeyboardShortcutsHandler";
 
 // ArchivePage and WishlistPage are imported above
 
@@ -26,6 +27,7 @@ import { AgendaPage } from "./pages/AgendaPage";
 function App() {
   return (
     <BrowserRouter>
+      <KeyboardShortcutsHandler />
       <AppShell>
         <Routes>
           <Route path="/" element={<HomePage />} />

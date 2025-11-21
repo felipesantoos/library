@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useTheme } from '@/theme';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Moon, Sun, Type, Focus, Download, Database, Palette } from 'lucide-react';
+import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard } from 'lucide-react';
 import { setSetting } from '@/hooks/useSettings';
 import { invoke } from '@tauri-apps/api/core';
+import { defaultShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export function SettingsPage() {
   const { theme, setTheme, fontSize, setFontSize, highFocusMode, setHighFocusMode } = useTheme();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'data'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'shortcuts'>('appearance');
   const [exporting, setExporting] = useState(false);
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
@@ -111,6 +112,19 @@ export function SettingsPage() {
               <div className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
                 <span>Data</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('shortcuts')}
+              className={`px-4 py-2 font-medium text-sm transition-colors ${
+                activeTab === 'shortcuts'
+                  ? 'text-accent-primary border-b-2 border-accent-primary'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Keyboard className="w-4 h-4" />
+                <span>Shortcuts</span>
               </div>
             </button>
           </div>
@@ -239,6 +253,99 @@ export function SettingsPage() {
                   <MetaText className="text-xs text-text-secondary">
                     The backup will be saved as a JSON file containing all your reading data
                   </MetaText>
+                </Stack>
+              </Section>
+            </Stack>
+          )}
+
+          {/* Shortcuts Tab */}
+          {activeTab === 'shortcuts' && (
+            <Stack spacing="md">
+              <Section padding="md">
+                <Stack spacing="md">
+                  <div className="flex items-center space-x-3">
+                    <Keyboard className="w-5 h-5 text-accent-primary" />
+                    <Heading level={4}>Keyboard Shortcuts</Heading>
+                  </div>
+                  <Paragraph variant="secondary" className="text-sm">
+                    Quick access to features using keyboard shortcuts
+                  </Paragraph>
+
+                  {/* Group shortcuts by category */}
+                  {['Navigation', 'Actions'].map((category) => (
+                    <div key={category}>
+                      <Heading level={5} className="text-sm font-medium mb-3">
+                        {category}
+                      </Heading>
+                      <div className="space-y-2">
+                        {defaultShortcuts
+                          .filter((s) => s.category === category)
+                          .map((shortcut, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border"
+                            >
+                              <span className="text-sm text-text-primary">
+                                {shortcut.description}
+                              </span>
+                              <div className="flex items-center space-x-1">
+                                {shortcut.ctrl && (
+                                  <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface border border-background-border rounded">
+                                    {navigator.platform.toLowerCase().includes('mac') ? '⌘' : 'Ctrl'}
+                                  </kbd>
+                                )}
+                                {shortcut.shift && (
+                                  <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface border border-background-border rounded">
+                                    Shift
+                                  </kbd>
+                                )}
+                                <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                                  {shortcut.key.toUpperCase()}
+                                </kbd>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* General Navigation */}
+                  <div>
+                    <Heading level={5} className="text-sm font-medium mb-3">
+                      General Navigation
+                    </Heading>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                        <span className="text-sm text-text-primary">Close Modals / Dialogs</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                          Esc
+                        </kbd>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                        <span className="text-sm text-text-primary">Navigate with Tab</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                          Tab
+                        </kbd>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                        <span className="text-sm text-text-primary">Navigate lists with arrows</span>
+                        <div className="flex items-center space-x-1">
+                          <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                            ↑
+                          </kbd>
+                          <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                            ↓
+                          </kbd>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
+                        <span className="text-sm text-text-primary">Open selected item</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
+                          Enter
+                        </kbd>
+                      </div>
+                    </div>
+                  </div>
                 </Stack>
               </Section>
             </Stack>
