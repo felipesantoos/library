@@ -1,13 +1,23 @@
 import React from 'react';
 import { HandDrawnBox } from './HandDrawnBox';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+export type IconPosition = 'left' | 'right';
+
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   fullWidth?: boolean;
   showBorder?: boolean;
   linearCorners?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: IconPosition;
+  iconOnly?: boolean;
+  loading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function Button({
@@ -18,14 +28,25 @@ export function Button({
   fullWidth = false,
   showBorder = true,
   linearCorners = true,
+  icon,
+  iconPosition = 'left',
+  iconOnly = false,
+  loading = false,
+  disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'flex items-center justify-center transition-all duration-200 ease-in-out font-medium';
+  const baseStyles = 'flex items-center justify-center transition-all duration-200 ease-in-out font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
   
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+    sm: iconOnly ? 'p-1.5' : 'px-3 py-1.5 text-sm',
+    md: iconOnly ? 'p-2' : 'px-4 py-2 text-base',
+    lg: iconOnly ? 'p-3' : 'px-6 py-3 text-lg',
+  };
+
+  const iconSizeStyles = {
+    sm: 'w-3 h-3',
+    md: 'w-4 h-4',
+    lg: 'w-5 h-5',
   };
 
   const getVariantStyles = (showBorder: boolean) => ({
@@ -61,6 +82,29 @@ export function Button({
   };
 
   const variantStyles = getVariantStyles(showBorder);
+  const isDisabled = disabled || loading;
+
+  // Render icon
+  const renderIcon = () => {
+    if (loading) {
+      return <Loader2 className={cn(iconSizeStyles[size], 'animate-spin')} aria-hidden="true" />;
+    }
+    if (icon) {
+      return <span className={cn(iconSizeStyles[size], 'flex-shrink-0')} aria-hidden="true">{icon}</span>;
+    }
+    return null;
+  };
+
+  // Determine content order
+  const content = iconOnly ? (
+    renderIcon()
+  ) : (
+    <>
+      {icon && iconPosition === 'left' && renderIcon()}
+      {children && <span className={icon ? (iconPosition === 'left' ? 'ml-2' : 'mr-2') : ''}>{children}</span>}
+      {icon && iconPosition === 'right' && renderIcon()}
+    </>
+  );
 
   const buttonElement = (
     <button
@@ -69,9 +113,10 @@ export function Button({
         sizeStyles[size],
         variantStyles[variant],
         fullWidth && 'w-full',
-        'hover:scale-[1.02] active:scale-[0.98]',
+        !isDisabled && 'hover:scale-[1.02] active:scale-[0.98]',
         !showBorder && 'rounded-md',
         variant === 'outline' && !showBorder && 'relative',
+        iconOnly && 'aspect-square',
         className
       )}
       style={
@@ -81,9 +126,12 @@ export function Button({
             }
           : undefined
       }
+      disabled={isDisabled}
+      aria-busy={loading}
+      aria-disabled={isDisabled}
       {...props}
     >
-      {children}
+      {content}
     </button>
   );
 

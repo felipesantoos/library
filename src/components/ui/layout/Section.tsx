@@ -24,6 +24,7 @@ export function Section({
     <HandDrawnBox
       borderRadius={8}
       strokeWidth={1}
+      linearCorners={true}
       className={cn(
         'rounded-md',
         'bg-background-surface dark:bg-dark-background-surface',
