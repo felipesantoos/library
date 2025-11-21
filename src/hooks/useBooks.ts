@@ -35,6 +35,7 @@ export interface CreateBookCommand {
   total_minutes?: number;
   cover_url?: string;
   url?: string;
+  is_wishlist?: boolean;
 }
 
 export function useBooks(filters?: {

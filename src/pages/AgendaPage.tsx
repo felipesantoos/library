@@ -75,6 +75,14 @@ export function AgendaPage() {
     }
   };
 
+  const handleSubmit = async (command: CreateAgendaBlockCommand | UpdateAgendaBlockCommand) => {
+    if ('id' in command) {
+      await handleUpdate(command);
+    } else {
+      await handleCreate(command);
+    }
+  };
+
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this agenda block?')) {
       try {
@@ -165,7 +173,7 @@ export function AgendaPage() {
               block={editingBlock}
               books={books}
               defaultDate={selectedDate.toISOString().split('T')[0]}
-              onSubmit={editingBlock ? handleUpdate : handleCreate}
+              onSubmit={handleSubmit}
               onCancel={handleCancel}
             />
           )}
@@ -368,7 +376,7 @@ function DayDetails({
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <Stack spacing="xs">
+                        <Stack spacing="sm">
                           {block.start_time && block.end_time && (
                             <MetaText className="text-xs">
                               {formatTime(block.start_time)} - {formatTime(block.end_time)}
