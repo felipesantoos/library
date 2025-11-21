@@ -6,6 +6,7 @@ pub mod settings_commands;
 pub mod tag_commands;
 pub mod collection_commands;
 pub mod journal_commands;
+pub mod agenda_commands;
 
 pub use book_commands::*;
 pub use session_commands::*;
@@ -15,3 +16,4 @@ pub use settings_commands::*;
 pub use tag_commands::*;
 pub use collection_commands::*;
 pub use journal_commands::*;
+pub use agenda_commands::*;

@@ -17,20 +17,7 @@ import { ArchivePage } from "./pages/ArchivePage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { CollectionsPage } from "./pages/CollectionsPage";
 import { JournalPage } from "./pages/JournalPage";
-
-// Placeholder pages
-function AgendaPage() {
-  return (
-    <Container>
-      <div className="py-8">
-        <Heading level={1}>The Reading Almanac</Heading>
-        <p className="mt-4 text-text-secondary dark:text-dark-text-secondary">
-          Your reading agenda will appear here.
-        </p>
-      </div>
-    </Container>
-  );
-}
+import { AgendaPage } from "./pages/AgendaPage";
 
 // ArchivePage and WishlistPage are imported above
 

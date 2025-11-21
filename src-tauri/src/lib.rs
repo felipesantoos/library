@@ -28,6 +28,8 @@ use adapters::tauri::commands::{
     add_books_to_collection, remove_book_from_collection,
     create_journal_entry, update_journal_entry, delete_journal_entry,
     get_journal_entry, list_journal_entries,
+    create_agenda_block, update_agenda_block, delete_agenda_block,
+    get_agenda_block, list_agenda_blocks, mark_agenda_block_completed,
 };
 
 pub fn run() {
@@ -89,6 +91,12 @@ pub fn run() {
             delete_journal_entry,
             get_journal_entry,
             list_journal_entries,
+            create_agenda_block,
+            update_agenda_block,
+            delete_agenda_block,
+            get_agenda_block,
+            list_agenda_blocks,
+            mark_agenda_block_completed,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
