@@ -144,28 +144,28 @@ export function CollectionSelector({
                   strokeWidth={1}
                   className="w-full"
                 >
-                  <input
-                    type="text"
-                    value={newCollectionName}
-                    onChange={(e) => setNewCollectionName(e.target.value)}
-                    placeholder="Collection name"
+                <input
+                  type="text"
+                  value={newCollectionName}
+                  onChange={(e) => setNewCollectionName(e.target.value)}
+                  placeholder="Collection name"
                     className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    disabled={creating}
-                  />
+                  disabled={creating}
+                />
                 </HandDrawnBox>
                 <HandDrawnBox
                   borderRadius={6}
                   strokeWidth={1}
                   className="w-full"
                 >
-                  <textarea
-                    value={newCollectionDescription}
-                    onChange={(e) => setNewCollectionDescription(e.target.value)}
-                    placeholder="Optional description"
-                    rows={2}
+                <textarea
+                  value={newCollectionDescription}
+                  onChange={(e) => setNewCollectionDescription(e.target.value)}
+                  placeholder="Optional description"
+                  rows={2}
                     className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                    disabled={creating}
-                  />
+                  disabled={creating}
+                />
                 </HandDrawnBox>
                 <button
                   type="submit"

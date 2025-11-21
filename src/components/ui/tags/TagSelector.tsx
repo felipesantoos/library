@@ -131,14 +131,14 @@ export function TagSelector({
                   strokeWidth={1}
                   className="w-full"
                 >
-                  <input
-                    type="text"
-                    value={newTagName}
-                    onChange={(e) => setNewTagName(e.target.value)}
-                    placeholder="Tag name"
+                <input
+                  type="text"
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  placeholder="Tag name"
                     className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    disabled={creating}
-                  />
+                  disabled={creating}
+                />
                 </HandDrawnBox>
                 <div className="flex items-center gap-2">
                   <HandDrawnBox
@@ -146,13 +146,13 @@ export function TagSelector({
                     strokeWidth={1}
                     className="w-8 h-8"
                   >
-                    <input
-                      type="color"
-                      value={newTagColor || '#000000'}
-                      onChange={(e) => setNewTagColor(e.target.value)}
+                  <input
+                    type="color"
+                    value={newTagColor || '#000000'}
+                    onChange={(e) => setNewTagColor(e.target.value)}
                       className="w-full h-full rounded cursor-pointer opacity-0 absolute inset-0"
-                      disabled={creating}
-                    />
+                    disabled={creating}
+                  />
                     <div className="w-full h-full rounded" style={{ backgroundColor: newTagColor || '#000000' }} />
                   </HandDrawnBox>
                   <div className="flex gap-1 flex-1 flex-wrap">

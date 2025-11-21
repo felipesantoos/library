@@ -103,7 +103,7 @@ export function Sidebar() {
         }}
         className={cn(
           'relative h-16 flex items-center transition-all duration-300',
-          isExpanded ? 'px-4' : 'px-0 justify-center'
+        isExpanded ? 'px-4' : 'px-0 justify-center'
         )}
       >
         <HandDrawnBorder

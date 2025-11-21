@@ -94,13 +94,13 @@ export function NotesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
               <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <input
-                  type="text"
-                  placeholder="Search notes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+              <input
+                type="text"
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
+              />
               </HandDrawnBox>
               {searchQuery && (
                 <button
@@ -123,15 +123,15 @@ export function NotesPage() {
                   Type
                 </label>
                 <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value as any)}
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value as any)}
                     className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
+                >
                   <option value="all">All Types</option>
                   <option value="note">Notes</option>
                   <option value="highlight">Highlights</option>
-                  </select>
+                </select>
                 </HandDrawnBox>
               </div>
 
@@ -140,17 +140,17 @@ export function NotesPage() {
                   Sentiment
                 </label>
                 <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={sentimentFilter}
-                    onChange={(e) => setSentimentFilter(e.target.value as any)}
+                <select
+                  value={sentimentFilter}
+                  onChange={(e) => setSentimentFilter(e.target.value as any)}
                     className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
+                >
                   <option value="all">All Sentiments</option>
                   <option value="inspiration">Inspiration</option>
                   <option value="doubt">Doubt</option>
                   <option value="reflection">Reflection</option>
                   <option value="learning">Learning</option>
-                  </select>
+                </select>
                 </HandDrawnBox>
               </div>
 
@@ -159,7 +159,7 @@ export function NotesPage() {
                   Book
                 </label>
                 <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
+                <select
                   value={bookFilter || ''}
                   onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
                   className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
@@ -351,12 +351,12 @@ function NoteForm({
                 Book *
               </label>
               <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <select
-                  required
-                  value={bookId || ''}
-                  onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
+              <select
+                required
+                value={bookId || ''}
+                onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
                   className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
+              >
                 <option value="">Select a book...</option>
                 {books
                   .filter((b) => !b.is_archived)
@@ -365,7 +365,7 @@ function NoteForm({
                       {book.title} {book.author ? `by ${book.author}` : ''}
                     </option>
                   ))}
-                </select>
+              </select>
               </HandDrawnBox>
             </div>
 
@@ -374,15 +374,15 @@ function NoteForm({
                 Type *
               </label>
               <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <select
-                  required
-                  value={noteType}
-                  onChange={(e) => setNoteType(e.target.value as any)}
+              <select
+                required
+                value={noteType}
+                onChange={(e) => setNoteType(e.target.value as any)}
                   className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="note">Note</option>
-                  <option value="highlight">Highlight</option>
-                </select>
+              >
+                <option value="note">Note</option>
+                <option value="highlight">Highlight</option>
+              </select>
               </HandDrawnBox>
             </div>
           </div>
@@ -393,14 +393,14 @@ function NoteForm({
                 Page
               </label>
               <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <input
-                  type="number"
-                  min="0"
-                  value={page || ''}
-                  onChange={(e) => setPage(e.target.value ? parseInt(e.target.value) : null)}
+              <input
+                type="number"
+                min="0"
+                value={page || ''}
+                onChange={(e) => setPage(e.target.value ? parseInt(e.target.value) : null)}
                   className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  placeholder="Optional"
-                />
+                placeholder="Optional"
+              />
               </HandDrawnBox>
             </div>
 
@@ -410,17 +410,17 @@ function NoteForm({
               </label>
               <div className="flex items-center gap-2">
                 <HandDrawnBox borderRadius={6} strokeWidth={1} className="flex-1">
-                  <select
-                    value={sentiment}
-                    onChange={(e) => setSentiment(e.target.value)}
+                <select
+                  value={sentiment}
+                  onChange={(e) => setSentiment(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
+                >
                   <option value="">None</option>
                   <option value="inspiration">Inspiration</option>
                   <option value="doubt">Doubt</option>
-                    <option value="reflection">Reflection</option>
-                    <option value="learning">Learning</option>
-                  </select>
+                  <option value="reflection">Reflection</option>
+                  <option value="learning">Learning</option>
+                </select>
                 </HandDrawnBox>
                 {sentiment && (
                   <SentimentBadge sentiment={sentiment as any} size="md" variant="outline" />
@@ -435,14 +435,14 @@ function NoteForm({
                 Excerpt *
               </label>
               <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <textarea
-                  required
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  rows={2}
+              <textarea
+                required
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                rows={2}
                   className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                  placeholder="Selected text..."
-                />
+                placeholder="Selected text..."
+              />
               </HandDrawnBox>
             </div>
           )}
@@ -452,26 +452,26 @@ function NoteForm({
               Content *
             </label>
             <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-              <textarea
-                required
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={4}
+            <textarea
+              required
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={4}
                 className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                placeholder="Your note or comment..."
-              />
+              placeholder="Your note or comment..."
+            />
             </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">
             <HandDrawnBox borderRadius={6} strokeWidth={1}>
-              <button
-                type="button"
-                onClick={onCancel}
+            <button
+              type="button"
+              onClick={onCancel}
                 className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
-              >
-                Cancel
-              </button>
+            >
+              Cancel
+            </button>
             </HandDrawnBox>
             <button
               type="submit"
