@@ -26,6 +26,8 @@ use adapters::tauri::commands::{
     create_tag, list_tags, delete_tag, add_tags_to_book, remove_tag_from_book,
     create_collection, list_collections, update_collection, delete_collection,
     add_books_to_collection, remove_book_from_collection,
+    create_journal_entry, update_journal_entry, delete_journal_entry,
+    get_journal_entry, list_journal_entries,
 };
 
 pub fn run() {
@@ -82,6 +84,11 @@ pub fn run() {
             delete_collection,
             add_books_to_collection,
             remove_book_from_collection,
+            create_journal_entry,
+            update_journal_entry,
+            delete_journal_entry,
+            get_journal_entry,
+            list_journal_entries,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

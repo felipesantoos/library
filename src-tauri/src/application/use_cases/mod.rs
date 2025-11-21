@@ -8,4 +8,5 @@ pub mod goals;
 pub mod settings;
 pub mod tags;
 pub mod collections;
+pub mod journal;
 

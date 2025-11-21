@@ -8,6 +8,7 @@ pub mod sqlite_goal_repository;
 pub mod sqlite_settings_repository;
 pub mod sqlite_tag_repository;
 pub mod sqlite_collection_repository;
+pub mod sqlite_journal_repository;
 
 pub use sqlite_book_repository::*;
 pub use sqlite_session_repository::*;
@@ -16,4 +17,5 @@ pub use sqlite_goal_repository::*;
 pub use sqlite_settings_repository::*;
 pub use sqlite_tag_repository::*;
 pub use sqlite_collection_repository::*;
+pub use sqlite_journal_repository::*;
 

@@ -8,6 +8,7 @@ pub mod goal_repository;
 pub mod settings_repository;
 pub mod tag_repository;
 pub mod collection_repository;
+pub mod journal_repository;
 
 pub use book_repository::*;
 pub use session_repository::*;

@@ -10,7 +10,8 @@ import {
   Settings,
   Archive,
   Heart,
-  FolderKanban
+  FolderKanban,
+  BookMarked
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ const navigation = [
   { name: 'Sessions', path: '/sessions', icon: Clock },
   { name: 'Notes', path: '/notes', icon: FileText },
   { name: 'Goals & Stats', path: '/goals', icon: Target },
+  { name: 'Journal', path: '/journal', icon: BookMarked },
   { name: 'Collections', path: '/collections', icon: FolderKanban },
   { name: 'Agenda', path: '/agenda', icon: Calendar },
   { name: 'Archive', path: '/archive', icon: Archive },

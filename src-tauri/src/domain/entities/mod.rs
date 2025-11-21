@@ -6,6 +6,7 @@ pub mod reading;
 pub mod setting;
 pub mod tag;
 pub mod collection;
+pub mod journal_entry;
 
 pub use book::*;
 pub use session::*;

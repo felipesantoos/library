@@ -16,6 +16,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { ArchivePage } from "./pages/ArchivePage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { CollectionsPage } from "./pages/CollectionsPage";
+import { JournalPage } from "./pages/JournalPage";
 
 // Placeholder pages
 function AgendaPage() {
@@ -51,6 +52,7 @@ function App() {
           <Route path="/book/:id/progress-correction" element={<ProgressCorrectionPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/journal" element={<JournalPage />} />
           <Route path="/agenda" element={<AgendaPage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
