@@ -6,6 +6,7 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
 import { BookOpen, Archive, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function ArchivePage() {
   const navigate = useNavigate();
@@ -101,8 +102,10 @@ function ArchivedBookCard({
     <Section padding="md" className="hover:shadow-medium hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 ease-in-out">
       <Stack spacing="sm">
         {/* Cover */}
-        <div
-          className="aspect-[3/4] bg-background-surface border border-background-border rounded-md flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent-primary/50 transition-all duration-200 ease-in-out"
+        <HandDrawnBox
+          borderRadius={8}
+          strokeWidth={1}
+          className="aspect-[3/4] bg-background-surface rounded-md flex items-center justify-center overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
           onClick={onClick}
         >
           {book.cover_url ? (
@@ -114,7 +117,7 @@ function ArchivedBookCard({
           ) : (
             <BookOpen className="w-12 h-12 text-text-secondary" />
           )}
-        </div>
+        </HandDrawnBox>
 
         {/* Info */}
         <div onClick={onClick} className="cursor-pointer">

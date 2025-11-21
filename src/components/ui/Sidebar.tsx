@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { HandDrawnCircle } from './HandDrawnCircle';
 import { DecorativeArrow } from './DecorativeArrow';
+import { HandDrawnBorder } from './HandDrawnBorder';
 
 const navigation = [
   { name: 'Home', path: '/', icon: Home },
@@ -37,6 +38,8 @@ const SIDEBAR_STATE_KEY = 'sidebar-expanded';
 
 export function Sidebar() {
   const location = useLocation();
+  const sidebarRef = useRef<HTMLElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isExpanded, setIsExpanded] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_STATE_KEY);
     return saved ? JSON.parse(saved) : true;
@@ -46,22 +49,71 @@ export function Sidebar() {
     localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(isExpanded));
   }, [isExpanded]);
 
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (sidebarRef.current) {
+        const rect = sidebarRef.current.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    updateDimensions();
+    
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (sidebarRef.current) {
+      resizeObserver.observe(sidebarRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isExpanded]);
+
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
 
   return (
     <aside 
+      ref={sidebarRef}
       className={cn(
-        'flex flex-col bg-background-surface dark:bg-dark-background-surface border-r border-background-border dark:border-dark-background-border transition-all duration-300',
+        'relative flex flex-col bg-background-surface dark:bg-dark-background-surface transition-all duration-300',
         isExpanded ? 'w-64' : 'w-20'
       )}
     >
+      {dimensions.width > 0 && dimensions.height > 0 && (
+        <HandDrawnBorder
+          width={dimensions.width}
+          height={dimensions.height}
+          borderRadius={0}
+          strokeWidth={1}
+          sides="right"
+          className="pointer-events-none"
+        />
+      )}
       {/* Logo Section */}
-      <div className={cn(
-        'h-16 flex items-center border-b border-background-border dark:border-dark-background-border transition-all duration-300',
-        isExpanded ? 'px-4' : 'px-0 justify-center'
-      )}>
+      <div 
+        ref={(el) => {
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+              // Update border for this section
+            }
+          }
+        }}
+        className={cn(
+          'relative h-16 flex items-center transition-all duration-300',
+          isExpanded ? 'px-4' : 'px-0 justify-center'
+        )}
+      >
+        <HandDrawnBorder
+          width={isExpanded ? 256 : 80}
+          height={64}
+          borderRadius={0}
+          strokeWidth={1}
+          sides="bottom"
+          className="pointer-events-none"
+        />
         {isExpanded ? (
           <div className="flex items-center space-x-3 w-full">
             <div className="w-8 h-8 flex-shrink-0 bg-accent-primary rounded-md flex items-center justify-center">
@@ -136,9 +188,17 @@ export function Sidebar() {
 
       {/* Toggle Button */}
       <div className={cn(
-        'border-t border-background-border dark:border-dark-background-border transition-all duration-300',
+        'relative transition-all duration-300',
         isExpanded ? 'px-4 py-3' : 'px-0 py-3 flex justify-center'
       )}>
+        <HandDrawnBorder
+          width={isExpanded ? 256 : 80}
+          height={60}
+          borderRadius={0}
+          strokeWidth={1}
+          sides="top"
+          className="pointer-events-none"
+        />
         <button
           onClick={toggleSidebar}
           className={cn(

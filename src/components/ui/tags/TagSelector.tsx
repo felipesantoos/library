@@ -3,6 +3,7 @@ import { useTags, TagDto, createTag, CreateTagCommand } from '@/hooks/useTags';
 import { Tag } from './Tag';
 import { X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface TagSelectorProps {
   selectedTagIds: number[];
@@ -65,7 +66,11 @@ export function TagSelector({
   return (
     <div className="relative">
       {/* Selected Tags Display */}
-      <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 border border-background-border rounded-md bg-background-surface">
+      <HandDrawnBox
+        borderRadius={8}
+        strokeWidth={1}
+        className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 rounded-md bg-background-surface"
+      >
         {selectedTags.length === 0 && (
           <span className="text-text-secondary text-sm py-1">
             No tags selected
@@ -88,11 +93,15 @@ export function TagSelector({
           <Plus className="w-4 h-4" />
           <span>Add tag</span>
         </button>
-      </div>
+      </HandDrawnBox>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full bg-background-base border border-background-border rounded-md shadow-lg max-h-64 overflow-y-auto">
+        <HandDrawnBox
+          borderRadius={8}
+          strokeWidth={1}
+          className="absolute z-10 mt-2 w-full bg-background-base rounded-md shadow-lg max-h-64 overflow-y-auto"
+        >
           <div className="p-2">
             {/* Available Tags */}
             {availableTags.length > 0 && (
@@ -117,45 +126,58 @@ export function TagSelector({
             <form onSubmit={handleCreateTag} className="border-t border-background-border pt-2 mt-2">
               <div className="text-xs text-text-secondary mb-2 px-2">Create new tag</div>
               <div className="space-y-2">
-                <input
-                  type="text"
-                  value={newTagName}
-                  onChange={(e) => setNewTagName(e.target.value)}
-                  placeholder="Tag name"
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  disabled={creating}
-                />
-                <div className="flex items-center gap-2">
+                <HandDrawnBox
+                  borderRadius={6}
+                  strokeWidth={1}
+                  className="w-full"
+                >
                   <input
-                    type="color"
-                    value={newTagColor || '#000000'}
-                    onChange={(e) => setNewTagColor(e.target.value)}
-                    className="w-8 h-8 rounded border border-background-border cursor-pointer"
+                    type="text"
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    placeholder="Tag name"
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
                     disabled={creating}
                   />
+                </HandDrawnBox>
+                <div className="flex items-center gap-2">
+                  <HandDrawnBox
+                    borderRadius={6}
+                    strokeWidth={1}
+                    className="w-8 h-8"
+                  >
+                    <input
+                      type="color"
+                      value={newTagColor || '#000000'}
+                      onChange={(e) => setNewTagColor(e.target.value)}
+                      className="w-full h-full rounded cursor-pointer opacity-0 absolute inset-0"
+                      disabled={creating}
+                    />
+                    <div className="w-full h-full rounded" style={{ backgroundColor: newTagColor || '#000000' }} />
+                  </HandDrawnBox>
                   <div className="flex gap-1 flex-1 flex-wrap">
                     {predefinedColors.map((color) => (
-                      <button
+                      <HandDrawnBox
                         key={color}
-                        type="button"
-                        onClick={() => setNewTagColor(color)}
+                        borderRadius={6}
+                        strokeWidth={1}
                         className={cn(
-                          "w-6 h-6 rounded border border-background-border hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out",
+                          "w-6 h-6 rounded hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out cursor-pointer",
                           newTagColor === color && "ring-2 ring-accent-primary"
                         )}
                         style={{ backgroundColor: color }}
-                        disabled={creating}
+                        onClick={() => !creating && setNewTagColor(color)}
                       />
                     ))}
                     {newTagColor && (
-                      <button
-                        type="button"
-                        onClick={() => setNewTagColor('')}
-                        className="w-6 h-6 rounded border border-background-border flex items-center justify-center hover:bg-background-surface hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
-                        disabled={creating}
+                      <HandDrawnBox
+                        borderRadius={6}
+                        strokeWidth={1}
+                        className="w-6 h-6 rounded flex items-center justify-center hover:bg-background-surface hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out cursor-pointer"
+                        onClick={() => !creating && setNewTagColor('')}
                       >
                         <X className="w-3 h-3" />
-                      </button>
+                      </HandDrawnBox>
                     )}
                   </div>
                 </div>
@@ -169,7 +191,7 @@ export function TagSelector({
               </div>
             </form>
           </div>
-        </div>
+        </HandDrawnBox>
       )}
 
       {/* Backdrop to close */}

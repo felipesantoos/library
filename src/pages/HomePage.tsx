@@ -7,6 +7,7 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
 import { BookOpen, Play, Target, TrendingUp, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ export function HomePage() {
                     <Stack spacing="md">
                       <div className="flex items-start space-x-4">
                         {/* Book Cover */}
-                        <div className="w-24 h-32 flex-shrink-0 bg-background-surface dark:bg-dark-background-surface border border-background-border dark:border-dark-background-border rounded-md overflow-hidden">
+                        <HandDrawnBox borderRadius={8} strokeWidth={1} className="w-24 h-32 flex-shrink-0 bg-background-surface dark:bg-dark-background-surface rounded-md overflow-hidden">
                           {currentBook.cover_url ? (
                             <img
                               src={currentBook.cover_url}
@@ -70,7 +71,7 @@ export function HomePage() {
                               <BookOpen className="w-12 h-12 text-text-secondary dark:text-dark-text-secondary" />
                             </div>
                           )}
-                        </div>
+                        </HandDrawnBox>
 
                         {/* Book Info */}
                         <div className="flex-1">

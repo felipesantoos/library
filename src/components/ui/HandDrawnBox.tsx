@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBorder } from './HandDrawnBorder';
 
-interface HandDrawnBoxProps {
+interface HandDrawnBoxProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
   borderRadius?: number;
@@ -21,6 +21,8 @@ export function HandDrawnBox({
   color,
   sides = 'all',
   removeBorderClass = true,
+  style,
+  ...props
 }: HandDrawnBoxProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -60,7 +62,8 @@ export function HandDrawnBox({
     <div
       ref={containerRef}
       className={cn('relative', processedClassName)}
-      style={{ border: 'none' }}
+      style={{ border: 'none', ...style }}
+      {...props}
     >
       {dimensions.width > 0 && dimensions.height > 0 && (
         <HandDrawnBorder

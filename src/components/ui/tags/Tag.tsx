@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface TagProps {
   name: string;
@@ -28,13 +29,61 @@ export function Tag({
 
   const variantStyles = {
     default: color
-      ? 'text-white border border-transparent'
-      : 'bg-accent-primary/20 text-accent-primary border border-accent-primary/30',
-    outline: 'bg-transparent border border-background-border text-text-primary',
+      ? 'text-white'
+      : 'bg-accent-primary/20 text-accent-primary',
+    outline: 'bg-transparent text-text-primary',
     ghost: 'bg-transparent text-text-secondary hover:text-text-primary',
   };
 
   const style = color ? { backgroundColor: color } : undefined;
+  const hasBorder = variant !== 'ghost';
+  
+  // Determine border color based on variant
+  const borderColor = variant === 'outline' 
+    ? 'hsl(var(--background-border))' 
+    : variant === 'default' && !color
+      ? 'hsl(var(--accent-primary) / 0.3)'
+      : 'transparent';
+
+  const content = (
+    <>
+      <span>{name}</span>
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 hover:bg-black/15 dark:hover:bg-white/15 rounded-full p-0.5 hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
+          aria-label={`Remove ${name} tag`}
+        >
+          <span className="text-xs leading-none">×</span>
+        </button>
+      )}
+    </>
+  );
+
+  if (hasBorder) {
+    return (
+      <HandDrawnBox
+        borderRadius={9999} // rounded-full equivalent
+        strokeWidth={1}
+        color={borderColor}
+        className={cn(
+          baseStyles,
+          sizeStyles[size],
+          variantStyles[variant],
+          onClick && 'cursor-pointer hover:opacity-90 hover:scale-[1.05] active:scale-[0.95]',
+          onRemove && 'pr-1',
+          onClick && 'transition-all duration-200 ease-in-out'
+        )}
+        style={style}
+        onClick={onClick}
+      >
+        {content}
+      </HandDrawnBox>
+    );
+  }
 
   return (
     <span
@@ -49,19 +98,7 @@ export function Tag({
       style={style}
       onClick={onClick}
     >
-      <span>{name}</span>
-      {onRemove && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="ml-1 hover:bg-black/15 dark:hover:bg-white/15 rounded-full p-0.5 hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
-          aria-label={`Remove ${name} tag`}
-        >
-          <span className="text-xs leading-none">×</span>
-        </button>
-      )}
+      {content}
     </span>
   );
 }

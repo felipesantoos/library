@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface SectionProps {
   children: ReactNode;
@@ -20,18 +21,19 @@ export function Section({
   };
 
   return (
-    <section 
+    <HandDrawnBox
+      borderRadius={8}
+      strokeWidth={1}
       className={cn(
         'rounded-md',
         'bg-background-surface dark:bg-dark-background-surface',
-        'border border-background-border dark:border-dark-background-border',
         'shadow-soft',
         paddingClasses[padding],
         className
       )}
     >
       {children}
-    </section>
+    </HandDrawnBox>
   );
 }
 

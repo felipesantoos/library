@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCollections, CollectionDto, createCollection, CreateCollectionCommand } from '@/hooks/useCollections';
 import { cn } from '@/lib/utils';
 import { Plus, FolderKanban, X } from 'lucide-react';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface CollectionSelectorProps {
   selectedCollectionIds: number[];
@@ -65,16 +66,23 @@ export function CollectionSelector({
   return (
     <div className="relative">
       {/* Selected Collections Display */}
-      <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 border border-background-border rounded-md bg-background-surface">
+      <HandDrawnBox
+        borderRadius={8}
+        strokeWidth={1}
+        className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 rounded-md bg-background-surface"
+      >
         {selectedCollections.length === 0 && (
           <span className="text-text-secondary text-sm py-1">
             No collections selected
           </span>
         )}
         {selectedCollections.map((collection) => (
-          <div
+          <HandDrawnBox
             key={collection.id}
-            className="flex items-center gap-1 px-2 py-1 rounded-md bg-accent-primary/20 text-accent-primary border border-accent-primary/30"
+            borderRadius={6}
+            strokeWidth={1}
+            color="hsl(var(--accent-primary) / 0.3)"
+            className="flex items-center gap-1 px-2 py-1 rounded-md bg-accent-primary/20 text-accent-primary"
           >
             <FolderKanban className="w-3 h-3" />
             <span className="text-sm">{collection.name}</span>
@@ -86,7 +94,7 @@ export function CollectionSelector({
             >
               <X className="w-3 h-3" />
             </button>
-          </div>
+          </HandDrawnBox>
         ))}
         <button
           type="button"
@@ -96,11 +104,15 @@ export function CollectionSelector({
           <Plus className="w-4 h-4" />
           <span>Add collection</span>
         </button>
-      </div>
+      </HandDrawnBox>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full bg-background-base border border-background-border rounded-md shadow-lg max-h-64 overflow-y-auto">
+        <HandDrawnBox
+          borderRadius={8}
+          strokeWidth={1}
+          className="absolute z-10 mt-2 w-full bg-background-base rounded-md shadow-lg max-h-64 overflow-y-auto"
+        >
           <div className="p-2">
             {/* Available Collections */}
             {availableCollections.length > 0 && (
@@ -108,15 +120,16 @@ export function CollectionSelector({
                 <div className="text-xs text-text-secondary mb-1 px-2">Existing collections</div>
                 <div className="flex flex-wrap gap-1">
                   {availableCollections.map((collection) => (
-                    <button
+                    <HandDrawnBox
                       key={collection.id}
-                      type="button"
+                      borderRadius={6}
+                      strokeWidth={1}
+                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-background-surface text-text-primary hover:bg-accent-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-sm cursor-pointer"
                       onClick={() => handleToggleCollection(collection.id!)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-background-surface border border-background-border text-text-primary hover:bg-accent-primary/10 hover:border-accent-primary hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-sm"
                     >
                       <FolderKanban className="w-3 h-3" />
                       <span>{collection.name}</span>
-                    </button>
+                    </HandDrawnBox>
                   ))}
                 </div>
               </div>
@@ -126,22 +139,34 @@ export function CollectionSelector({
             <form onSubmit={handleCreateCollection} className="border-t border-background-border pt-2 mt-2">
               <div className="text-xs text-text-secondary mb-2 px-2">Create new collection</div>
               <div className="space-y-2">
-                <input
-                  type="text"
-                  value={newCollectionName}
-                  onChange={(e) => setNewCollectionName(e.target.value)}
-                  placeholder="Collection name"
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  disabled={creating}
-                />
-                <textarea
-                  value={newCollectionDescription}
-                  onChange={(e) => setNewCollectionDescription(e.target.value)}
-                  placeholder="Optional description"
-                  rows={2}
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                  disabled={creating}
-                />
+                <HandDrawnBox
+                  borderRadius={6}
+                  strokeWidth={1}
+                  className="w-full"
+                >
+                  <input
+                    type="text"
+                    value={newCollectionName}
+                    onChange={(e) => setNewCollectionName(e.target.value)}
+                    placeholder="Collection name"
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    disabled={creating}
+                  />
+                </HandDrawnBox>
+                <HandDrawnBox
+                  borderRadius={6}
+                  strokeWidth={1}
+                  className="w-full"
+                >
+                  <textarea
+                    value={newCollectionDescription}
+                    onChange={(e) => setNewCollectionDescription(e.target.value)}
+                    placeholder="Optional description"
+                    rows={2}
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                    disabled={creating}
+                  />
+                </HandDrawnBox>
                 <button
                   type="submit"
                   disabled={!newCollectionName.trim() || creating}
@@ -152,7 +177,7 @@ export function CollectionSelector({
               </div>
             </form>
           </div>
-        </div>
+        </HandDrawnBox>
       )}
 
       {/* Backdrop to close */}

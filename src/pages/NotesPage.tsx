@@ -7,6 +7,7 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { SentimentBadge } from '@/components/ui/notes/SentimentBadge';
 import { BookOpen, Plus, Search, Trash2, FileText, Highlighter, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function NotesPage() {
   const navigate = useNavigate();
@@ -92,13 +93,15 @@ export function NotesPage() {
           <Section padding="sm">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
-              <input
-                type="text"
-                placeholder="Search notes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="text"
+                  placeholder="Search notes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
@@ -119,42 +122,47 @@ export function NotesPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Type
                 </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
                   <option value="all">All Types</option>
                   <option value="note">Notes</option>
                   <option value="highlight">Highlights</option>
-                </select>
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Sentiment
                 </label>
-                <select
-                  value={sentimentFilter}
-                  onChange={(e) => setSentimentFilter(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={sentimentFilter}
+                    onChange={(e) => setSentimentFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
                   <option value="all">All Sentiments</option>
                   <option value="inspiration">Inspiration</option>
                   <option value="doubt">Doubt</option>
                   <option value="reflection">Reflection</option>
                   <option value="learning">Learning</option>
-                </select>
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[200px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Book
                 </label>
-                <select
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
                   value={bookFilter || ''}
                   onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
                 >
                   <option value="">All Books</option>
                   {books.map((book) => (
@@ -163,6 +171,7 @@ export function NotesPage() {
                     </option>
                   ))}
                 </select>
+                </HandDrawnBox>
               </div>
             </Stack>
           </Section>
@@ -341,12 +350,13 @@ function NoteForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Book *
               </label>
-              <select
-                required
-                value={bookId || ''}
-                onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <select
+                  required
+                  value={bookId || ''}
+                  onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                >
                 <option value="">Select a book...</option>
                 {books
                   .filter((b) => !b.is_archived)
@@ -355,22 +365,25 @@ function NoteForm({
                       {book.title} {book.author ? `by ${book.author}` : ''}
                     </option>
                   ))}
-              </select>
+                </select>
+              </HandDrawnBox>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Type *
               </label>
-              <select
-                required
-                value={noteType}
-                onChange={(e) => setNoteType(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
-                <option value="note">Note</option>
-                <option value="highlight">Highlight</option>
-              </select>
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <select
+                  required
+                  value={noteType}
+                  onChange={(e) => setNoteType(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                >
+                  <option value="note">Note</option>
+                  <option value="highlight">Highlight</option>
+                </select>
+              </HandDrawnBox>
             </div>
           </div>
 
@@ -379,14 +392,16 @@ function NoteForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Page
               </label>
-              <input
-                type="number"
-                min="0"
-                value={page || ''}
-                onChange={(e) => setPage(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                placeholder="Optional"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="number"
+                  min="0"
+                  value={page || ''}
+                  onChange={(e) => setPage(e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  placeholder="Optional"
+                />
+              </HandDrawnBox>
             </div>
 
             <div>
@@ -394,17 +409,19 @@ function NoteForm({
                 Sentiment (optional)
               </label>
               <div className="flex items-center gap-2">
-                <select
-                  value={sentiment}
-                  onChange={(e) => setSentiment(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="flex-1">
+                  <select
+                    value={sentiment}
+                    onChange={(e) => setSentiment(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
                   <option value="">None</option>
                   <option value="inspiration">Inspiration</option>
                   <option value="doubt">Doubt</option>
-                  <option value="reflection">Reflection</option>
-                  <option value="learning">Learning</option>
-                </select>
+                    <option value="reflection">Reflection</option>
+                    <option value="learning">Learning</option>
+                  </select>
+                </HandDrawnBox>
                 {sentiment && (
                   <SentimentBadge sentiment={sentiment as any} size="md" variant="outline" />
                 )}
@@ -417,14 +434,16 @@ function NoteForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Excerpt *
               </label>
-              <textarea
-                required
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                rows={2}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                placeholder="Selected text..."
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <textarea
+                  required
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                  placeholder="Selected text..."
+                />
+              </HandDrawnBox>
             </div>
           )}
 
@@ -432,24 +451,28 @@ function NoteForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Content *
             </label>
-            <textarea
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-              placeholder="Your note or comment..."
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <textarea
+                required
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                placeholder="Your note or comment..."
+              />
+            </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-            >
-              Cancel
-            </button>
+            <HandDrawnBox borderRadius={6} strokeWidth={1}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
+              >
+                Cancel
+              </button>
+            </HandDrawnBox>
             <button
               type="submit"
               className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
