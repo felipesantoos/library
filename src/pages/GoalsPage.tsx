@@ -107,24 +107,24 @@ export function GoalsPage() {
               <Stack spacing="md">
                 <Heading level={3}>Statistics Overview</Heading>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-md bg-background-surface border border-background-border">
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="p-4 bg-background-surface">
                     <MetaText className="block mb-1">Total Pages</MetaText>
                     <Paragraph className="text-2xl font-bold">{statistics.total_pages_read}</Paragraph>
-                  </div>
-                  <div className="p-4 rounded-md bg-background-surface border border-background-border">
+                  </HandDrawnBox>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="p-4 bg-background-surface">
                     <MetaText className="block mb-1">Books Completed</MetaText>
                     <Paragraph className="text-2xl font-bold">{statistics.books_completed}</Paragraph>
-                  </div>
-                  <div className="p-4 rounded-md bg-background-surface border border-background-border">
+                  </HandDrawnBox>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="p-4 bg-background-surface">
                     <MetaText className="block mb-1">This Month</MetaText>
                     <Paragraph className="text-2xl font-bold">{statistics.pages_read_this_month}</Paragraph>
-                  </div>
-                  <div className="p-4 rounded-md bg-background-surface border border-background-border">
+                  </HandDrawnBox>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="p-4 bg-background-surface">
                     <MetaText className="block mb-1">Avg Pages/Session</MetaText>
                     <Paragraph className="text-2xl font-bold">
                       {statistics.average_pages_per_session.toFixed(1)}
                     </Paragraph>
-                  </div>
+                  </HandDrawnBox>
                 </div>
               </Stack>
             </Section>
@@ -207,9 +207,12 @@ export function GoalsPage() {
                   {rankings.bestMonths.map((month, index) => {
                     const monthName = new Date(2000, month.month - 1).toLocaleString('en-US', { month: 'long' });
                     return (
-                      <div
+                      <HandDrawnBox
                         key={`${month.year}-${month.month}`}
-                        className="p-3 rounded-md bg-background-surface border border-background-border"
+                        borderRadius={6}
+                        strokeWidth={1}
+                        linearCorners={true}
+                        className="p-3 bg-background-surface"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-text-primary">
@@ -226,7 +229,7 @@ export function GoalsPage() {
                         </div>
                         <Paragraph className="text-sm font-medium">{monthName} {month.year}</Paragraph>
                         <MetaText className="text-xs">{month.pages} pages</MetaText>
-                      </div>
+                      </HandDrawnBox>
                     );
                   })}
                 </div>
@@ -477,13 +480,13 @@ function GoalForm({
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Year
                   </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                     <input
                       type="number"
                       required
                       value={periodYear}
                       onChange={(e) => setPeriodYear(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                       min={2020}
                       max={2100}
                     />
@@ -493,20 +496,17 @@ function GoalForm({
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Month
                   </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                    <select
-                      required
-                      value={periodMonth}
-                      onChange={(e) => setPeriodMonth(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    >
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                        <option key={month} value={month}>
-                          {new Date(2000, month - 1).toLocaleString('en-US', { month: 'long' })}
-                        </option>
-                      ))}
-                    </select>
-                  </HandDrawnBox>
+                  <HandDrawnDropdown
+                    options={Array.from({ length: 12 }, (_, i) => i + 1).map((month) => ({
+                      value: month,
+                      label: new Date(2000, month - 1).toLocaleString('en-US', { month: 'long' }),
+                    }))}
+                    value={periodMonth}
+                    onChange={(value) => setPeriodMonth(value ? (typeof value === 'number' ? value : parseInt(value as string)) : currentMonth)}
+                    placeholder="Select month..."
+                    borderRadius={6}
+                    strokeWidth={1}
+                  />
                 </div>
               </>
             )}
@@ -516,13 +516,13 @@ function GoalForm({
                 <label className="block text-sm font-medium text-text-primary mb-1">
                   Year
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                   <input
                     type="number"
                     required
                     value={periodYear}
                     onChange={(e) => setPeriodYear(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                     min={2020}
                     max={2100}
                   />
@@ -543,14 +543,14 @@ function GoalForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Target *
             </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <input
                 type="number"
                 required
                 min={1}
                 value={targetValue}
                 onChange={(e) => setTargetValue(parseInt(e.target.value))}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                 placeholder={
                   goalType === 'pages_monthly'
                     ? 'e.g., 500 pages'

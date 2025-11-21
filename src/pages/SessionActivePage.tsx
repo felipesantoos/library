@@ -208,28 +208,44 @@ export function SessionActivePage() {
           <form onSubmit={handleSubmit}>
             <Section padding="lg">
               <Stack spacing="md">
-                {/* Book Selector */}
-                <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1">
-                    Book *
-                  </label>
-                  <HandDrawnDropdown
-                    options={[
-                      { value: '', label: 'Select a book...' },
-                      ...books
-                        .filter((b) => !b.is_archived)
-                        .map((book) => ({
-                          value: book.id || 0,
-                          label: `${book.title}${book.author ? ` by ${book.author}` : ''}`,
-                        })),
-                    ]}
-                    value={bookId || ''}
-                    onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
-                    placeholder="Select a book..."
-                    searchable={books.filter((b) => !b.is_archived).length > 5}
-                    borderRadius={6}
-                    strokeWidth={1}
-                  />
+                {/* Book and Date */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-1">
+                      Book *
+                    </label>
+                    <HandDrawnDropdown
+                      options={[
+                        { value: '', label: 'Select a book...' },
+                        ...books
+                          .filter((b) => !b.is_archived)
+                          .map((book) => ({
+                            value: book.id || 0,
+                            label: `${book.title}${book.author ? ` by ${book.author}` : ''}`,
+                          })),
+                      ]}
+                      value={bookId || ''}
+                      onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                      placeholder="Select a book..."
+                      searchable={books.filter((b) => !b.is_archived).length > 5}
+                      borderRadius={6}
+                      strokeWidth={1}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-1">
+                      Date *
+                    </label>
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                      <input
+                        type="date"
+                        required
+                        value={sessionDate}
+                        onChange={(e) => setSessionDate(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
+                      />
+                    </HandDrawnBox>
+                  </div>
                 </div>
 
                 {selectedBook && (
@@ -241,21 +257,26 @@ export function SessionActivePage() {
                   </div>
                 )}
 
-                {/* Date */}
-                <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1">
-                    Date *
-                  </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-                    <input
-                      type="date"
-                      required
-                      value={sessionDate}
-                      onChange={(e) => setSessionDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
-                    />
-                  </HandDrawnBox>
-                </div>
+                {/* Minutes (for audiobooks) */}
+                {selectedBook && selectedBook.book_type === 'audiobook' && (
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-1">
+                      Minutes Read
+                    </label>
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        value={minutesRead || ''}
+                        onChange={(e) =>
+                          setMinutesRead(e.target.value ? parseInt(e.target.value) : null)
+                        }
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
+                        placeholder="Minutes"
+                      />
+                    </HandDrawnBox>
+                  </div>
+                )}
 
                 {/* Time Range */}
                 <div className="grid grid-cols-2 gap-4">
@@ -329,27 +350,6 @@ export function SessionActivePage() {
                         </Paragraph>
                       )}
                     </div>
-                  </div>
-                )}
-
-                {/* Minutes (for audiobooks) */}
-                {selectedBook && selectedBook.book_type === 'audiobook' && (
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">
-                      Minutes Read
-                    </label>
-                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-                      <input
-                        type="number"
-                        min="0"
-                        value={minutesRead || ''}
-                        onChange={(e) =>
-                          setMinutesRead(e.target.value ? parseInt(e.target.value) : null)
-                        }
-                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
-                        placeholder="Minutes"
-                      />
-                    </HandDrawnBox>
                   </div>
                 )}
 

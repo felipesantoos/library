@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, Search, X, Check } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { HandDrawnBox } from '../HandDrawnBox';
+import { DecorativeArrow } from '../DecorativeArrow';
 import { useTheme } from '@/theme/ThemeProvider';
 import { cn } from '@/lib/utils';
 
@@ -498,17 +499,17 @@ export function HandDrawnDropdown({
                             }}
                             onClick={() => handleOptionClick(option)}
                             className={cn(
-                              'px-3 py-2 text-sm cursor-pointer transition-colors',
-                              'flex items-center justify-between gap-2',
+                              'px-3 py-2 text-sm cursor-pointer transition-all duration-150',
+                              'flex items-center gap-2',
                               selected && 'bg-accent-primary/10',
                               flatIndex === focusedIndex && 'bg-accent-primary/20',
-                              !selected && flatIndex !== focusedIndex && 'hover:bg-background-surface/80',
+                              !selected && flatIndex !== focusedIndex && !option.disabled && 'hover:bg-accent-primary/10 hover:scale-[1.01]',
                               option.disabled && 'opacity-50 cursor-not-allowed'
                             )}
                           >
-                            <span className="flex-1">{option.label}</span>
+                            <span>{option.label}</span>
                             {selected && (
-                              <Check className="w-4 h-4 text-accent-primary flex-shrink-0" />
+                              <DecorativeArrow size={16} className="text-accent-primary flex-shrink-0" />
                             )}
                             {multiple && !selected && (
                               <div className="w-4 h-4 flex-shrink-0" />
@@ -531,17 +532,17 @@ export function HandDrawnDropdown({
                         }}
                         onClick={() => handleOptionClick(option)}
                         className={cn(
-                          'px-3 py-2 text-sm cursor-pointer transition-colors',
-                          'flex items-center justify-between gap-2',
+                          'px-3 py-2 text-sm cursor-pointer transition-all duration-150',
+                          'flex items-center gap-2',
                           selected && 'bg-accent-primary/10',
                           index === focusedIndex && 'bg-accent-primary/20',
-                          !selected && index !== focusedIndex && 'hover:bg-background-surface/80',
+                          !selected && index !== focusedIndex && !option.disabled && 'hover:bg-accent-primary/10 hover:scale-[1.01]',
                           option.disabled && 'opacity-50 cursor-not-allowed'
                         )}
                       >
-                        <span className="flex-1">{option.label}</span>
+                        <span>{option.label}</span>
                         {selected && (
-                          <Check className="w-4 h-4 text-accent-primary flex-shrink-0" />
+                          <DecorativeArrow size={40} stroke="currentColor" strokeWidth={50} className="text-accent-primary flex-shrink-0" />
                         )}
                         {multiple && !selected && (
                           <div className="w-4 h-4 flex-shrink-0" />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSessions, SessionDto } from '@/hooks/useSessions';
 import { useBooks } from '@/hooks/useBooks';
 import { Container, Stack, Section } from '@/components/ui/layout';
@@ -7,8 +8,10 @@ import { Clock, BookOpen, Calendar, Trash2, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { deleteSession } from '@/hooks/useSessions';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function SessionsPage() {
+  const navigate = useNavigate();
   const [bookFilter, setBookFilter] = useState<number | null>(null);
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   
@@ -92,38 +95,43 @@ export function SessionsPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Book
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={bookFilter || ''}
-                    onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All Books</option>
-                    {books.map((book) => (
-                      <option key={book.id} value={book.id || 0}>
-                        {book.title}
-                      </option>
-                    ))}
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: 0, label: 'All Books' },
+                    ...books.map((book) => ({
+                      value: book.id || 0,
+                      label: book.title,
+                    })),
+                  ]}
+                  value={bookFilter || 0}
+                  onChange={(value) => {
+                    const numValue = value ? (typeof value === 'number' ? value : parseInt(value as string)) : 0;
+                    setBookFilter(numValue === 0 ? null : numValue);
+                  }}
+                  placeholder="All Books"
+                  searchable={books.length > 5}
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               <div className="flex-1 min-w-[200px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Date Range
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="all">All Time</option>
-                    <option value="today">Today</option>
-                    <option value="week">Last 7 Days</option>
-                    <option value="month">Last 30 Days</option>
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: 'all', label: 'All Time' },
+                    { value: 'today', label: 'Today' },
+                    { value: 'week', label: 'Last 7 Days' },
+                    { value: 'month', label: 'Last 30 Days' },
+                  ]}
+                  value={dateFilter}
+                  onChange={(value) => setDateFilter(value ? (value as 'all' | 'today' | 'week' | 'month') : 'all')}
+                  placeholder="All Time"
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
             </Stack>
           </Section>

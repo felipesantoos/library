@@ -158,41 +158,57 @@ export function TagSelector({
                 />
                 </HandDrawnBox>
                 <div className="flex items-center gap-2">
-                  <HandDrawnBox
-                    borderRadius={6}
-                    strokeWidth={1}
-                    className="w-8 h-8"
-                  >
-                  <input
-                    type="color"
-                    value={newTagColor || '#000000'}
-                    onChange={(e) => setNewTagColor(e.target.value)}
-                      className="w-full h-full rounded cursor-pointer opacity-0 absolute inset-0"
-                    disabled={creating}
-                  />
-                    <div className="w-full h-full rounded" style={{ backgroundColor: newTagColor || '#000000' }} />
-                  </HandDrawnBox>
+                  <div className="relative w-8 h-8" style={{ backgroundColor: newTagColor || '#000000' }}>
+                    <HandDrawnBox
+                      borderRadius={6}
+                      strokeWidth={1.5}
+                      linearCorners={true}
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ zIndex: 10 }}
+                    >
+                      <div />
+                    </HandDrawnBox>
+                    <input
+                      type="color"
+                      value={newTagColor || '#000000'}
+                      onChange={(e) => setNewTagColor(e.target.value)}
+                      className="w-full h-full cursor-pointer opacity-0 absolute inset-0"
+                      style={{ zIndex: 20 }}
+                      disabled={creating}
+                    />
+                  </div>
                   <div className="flex gap-1 flex-1 flex-wrap">
-                    {predefinedColors.map((color) => (
-                      <div
-                        key={color}
-                        className={cn(
-                          "w-6 h-6 rounded hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out cursor-pointer",
-                          newTagColor === color && "ring-2 ring-accent-primary"
-                        )}
-                        style={{ backgroundColor: color }}
-                        onClick={() => !creating && setNewTagColor(color)}
-                      />
-                    ))}
+                    {predefinedColors.map((color) => {
+                      const isSelected = newTagColor === color;
+                      return (
+                        <div
+                          key={color}
+                          className={cn(
+                            "relative w-6 h-6 hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out cursor-pointer"
+                          )}
+                          style={{ backgroundColor: color }}
+                          onClick={() => !creating && setNewTagColor(color)}
+                        >
+                          <HandDrawnBox
+                            borderRadius={6}
+                            strokeWidth={isSelected ? 3 : 1.5}
+                            linearCorners={true}
+                            color="#000000"
+                            className="absolute inset-0 pointer-events-none"
+                            style={{ zIndex: 10 }}
+                          >
+                            <div />
+                          </HandDrawnBox>
+                        </div>
+                      );
+                    })}
                     {newTagColor && (
-                      <HandDrawnBox
-                        borderRadius={6}
-                        strokeWidth={1}
+                      <div
                         className="w-6 h-6 rounded flex items-center justify-center hover:bg-background-surface hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out cursor-pointer"
                         onClick={() => !creating && setNewTagColor('')}
                       >
                         <X className="w-3 h-3" />
-                      </HandDrawnBox>
+                      </div>
                     )}
                   </div>
                 </div>

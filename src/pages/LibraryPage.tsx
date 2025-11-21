@@ -10,6 +10,7 @@ import { Tag } from '@/components/ui/tags';
 import { BookOpen, Grid, List, FolderKanban, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 type ViewMode = 'grid' | 'list';
 
@@ -138,13 +139,13 @@ export function LibraryPage() {
           <Section padding="sm">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary z-10" />
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by title or author..."
-                  className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                 />
               </HandDrawnBox>
               {searchQuery && (
@@ -166,81 +167,91 @@ export function LibraryPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Status
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All</option>
-                    <option value="not_started">Not Started</option>
-                    <option value="reading">Reading</option>
-                    <option value="paused">Paused</option>
-                    <option value="completed">Completed</option>
-                    <option value="abandoned">Abandoned</option>
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: '', label: 'All' },
+                    { value: 'not_started', label: 'Not Started' },
+                    { value: 'reading', label: 'Reading' },
+                    { value: 'paused', label: 'Paused' },
+                    { value: 'completed', label: 'Completed' },
+                    { value: 'abandoned', label: 'Abandoned' },
+                  ]}
+                  value={statusFilter}
+                  onChange={(value) => setStatusFilter(value ? String(value) : '')}
+                  placeholder="All"
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Type
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All</option>
-                    <option value="physical_book">Physical Book</option>
-                    <option value="ebook">Ebook</option>
-                    <option value="audiobook">Audiobook</option>
-                    <option value="article">Article</option>
-                    <option value="PDF">PDF</option>
-                    <option value="comic">Comic</option>
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: '', label: 'All' },
+                    { value: 'physical_book', label: 'Physical Book' },
+                    { value: 'ebook', label: 'Ebook' },
+                    { value: 'audiobook', label: 'Audiobook' },
+                    { value: 'article', label: 'Article' },
+                    { value: 'PDF', label: 'PDF' },
+                    { value: 'comic', label: 'Comic' },
+                  ]}
+                  value={typeFilter}
+                  onChange={(value) => setTypeFilter(value ? String(value) : '')}
+                  placeholder="All"
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Tag
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={tagFilter || ''}
-                    onChange={(e) => setTagFilter(e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All Tags</option>
-                    {tags.map((tag) => (
-                      <option key={tag.id} value={tag.id}>
-                        {tag.name}
-                      </option>
-                    ))}
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: 0, label: 'All Tags' },
+                    ...tags.map((tag) => ({
+                      value: tag.id || 0,
+                      label: tag.name,
+                    })),
+                  ]}
+                  value={tagFilter || 0}
+                  onChange={(value) => {
+                    const numValue = value ? (typeof value === 'number' ? value : parseInt(value as string)) : 0;
+                    setTagFilter(numValue === 0 ? null : numValue);
+                  }}
+                  placeholder="All Tags"
+                  searchable={tags.length > 5}
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Collection
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={collectionFilter || ''}
-                    onChange={(e) => setCollectionFilter(e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All Collections</option>
-                    {collections.map((collection) => (
-                      <option key={collection.id} value={collection.id}>
-                        {collection.name}
-                      </option>
-                    ))}
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: 0, label: 'All Collections' },
+                    ...collections.map((collection) => ({
+                      value: collection.id || 0,
+                      label: collection.name,
+                    })),
+                  ]}
+                  value={collectionFilter || 0}
+                  onChange={(value) => {
+                    const numValue = value ? (typeof value === 'number' ? value : parseInt(value as string)) : 0;
+                    setCollectionFilter(numValue === 0 ? null : numValue);
+                  }}
+                  placeholder="All Collections"
+                  searchable={collections.length > 5}
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               {hasActiveFilters && (
