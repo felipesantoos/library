@@ -7,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   showBorder?: boolean;
+  linearCorners?: boolean;
 }
 
 export function Button({
@@ -16,6 +17,7 @@ export function Button({
   size = 'md',
   fullWidth = false,
   showBorder = true,
+  linearCorners = true,
   ...props
 }: ButtonProps) {
   const baseStyles = 'flex items-center justify-center transition-all duration-200 ease-in-out font-medium';
@@ -26,12 +28,14 @@ export function Button({
     lg: 'px-6 py-3 text-lg',
   };
 
-  const variantStyles = {
+  const getVariantStyles = (showBorder: boolean) => ({
     primary: 'bg-accent-primary text-background-surface dark:text-dark-text-primary hover:bg-accent-primary/90 text-accent-primary',
     secondary: 'bg-accent-secondary text-text-primary dark:text-dark-text-primary hover:bg-accent-secondary/90 text-accent-secondary',
-    outline: 'bg-transparent border border-background-border dark:border-dark-background-border text-text-primary dark:text-dark-text-primary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50',
+    outline: showBorder 
+      ? 'bg-transparent border-0 text-text-primary dark:text-dark-text-primary hover:bg-background-surface dark:hover:bg-dark-background-surface'
+      : 'bg-transparent border border-background-border dark:border-dark-background-border text-text-primary dark:text-dark-text-primary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50',
     ghost: 'bg-transparent border-0 text-text-secondary dark:text-dark-text-secondary hover:bg-accent-primary/15 hover:text-accent-primary dark:hover:text-dark-accent-primary',
-  };
+  });
 
   // Determine border color based on variant
   // For outline, we want the theme border color
@@ -55,6 +59,8 @@ export function Button({
       calc(100% - 7px) 100%, 100% 94%, calc(100% - 8px) 88%, 100% 80%, calc(100% - 6px) 72%, 100% 64%, calc(100% - 7px) 56%, 100% 48%, calc(100% - 8px) 40%, 100% 32%, calc(100% - 6px) 24%, 100% 16%, calc(100% - 7px) 8%, 100% 0%, calc(100% - 7px) 0%
     )`;
   };
+
+  const variantStyles = getVariantStyles(showBorder);
 
   const buttonElement = (
     <button
@@ -90,6 +96,7 @@ export function Button({
       borderRadius={6}
       strokeWidth={1}
       color={borderColor}
+      linearCorners={linearCorners}
       className={cn(
         'inline-block',
         fullWidth && 'w-full'

@@ -256,12 +256,15 @@ export function LibraryPage() {
 
               {hasActiveFilters && (
                 <div className="flex items-end">
-                  <button
-                    onClick={clearFilters}
-                    className="px-3 py-2 text-sm rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-                  >
-                    Clear Filters
-                  </button>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true}>
+                    <button
+                      onClick={clearFilters}
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-text-secondary hover:bg-background-surface transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Clear Filters</span>
+                    </button>
+                  </HandDrawnBox>
                 </div>
               )}
             </Stack>
@@ -281,12 +284,15 @@ export function LibraryPage() {
                     : 'Add your first book to get started'}
                 </Paragraph>
                 {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="mt-4 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
-                  >
-                    Clear All Filters
-                  </button>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="mt-4">
+                    <button
+                      onClick={clearFilters}
+                      className="flex items-center space-x-2 px-4 py-2 bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Clear All Filters</span>
+                    </button>
+                  </HandDrawnBox>
                 )}
               </div>
             </Section>

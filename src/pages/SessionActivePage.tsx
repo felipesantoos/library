@@ -370,14 +370,7 @@ export function SessionActivePage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/sessions')}
-                    className="px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-                  >
-                    Cancel
-                  </button>
+                <div className="flex items-center justify-end pt-4">
                   <button
                     type="submit"
                     disabled={loading || !bookId}

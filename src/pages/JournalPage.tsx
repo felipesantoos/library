@@ -6,6 +6,7 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { BookOpen, Plus, Edit2, Trash2, Calendar, Filter, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function JournalPage() {
   const [showForm, setShowForm] = useState(false);
@@ -132,32 +133,32 @@ export function JournalPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Book
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                  <select
-                    value={bookFilter || ''}
-                    onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    <option value="">All Books</option>
-                    {books.map((book) => (
-                      <option key={book.id} value={book.id || 0}>
-                        {book.title}
-                      </option>
-                    ))}
-                  </select>
-                </HandDrawnBox>
+                <HandDrawnDropdown
+                  options={[
+                    { value: '', label: 'All Books' },
+                    ...books.map((book) => ({
+                      value: book.id || 0,
+                      label: book.title,
+                    })),
+                  ]}
+                  value={bookFilter || ''}
+                  onChange={(value) => setBookFilter(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                  placeholder="All Books"
+                  borderRadius={6}
+                  strokeWidth={1}
+                />
               </div>
 
               <div className="flex-1 min-w-[150px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Start Date
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                   <input
                     type="date"
                     value={startDate || ''}
                     onChange={(e) => setStartDate(e.target.value || null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                   />
                 </HandDrawnBox>
               </div>
@@ -166,12 +167,12 @@ export function JournalPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   End Date
                 </label>
-                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                   <input
                     type="date"
                     value={endDate || ''}
                     onChange={(e) => setEndDate(e.target.value || null)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                   />
                 </HandDrawnBox>
               </div>
@@ -367,13 +368,13 @@ function JournalEntryForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Date *
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                 <input
                   type="date"
                   required
                   value={entryDate}
                   onChange={(e) => setEntryDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                 />
               </HandDrawnBox>
             </div>
@@ -381,20 +382,20 @@ function JournalEntryForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Book (optional)
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <select
-                  value={bookId || ''}
-                  onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">No book</option>
-                  {books.map((book) => (
-                    <option key={book.id} value={book.id || 0}>
-                      {book.title}
-                    </option>
-                  ))}
-                </select>
-              </HandDrawnBox>
+              <HandDrawnDropdown
+                options={[
+                  { value: '', label: 'No book' },
+                  ...books.map((book) => ({
+                    value: book.id || 0,
+                    label: book.title,
+                  })),
+                ]}
+                value={bookId || ''}
+                onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                placeholder="No book"
+                borderRadius={6}
+                strokeWidth={1}
+              />
             </div>
           </div>
 
@@ -408,25 +409,28 @@ function JournalEntryForm({
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={8}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none font-serif"
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none font-serif"
                 placeholder="Write your thoughts, reflections, or insights here..."
               />
             </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-            >
-              Cancel
-            </button>
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
+              >
+                Cancel
+              </button>
+            </HandDrawnBox>
             <button
               type="submit"
-              className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
             >
-              {entry ? 'Update Entry' : 'Create Entry'}
+              <Plus className="w-4 h-4" />
+              <span>{entry ? 'Update Entry' : 'Create Entry'}</span>
             </button>
           </div>
         </Stack>

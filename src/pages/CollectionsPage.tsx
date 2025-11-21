@@ -220,13 +220,13 @@ function CollectionForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Name *
             </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                 placeholder="Collection name"
               />
             </HandDrawnBox>
@@ -235,30 +235,33 @@ function CollectionForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Description
             </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
                 placeholder="Optional description"
               />
             </HandDrawnBox>
           </div>
           <div className="flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-            >
-              Cancel
-            </button>
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
+              >
+                Cancel
+              </button>
+            </HandDrawnBox>
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? 'Saving...' : collection ? 'Update' : 'Create'}
+              <Plus className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : collection ? 'Update' : 'Create'}</span>
             </button>
           </div>
         </Stack>

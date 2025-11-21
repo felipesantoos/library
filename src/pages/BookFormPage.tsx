@@ -7,7 +7,7 @@ import { TagSelector } from '@/components/ui/tags';
 import { CollectionSelector } from '@/components/ui/collections';
 import { useTags, addTagsToBook, removeTagFromBook } from '@/hooks/useTags';
 import { useCollections, addBooksToCollection, removeBookFromCollection } from '@/hooks/useCollections';
-import { ArrowLeft, Save, X } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 import { HandDrawnDropdown } from '@/components/ui/inputs';
 
@@ -416,15 +416,7 @@ export function BookFormPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/library')}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                    <span>Cancel</span>
-                  </button>
+                <div className="flex items-center justify-end pt-4">
                   <button
                     type="submit"
                     disabled={loading}

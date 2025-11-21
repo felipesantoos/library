@@ -448,7 +448,7 @@ export function HandDrawnDropdown({
                 >
               {/* Search Input */}
               {searchable && (
-                <div className="p-2 border-b border-background-border">
+                <div className="p-2">
                   <div className="relative">
                     <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                     <input
@@ -457,7 +457,7 @@ export function HandDrawnDropdown({
                       value={searchQuery}
                       onChange={handleSearchChange}
                       placeholder={searchPlaceholder}
-                      className="w-full pl-8 pr-3 py-2 text-sm rounded-md border border-background-border text-text-primary focus:outline-none"
+                      className="w-full pl-8 pr-3 py-2 text-sm bg-transparent text-text-primary focus:outline-none border-0"
                       style={{ backgroundColor: backgroundColor }}
                       onKeyDown={(e) => {
                         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {

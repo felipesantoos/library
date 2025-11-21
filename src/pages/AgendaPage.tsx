@@ -4,7 +4,7 @@ import { useSessions } from '@/hooks/useSessions';
 import { useBooks } from '@/hooks/useBooks';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Calendar, Plus, Edit2, Trash2, BookOpen, Clock, CheckCircle, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, BookOpen, Clock, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 import { HandDrawnDropdown } from '@/components/ui/inputs';
@@ -121,7 +121,6 @@ export function AgendaPage() {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - startDate.getDay()); // Start from Sunday
     
@@ -190,7 +189,7 @@ export function AgendaPage() {
                   className="p-2 rounded-md hover:bg-background-surface transition-colors"
                   aria-label="Previous month"
                 >
-                  <X className="w-5 h-5 rotate-90" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
                 <Heading level={2}>
                   {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -200,7 +199,7 @@ export function AgendaPage() {
                   className="p-2 rounded-md hover:bg-background-surface transition-colors"
                   aria-label="Next month"
                 >
-                  <X className="w-5 h-5 -rotate-90" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
 
@@ -212,13 +211,19 @@ export function AgendaPage() {
                   Error: {error}
                 </Paragraph>
               ) : (
-                <div className="border border-background-border rounded-md overflow-hidden">
+                <div className="p-1">
                   {/* Day headers */}
-                  <div className="grid grid-cols-7 bg-background-surface border-b border-background-border">
+                  <div className="grid grid-cols-7">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="p-2 text-center text-sm font-medium text-text-secondary border-r border-background-border last:border-r-0">
+                      <HandDrawnBox
+                        key={day}
+                        borderRadius={4}
+                        strokeWidth={1}
+                        linearCorners={true}
+                        className="p-2 text-center text-sm font-medium text-text-secondary bg-background-surface"
+                      >
                         {day}
-                      </div>
+                      </HandDrawnBox>
                     ))}
                   </div>
                   
@@ -230,17 +235,28 @@ export function AgendaPage() {
                       const dayEvents = getDayEvents(day);
                       
                       return (
-                        <div
+                        <HandDrawnBox
                           key={index}
+                          borderRadius={4}
+                          strokeWidth={1}
+                          linearCorners={true}
                           className={cn(
-                            "min-h-[100px] p-2 border-r border-b border-background-border last:border-r-0",
-                            !isCurrentMonth && "bg-background-surface/50 text-text-secondary",
-                            isToday && "bg-accent-primary/10 border-accent-primary border-2"
+                            "min-h-[100px] p-2",
+                            !isCurrentMonth && "bg-background-surface/50",
+                            isToday && "bg-accent-primary/10"
                           )}
+                          style={{
+                            backgroundColor: isToday 
+                              ? 'rgba(46, 74, 120, 0.1)' 
+                              : !isCurrentMonth 
+                                ? 'rgba(248, 243, 232, 0.5)' 
+                                : undefined
+                          }}
                         >
                           <div className={cn(
                             "text-sm font-medium mb-1",
-                            isToday && "text-accent-primary"
+                            isToday && "text-accent-primary",
+                            !isCurrentMonth && "text-text-secondary"
                           )}>
                             {day.getDate()}
                           </div>
@@ -285,7 +301,7 @@ export function AgendaPage() {
                               </div>
                             )}
                           </div>
-                        </div>
+                        </HandDrawnBox>
                       );
                     })}
                   </div>
@@ -514,7 +530,7 @@ function AgendaBlockForm({
                   required
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full px-3 py-2 bg-transparent text-text-primary focus:outline-none border-0"
                 />
               </HandDrawnBox>
             </div>
@@ -550,7 +566,7 @@ function AgendaBlockForm({
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full px-3 py-2 bg-transparent text-text-primary focus:outline-none border-0"
                 />
               </HandDrawnBox>
             </div>
@@ -563,7 +579,7 @@ function AgendaBlockForm({
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  className="w-full px-3 py-2 bg-transparent text-text-primary focus:outline-none border-0"
                 />
               </HandDrawnBox>
             </div>
@@ -578,25 +594,28 @@ function AgendaBlockForm({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                className="w-full px-3 py-2 bg-transparent text-text-primary focus:outline-none resize-none border-0"
                 placeholder="Optional notes about this reading block..."
               />
             </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors"
-            >
-              Cancel
-            </button>
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
+              >
+                Cancel
+              </button>
+            </HandDrawnBox>
             <button
               type="submit"
-              className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
             >
-              {block ? 'Update Block' : 'Create Block'}
+              <Plus className="w-4 h-4" />
+              <span>{block ? 'Update Block' : 'Create Block'}</span>
             </button>
           </div>
         </Stack>

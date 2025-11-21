@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/theme';
 import { toast } from '@/utils/toast';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen, Settings, Bell, Clock } from 'lucide-react';
+import { Moon, Sun, Type, Focus, Download, Database, Palette, Keyboard, Contrast, Minimize2, Upload, FileText, Calendar, BookOpen, Settings, Bell, Clock, AlertTriangle } from 'lucide-react';
 import { setSetting } from '@/hooks/useSettings';
 import { invoke } from '@tauri-apps/api/core';
 import { defaultShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -12,6 +12,10 @@ import { useBooks } from '@/hooks/useBooks';
 import { useSessions } from '@/hooks/useSessions';
 import { useNotes } from '@/hooks/useNotes';
 import { useSettings } from '@/hooks/useSettings';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { Button } from '@/components/ui/Button';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
+import { cn } from '@/lib/utils';
 
 export function SettingsPage() {
   const { 
@@ -32,6 +36,7 @@ export function SettingsPage() {
   const { settings } = useSettings();
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState<number | undefined>(undefined);
   const { lastBackupDate, refresh: refreshLastBackup } = useLastBackupDate('full');
   const { books } = useBooks({});
   const { sessions } = useSessions({});
@@ -334,6 +339,7 @@ export function SettingsPage() {
       }
 
       alert(`Book data exported successfully!`);
+      setSelectedBookId(undefined); // Reset selection after export
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to export book data');
       console.error('Export error:', err);
@@ -416,9 +422,9 @@ export function SettingsPage() {
               `- Goals: ${backupData.data?.goals?.length || 0}\n\n` +
               `What would you like to do?`;
             
-            const action = confirm(preview + '\n\nOK = Merge with existing data\nCancel = Overwrite all data');
-            
             // TODO: Implement merge/overwrite logic
+            // const shouldMerge = confirm(preview + '\n\nOK = Merge with existing data\nCancel = Overwrite all data');
+            confirm(preview + '\n\nOK = Merge with existing data\nCancel = Overwrite all data');
             alert('Import functionality will be implemented in the next phase');
           } catch (err) {
             alert('Invalid backup file: ' + (err instanceof Error ? err.message : 'Unknown error'));
@@ -536,28 +542,60 @@ export function SettingsPage() {
                     Choose between light and dark mode
                   </Paragraph>
                   <div className="flex items-center space-x-4 pt-2">
-                    <button
-                      onClick={() => handleThemeChange('light')}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'light'
-                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                          : 'border-background-border text-text-secondary hover:bg-background-surface'
-                      }`}
+                    <HandDrawnBox
+                      borderRadius={6}
+                      strokeWidth={1}
+                      linearCorners={true}
                     >
-                      <Sun className="w-4 h-4" />
-                      <span>Light</span>
-                    </button>
-                    <button
-                      onClick={() => handleThemeChange('dark')}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'dark'
-                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                          : 'border-background-border text-text-secondary hover:bg-background-surface'
-                      }`}
+                      <button
+                        onClick={() => handleThemeChange('light')}
+                        className={cn(
+                          'relative w-full flex items-center justify-center space-x-2 px-4 py-2 transition-colors overflow-hidden',
+                          theme === 'light'
+                            ? 'text-accent-primary font-medium bg-accent-primary/10'
+                            : 'text-text-secondary hover:bg-background-surface'
+                        )}
+                        style={{
+                          backgroundImage: theme === 'light' ? `repeating-linear-gradient(
+                            45deg,
+                            transparent,
+                            transparent 2px,
+                            rgba(46, 74, 120, 0.2) 2px,
+                            rgba(46, 74, 120, 0.2) 3px
+                          )` : undefined,
+                        }}
+                      >
+                        <Sun className="w-4 h-4" />
+                        <span>Light</span>
+                      </button>
+                    </HandDrawnBox>
+                    <HandDrawnBox
+                      borderRadius={6}
+                      strokeWidth={1}
+                      linearCorners={true}
                     >
-                      <Moon className="w-4 h-4" />
-                      <span>Dark</span>
-                    </button>
+                      <button
+                        onClick={() => handleThemeChange('dark')}
+                        className={cn(
+                          'relative w-full flex items-center justify-center space-x-2 px-4 py-2 transition-colors overflow-hidden',
+                          theme === 'dark'
+                            ? 'text-accent-primary font-medium bg-accent-primary/10'
+                            : 'text-text-secondary hover:bg-background-surface'
+                        )}
+                        style={{
+                          backgroundImage: theme === 'dark' ? `repeating-linear-gradient(
+                            45deg,
+                            transparent,
+                            transparent 2px,
+                            rgba(46, 74, 120, 0.2) 2px,
+                            rgba(46, 74, 120, 0.2) 3px
+                          )` : undefined,
+                        }}
+                      >
+                        <Moon className="w-4 h-4" />
+                        <span>Dark</span>
+                      </button>
+                    </HandDrawnBox>
                   </div>
                 </Stack>
               </Section>
@@ -574,17 +612,33 @@ export function SettingsPage() {
                   </Paragraph>
                   <div className="flex items-center space-x-4 pt-2">
                     {(['small', 'standard', 'large'] as const).map((size) => (
-                      <button
+                      <HandDrawnBox
                         key={size}
-                        onClick={() => handleFontSizeChange(size)}
-                        className={`px-4 py-2 rounded-md border transition-colors capitalize ${
-                          fontSize === size
-                            ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                            : 'border-background-border text-text-secondary hover:bg-background-surface'
-                        }`}
+                        borderRadius={6}
+                        strokeWidth={1}
+                        linearCorners={true}
                       >
-                        {size}
-                      </button>
+                        <button
+                          onClick={() => handleFontSizeChange(size)}
+                          className={cn(
+                            'relative w-full px-4 py-2 transition-colors capitalize overflow-hidden',
+                            fontSize === size
+                              ? 'text-accent-primary font-medium bg-accent-primary/10'
+                              : 'text-text-secondary hover:bg-background-surface'
+                          )}
+                          style={{
+                            backgroundImage: fontSize === size ? `repeating-linear-gradient(
+                              45deg,
+                              transparent,
+                              transparent 2px,
+                              rgba(46, 74, 120, 0.2) 2px,
+                              rgba(46, 74, 120, 0.2) 3px
+                            )` : undefined,
+                          }}
+                        >
+                          {size}
+                        </button>
+                      </HandDrawnBox>
                     ))}
                   </div>
                 </Stack>
@@ -602,17 +656,33 @@ export function SettingsPage() {
                   </Paragraph>
                   <div className="flex items-center space-x-4 pt-2">
                     {(['tight', 'normal', 'relaxed', 'loose'] as const).map((spacing) => (
-                      <button
+                      <HandDrawnBox
                         key={spacing}
-                        onClick={() => handleLineSpacingChange(spacing)}
-                        className={`px-4 py-2 rounded-md border transition-colors capitalize ${
-                          lineSpacing === spacing
-                            ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                            : 'border-background-border text-text-secondary hover:bg-background-surface'
-                        }`}
+                        borderRadius={6}
+                        strokeWidth={1}
+                        linearCorners={true}
                       >
-                        {spacing}
-                      </button>
+                        <button
+                          onClick={() => handleLineSpacingChange(spacing)}
+                          className={cn(
+                            'relative w-full px-4 py-2 transition-colors capitalize overflow-hidden',
+                            lineSpacing === spacing
+                              ? 'text-accent-primary font-medium bg-accent-primary/10'
+                              : 'text-text-secondary hover:bg-background-surface'
+                          )}
+                          style={{
+                            backgroundImage: lineSpacing === spacing ? `repeating-linear-gradient(
+                              45deg,
+                              transparent,
+                              transparent 2px,
+                              rgba(46, 74, 120, 0.2) 2px,
+                              rgba(46, 74, 120, 0.2) 3px
+                            )` : undefined,
+                          }}
+                        >
+                          {spacing}
+                        </button>
+                      </HandDrawnBox>
                     ))}
                   </div>
                 </Stack>
@@ -706,26 +776,58 @@ export function SettingsPage() {
                     Choose how progress is displayed by default (pages or percentage)
                   </Paragraph>
                   <div className="flex items-center space-x-4 pt-2">
-                    <button
-                      onClick={() => handleProgressUnitChange('page')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        defaultProgressUnit === 'page'
-                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                          : 'border-background-border text-text-secondary hover:bg-background-surface'
-                      }`}
+                    <HandDrawnBox
+                      borderRadius={6}
+                      strokeWidth={1}
+                      linearCorners={true}
                     >
-                      Pages
-                    </button>
-                    <button
-                      onClick={() => handleProgressUnitChange('percentage')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        defaultProgressUnit === 'percentage'
-                          ? 'border-accent-primary bg-accent-primary/10 text-accent-primary'
-                          : 'border-background-border text-text-secondary hover:bg-background-surface'
-                      }`}
+                      <button
+                        onClick={() => handleProgressUnitChange('page')}
+                        className={cn(
+                          'relative w-full px-4 py-2 transition-colors overflow-hidden',
+                          defaultProgressUnit === 'page'
+                            ? 'text-accent-primary font-medium bg-accent-primary/10'
+                            : 'text-text-secondary hover:bg-background-surface'
+                        )}
+                        style={{
+                          backgroundImage: defaultProgressUnit === 'page' ? `repeating-linear-gradient(
+                            45deg,
+                            transparent,
+                            transparent 2px,
+                            rgba(46, 74, 120, 0.2) 2px,
+                            rgba(46, 74, 120, 0.2) 3px
+                          )` : undefined,
+                        }}
+                      >
+                        Pages
+                      </button>
+                    </HandDrawnBox>
+                    <HandDrawnBox
+                      borderRadius={6}
+                      strokeWidth={1}
+                      linearCorners={true}
                     >
-                      Percentage
-                    </button>
+                      <button
+                        onClick={() => handleProgressUnitChange('percentage')}
+                        className={cn(
+                          'relative w-full px-4 py-2 transition-colors overflow-hidden',
+                          defaultProgressUnit === 'percentage'
+                            ? 'text-accent-primary font-medium bg-accent-primary/10'
+                            : 'text-text-secondary hover:bg-background-surface'
+                        )}
+                        style={{
+                          backgroundImage: defaultProgressUnit === 'percentage' ? `repeating-linear-gradient(
+                            45deg,
+                            transparent,
+                            transparent 2px,
+                            rgba(46, 74, 120, 0.2) 2px,
+                            rgba(46, 74, 120, 0.2) 3px
+                          )` : undefined,
+                        }}
+                      >
+                        Percentage
+                      </button>
+                    </HandDrawnBox>
                   </div>
                 </Stack>
               </Section>
@@ -765,14 +867,16 @@ export function SettingsPage() {
                     Set the default starting page when creating a new book
                   </Paragraph>
                   <div className="pt-2">
-                    <input
-                      type="number"
-                      min="1"
-                      value={defaultStartPage}
-                      onChange={(e) => handleDefaultStartPageChange(e.target.value)}
-                      className="px-3 py-2 rounded-md border border-background-border bg-background-primary text-text-primary focus:ring-2 focus:ring-accent-primary focus:border-accent-primary w-32"
-                      placeholder="1"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-32">
+                      <input
+                        type="number"
+                        min="1"
+                        value={defaultStartPage}
+                        onChange={(e) => handleDefaultStartPageChange(e.target.value)}
+                        className="w-full px-3 py-2 bg-transparent text-text-primary focus:outline-none border-0"
+                        placeholder="1"
+                      />
+                    </HandDrawnBox>
                     <MetaText className="text-xs text-text-secondary mt-1 block">
                       Usually 1, but you can set a different default if needed
                     </MetaText>
@@ -897,16 +1001,17 @@ export function SettingsPage() {
                     Create a complete backup of all your data (books, sessions, notes, goals, journal, agenda)
                   </Paragraph>
                   <div className="pt-2">
-                    <button
+                    <Button
                       onClick={handleExportData}
                       disabled={exporting}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      variant="primary"
+                      size="md"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-4 h-4 mr-2" />
                       <span>{exporting ? 'Exporting...' : 'Export Full Backup'}</span>
-                    </button>
+                    </Button>
                   </div>
-                  <MetaText className="text-xs text-text-secondary">
+                  <MetaText className="text-xs text-text-secondary uppercase">
                     The backup will be saved as a JSON file containing all your reading data
                   </MetaText>
                 </Stack>
@@ -925,69 +1030,77 @@ export function SettingsPage() {
                   
                   <div className="pt-2 space-y-3">
                     {/* Export Year Statistics */}
-                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                      <div>
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface">
+                      <div className="flex-1">
                         <Paragraph className="text-sm font-medium">Export Year Statistics</Paragraph>
-                        <MetaText className="text-xs">Sessions and books completed in a specific year</MetaText>
+                        <MetaText className="text-xs uppercase">Sessions and books completed in a specific year</MetaText>
                       </div>
-                      <button
-                        onClick={() => {
-                          const currentYear = new Date().getFullYear();
-                          const yearInput = prompt(`Enter year to export:`, currentYear.toString());
-                          if (yearInput) {
-                            const year = parseInt(yearInput);
-                            if (!isNaN(year)) {
-                              handleExportYearStats(year);
+                      <div className="ml-4">
+                        <Button
+                          onClick={() => {
+                            const currentYear = new Date().getFullYear();
+                            const yearInput = prompt(`Enter year to export:`, currentYear.toString());
+                            if (yearInput) {
+                              const year = parseInt(yearInput);
+                              if (!isNaN(year)) {
+                                handleExportYearStats(year);
+                              }
                             }
-                          }
-                        }}
-                        disabled={exporting}
-                        className="px-3 py-1 rounded-md border border-background-border text-text-secondary hover:bg-background-surface/80 transition-colors disabled:opacity-50"
-                      >
-                        <Calendar className="w-4 h-4" />
-                      </button>
+                          }}
+                          disabled={exporting}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>Export</span>
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Export Single Book */}
-                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                      <div>
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface">
+                      <div className="flex-1">
                         <Paragraph className="text-sm font-medium">Export Single Book</Paragraph>
-                        <MetaText className="text-xs">Book data, sessions, and notes for research</MetaText>
+                        <MetaText className="text-xs uppercase">Book data, sessions, and notes for research</MetaText>
                       </div>
-                      <select
-                        onChange={(e) => {
-                          const bookId = parseInt(e.target.value);
-                          if (bookId) {
-                            handleExportSingleBook(bookId);
-                          }
-                        }}
-                        disabled={exporting}
-                        className="px-3 py-1 rounded-md border border-background-border text-sm bg-background-primary disabled:opacity-50"
-                        defaultValue=""
-                      >
-                        <option value="">Select book...</option>
-                        {books.map((book) => (
-                          <option key={book.id} value={book.id}>
-                            {book.title}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="ml-4 min-w-[200px]">
+                        <HandDrawnDropdown
+                          options={books.map((book) => ({
+                            value: book.id ?? 0,
+                            label: book.title,
+                          }))}
+                          value={selectedBookId}
+                          placeholder="Select book..."
+                          onChange={(value) => {
+                            if (value && typeof value === 'number') {
+                              setSelectedBookId(value);
+                              handleExportSingleBook(value);
+                            }
+                          }}
+                          disabled={exporting}
+                          borderRadius={6}
+                          strokeWidth={1}
+                        />
+                      </div>
                     </div>
 
                     {/* Export Notes */}
-                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                      <div>
+                    <div className="flex items-center justify-between p-3 rounded-md bg-background-surface">
+                      <div className="flex-1">
                         <Paragraph className="text-sm font-medium">Export Notes</Paragraph>
-                        <MetaText className="text-xs">All your notes and highlights</MetaText>
+                        <MetaText className="text-xs uppercase">All your notes and highlights</MetaText>
                       </div>
-                      <button
-                        onClick={handleExportNotes}
-                        disabled={exporting}
-                        className="flex items-center space-x-2 px-3 py-1 rounded-md border border-background-border text-text-secondary hover:bg-background-surface/80 transition-colors disabled:opacity-50"
-                      >
-                        <FileText className="w-4 h-4" />
-                        <span>Export</span>
-                      </button>
+                      <div className="ml-4">
+                        <Button
+                          onClick={handleExportNotes}
+                          disabled={exporting}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          <span>Export</span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </Stack>
@@ -1004,17 +1117,19 @@ export function SettingsPage() {
                     Restore data from a backup file
                   </Paragraph>
                   <div className="pt-2">
-                    <button
+                    <Button
                       onClick={handleImportBackup}
                       disabled={importing || exporting}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-md border border-accent-primary text-accent-primary hover:bg-accent-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      variant="outline"
+                      size="md"
                     >
-                      <Upload className="w-4 h-4" />
+                      <Upload className="w-4 h-4 mr-2" />
                       <span>{importing ? 'Importing...' : 'Import Backup'}</span>
-                    </button>
+                    </Button>
                   </div>
-                  <MetaText className="text-xs text-semantic-warning">
-                    ⚠️ Import functionality will validate the backup and allow you to merge or overwrite data
+                  <MetaText className="text-xs text-semantic-warning uppercase flex items-center gap-1.5">
+                    <AlertTriangle className="w-3 h-3" />
+                    <span>Import functionality will validate the backup and allow you to merge or overwrite data</span>
                   </MetaText>
                 </Stack>
               </Section>
@@ -1044,29 +1159,34 @@ export function SettingsPage() {
                         {defaultShortcuts
                           .filter((s) => s.category === category)
                           .map((shortcut, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border"
-                            >
-                              <span className="text-sm text-text-primary">
-                                {shortcut.description}
-                              </span>
-                              <div className="flex items-center space-x-1">
-                                {shortcut.ctrl && (
-                                  <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface border border-background-border rounded">
-                                    {navigator.platform.toLowerCase().includes('mac') ? '⌘' : 'Ctrl'}
-                                  </kbd>
-                                )}
-                                {shortcut.shift && (
-                                  <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface border border-background-border rounded">
-                                    Shift
-                                  </kbd>
-                                )}
-                                <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                                  {shortcut.key.toUpperCase()}
-                                </kbd>
+                            <HandDrawnBox key={index} borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                              <div className="flex items-center justify-between p-3 bg-background-surface">
+                                <span className="text-sm text-text-primary">
+                                  {shortcut.description}
+                                </span>
+                                <div className="flex items-center space-x-1">
+                                  {shortcut.ctrl && (
+                                    <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                                      <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface block">
+                                        {navigator.platform.toLowerCase().includes('mac') ? '⌘' : 'Ctrl'}
+                                      </kbd>
+                                    </HandDrawnBox>
+                                  )}
+                                  {shortcut.shift && (
+                                    <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                                      <kbd className="px-2 py-1 text-xs font-semibold text-text-secondary bg-background-surface block">
+                                        Shift
+                                      </kbd>
+                                    </HandDrawnBox>
+                                  )}
+                                  <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                                    <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                                      {shortcut.key.toUpperCase()}
+                                    </kbd>
+                                  </HandDrawnBox>
+                                </div>
                               </div>
-                            </div>
+                            </HandDrawnBox>
                           ))}
                       </div>
                     </div>
@@ -1078,35 +1198,53 @@ export function SettingsPage() {
                       General Navigation
                     </Heading>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                        <span className="text-sm text-text-primary">Close Modals / Dialogs</span>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                          Esc
-                        </kbd>
-                      </div>
-                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                        <span className="text-sm text-text-primary">Navigate with Tab</span>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                          Tab
-                        </kbd>
-                      </div>
-                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                        <span className="text-sm text-text-primary">Navigate lists with arrows</span>
-                        <div className="flex items-center space-x-1">
-                          <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                            ↑
-                          </kbd>
-                          <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                            ↓
-                          </kbd>
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                        <div className="flex items-center justify-between p-3 bg-background-surface">
+                          <span className="text-sm text-text-primary">Close Modals / Dialogs</span>
+                          <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                            <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                              Esc
+                            </kbd>
+                          </HandDrawnBox>
                         </div>
-                      </div>
-                      <div className="flex items-center justify-between p-3 rounded-md bg-background-surface border border-background-border">
-                        <span className="text-sm text-text-primary">Open selected item</span>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 border border-accent-primary rounded">
-                          Enter
-                        </kbd>
-                      </div>
+                      </HandDrawnBox>
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                        <div className="flex items-center justify-between p-3 bg-background-surface">
+                          <span className="text-sm text-text-primary">Navigate with Tab</span>
+                          <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                            <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                              Tab
+                            </kbd>
+                          </HandDrawnBox>
+                        </div>
+                      </HandDrawnBox>
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                        <div className="flex items-center justify-between p-3 bg-background-surface">
+                          <span className="text-sm text-text-primary">Navigate lists with arrows</span>
+                          <div className="flex items-center space-x-1">
+                            <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                              <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                                ↑
+                              </kbd>
+                            </HandDrawnBox>
+                            <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                              <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                                ↓
+                              </kbd>
+                            </HandDrawnBox>
+                          </div>
+                        </div>
+                      </HandDrawnBox>
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                        <div className="flex items-center justify-between p-3 bg-background-surface">
+                          <span className="text-sm text-text-primary">Open selected item</span>
+                          <HandDrawnBox borderRadius={4} strokeWidth={1} linearCorners={true}>
+                            <kbd className="px-2 py-1 text-xs font-semibold text-text-primary bg-accent-primary/20 block">
+                              Enter
+                            </kbd>
+                          </HandDrawnBox>
+                        </div>
+                      </HandDrawnBox>
                     </div>
                   </div>
                 </Stack>
