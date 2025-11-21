@@ -416,7 +416,7 @@ export function HandDrawnDropdown({
           }}
         >
           <div
-            className="relative"
+            className="relative shadow-lg"
             style={{ 
               width: menuPosition.width,
             }}
