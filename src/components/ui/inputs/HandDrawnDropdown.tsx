@@ -313,6 +313,7 @@ export function HandDrawnDropdown({
         <HandDrawnBox
           borderRadius={borderRadius}
           strokeWidth={strokeWidth}
+          linearCorners={true}
           className={cn('w-full', triggerClassName)}
         >
           <button
@@ -322,7 +323,7 @@ export function HandDrawnDropdown({
             disabled={disabled}
             className={cn(
               'w-full px-3 py-2 rounded-md bg-background-surface text-text-primary',
-              'focus:outline-none focus:ring-2 focus:ring-accent-primary',
+              'focus:outline-none',
               'flex items-center justify-between gap-2',
               'transition-colors',
               disabled && 'opacity-50 cursor-not-allowed',
@@ -430,6 +431,7 @@ export function HandDrawnDropdown({
               <HandDrawnBox
                 borderRadius={borderRadius}
                 strokeWidth={strokeWidth}
+                linearCorners={true}
                 className="relative"
                 style={{ width: '100%' }}
               >
@@ -454,7 +456,7 @@ export function HandDrawnDropdown({
                       value={searchQuery}
                       onChange={handleSearchChange}
                       placeholder={searchPlaceholder}
-                      className="w-full pl-8 pr-3 py-2 text-sm rounded-md border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      className="w-full pl-8 pr-3 py-2 text-sm rounded-md border border-background-border text-text-primary focus:outline-none"
                       style={{ backgroundColor: backgroundColor }}
                       onKeyDown={(e) => {
                         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {

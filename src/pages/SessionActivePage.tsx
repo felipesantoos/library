@@ -5,8 +5,8 @@ import { createSession, CreateSessionCommand } from '@/hooks/useSessions';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { ArrowLeft, Play, Pause, Square, Save } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function SessionActivePage() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export function SessionActivePage() {
   // Timer state
   const [isRunning, setIsRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
-  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+  const [timerInterval, setTimerInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   // Get selected book
   const selectedBook = books.find((b) => b.id === bookId);
@@ -213,23 +213,23 @@ export function SessionActivePage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Book *
                   </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                    <select
-                      required
-                      value={bookId || ''}
-                      onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    >
-                      <option value="">Select a book...</option>
-                      {books
+                  <HandDrawnDropdown
+                    options={[
+                      { value: '', label: 'Select a book...' },
+                      ...books
                         .filter((b) => !b.is_archived)
-                        .map((book) => (
-                          <option key={book.id} value={book.id || 0}>
-                            {book.title} {book.author ? `by ${book.author}` : ''}
-                          </option>
-                        ))}
-                    </select>
-                  </HandDrawnBox>
+                        .map((book) => ({
+                          value: book.id || 0,
+                          label: `${book.title}${book.author ? ` by ${book.author}` : ''}`,
+                        })),
+                    ]}
+                    value={bookId || ''}
+                    onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                    placeholder="Select a book..."
+                    searchable={books.filter((b) => !b.is_archived).length > 5}
+                    borderRadius={6}
+                    strokeWidth={1}
+                  />
                 </div>
 
                 {selectedBook && (
@@ -246,13 +246,13 @@ export function SessionActivePage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Date *
                   </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                     <input
                       type="date"
                       required
                       value={sessionDate}
                       onChange={(e) => setSessionDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                     />
                   </HandDrawnBox>
                 </div>
@@ -263,12 +263,12 @@ export function SessionActivePage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Start Time
                     </label>
-                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                       <input
                         type="time"
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
-                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                       />
                     </HandDrawnBox>
                   </div>
@@ -276,12 +276,12 @@ export function SessionActivePage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       End Time
                     </label>
-                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                       <input
                         type="time"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
-                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                       />
                     </HandDrawnBox>
                   </div>
@@ -294,7 +294,7 @@ export function SessionActivePage() {
                       <label className="block text-sm font-medium text-text-primary mb-1">
                         Start Page
                       </label>
-                      <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                         <input
                           type="number"
                           min="0"
@@ -302,7 +302,7 @@ export function SessionActivePage() {
                           onChange={(e) =>
                             setStartPage(e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                           placeholder="Page number"
                         />
                       </HandDrawnBox>
@@ -311,7 +311,7 @@ export function SessionActivePage() {
                       <label className="block text-sm font-medium text-text-primary mb-1">
                         End Page
                       </label>
-                      <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                         <input
                           type="number"
                           min={startPage || 0}
@@ -319,7 +319,7 @@ export function SessionActivePage() {
                           onChange={(e) =>
                             setEndPage(e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                           placeholder="Page number"
                         />
                       </HandDrawnBox>
@@ -338,7 +338,7 @@ export function SessionActivePage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Minutes Read
                     </label>
-                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                       <input
                         type="number"
                         min="0"
@@ -346,7 +346,7 @@ export function SessionActivePage() {
                         onChange={(e) =>
                           setMinutesRead(e.target.value ? parseInt(e.target.value) : null)
                         }
-                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
                         placeholder="Minutes"
                       />
                     </HandDrawnBox>
@@ -358,12 +358,12 @@ export function SessionActivePage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Notes
                   </label>
-                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
                       placeholder="Quick notes about this session..."
                     />
                   </HandDrawnBox>

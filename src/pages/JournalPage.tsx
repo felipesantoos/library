@@ -402,7 +402,7 @@ function JournalEntryForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Content *
             </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <textarea
                 required
                 value={content}

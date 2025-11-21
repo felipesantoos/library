@@ -508,7 +508,7 @@ function AgendaBlockForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Date *
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                 <input
                   type="date"
                   required
@@ -545,7 +545,7 @@ function AgendaBlockForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Start Time (optional)
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                 <input
                   type="time"
                   value={startTime}
@@ -558,7 +558,7 @@ function AgendaBlockForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 End Time (optional)
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
                 <input
                   type="time"
                   value={endTime}
@@ -573,7 +573,7 @@ function AgendaBlockForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Notes (optional)
             </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

@@ -52,6 +52,7 @@ export function TopBar() {
           <HandDrawnBox
             borderRadius={6}
             strokeWidth={1}
+            linearCorners={true}
             className="w-full"
           >
           <input
@@ -59,7 +60,7 @@ export function TopBar() {
             placeholder="Search for books, notes…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md bg-background dark:bg-dark-background text-text-primary dark:text-dark-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              className="w-full pl-10 pr-4 py-2 rounded-md bg-background dark:bg-dark-background text-text-primary dark:text-dark-text-primary placeholder:text-text-secondary focus:outline-none"
           />
           </HandDrawnBox>
         </div>

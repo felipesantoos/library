@@ -11,6 +11,8 @@ interface HandDrawnBoxProps extends React.HTMLAttributes<HTMLDivElement> {
   sides?: 'all' | 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-bottom' | 'top-left' | 'right-bottom' | 'right-left' | 'bottom-left' | 'top-right-bottom' | 'top-right-left' | 'top-bottom-left' | 'right-bottom-left';
   // Remove border from className if present
   removeBorderClass?: boolean;
+  // If true, corners will be linear (borderRadius = 0), if false, corners will be curved (hand drawn)
+  linearCorners?: boolean;
 }
 
 export function HandDrawnBox({
@@ -21,6 +23,7 @@ export function HandDrawnBox({
   color,
   sides = 'all',
   removeBorderClass = true,
+  linearCorners = false,
   style,
   ...props
 }: HandDrawnBoxProps) {
@@ -69,7 +72,7 @@ export function HandDrawnBox({
         <HandDrawnBorder
           width={dimensions.width}
           height={dimensions.height}
-          borderRadius={borderRadius}
+          borderRadius={linearCorners ? 0 : borderRadius}
           strokeWidth={strokeWidth}
           color={borderColor}
           sides={sides}

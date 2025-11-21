@@ -509,22 +509,22 @@ function EditableSessionCard({
           ) : (
             <div>
               <label className="block text-xs text-text-secondary mb-1">Minutes Read</label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-                <input
-                  type="number"
-                  min="0"
-                  value={session.minutes_read ?? ''}
-                  onChange={(e) => onChange('minutes_read', e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
-              </HandDrawnBox>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
+                  <input
+                    type="number"
+                    min="0"
+                    value={session.minutes_read ?? ''}
+                    onChange={(e) => onChange('minutes_read', e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  />
+                </HandDrawnBox>
             </div>
           )}
 
           {/* Notes */}
           <div>
             <label className="block text-xs text-text-secondary mb-1">Notes</label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
               <textarea
                 value={session.notes || ''}
                 onChange={(e) => onChange('notes', e.target.value || null)}
