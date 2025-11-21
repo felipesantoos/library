@@ -98,11 +98,11 @@ function ArchivedBookCard({
   onClick: () => void;
 }) {
   return (
-    <Section padding="md" className="hover:shadow-medium transition-shadow">
+    <Section padding="md" className="hover:shadow-medium hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 ease-in-out">
       <Stack spacing="sm">
         {/* Cover */}
         <div
-          className="aspect-[3/4] bg-background-surface border border-background-border rounded-md flex items-center justify-center overflow-hidden cursor-pointer"
+          className="aspect-[3/4] bg-background-surface border border-background-border rounded-md flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent-primary/50 transition-all duration-200 ease-in-out"
           onClick={onClick}
         >
           {book.cover_url ? (
@@ -148,7 +148,7 @@ function ArchivedBookCard({
             e.stopPropagation();
             onRestore(book);
           }}
-          className="flex items-center justify-center space-x-2 w-full px-3 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface transition-colors text-sm"
+          className="flex items-center justify-center space-x-2 w-full px-3 py-2 rounded-md border border-background-border text-text-secondary hover:bg-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-sm"
           title="Restore to library"
         >
           <RotateCcw className="w-4 h-4" />

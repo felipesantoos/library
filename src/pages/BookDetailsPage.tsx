@@ -366,7 +366,7 @@ export function BookDetailsPage() {
                   <div className="flex items-center space-x-3 pt-4 flex-wrap gap-2">
                     <button
                       onClick={() => navigate(`/session/new?bookId=${book.id}${selectedReadingId ? `&readingId=${selectedReadingId}` : ''}`)}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
                     >
                       <Calendar className="w-4 h-4" />
                       <span>Start Session</span>

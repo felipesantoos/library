@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 
 export interface BookSummaryDto {
@@ -18,7 +18,43 @@ export function useBookSummary(bookId: number | null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadSummary = async () => {
+  useEffect(() => {
+    if (!bookId) {
+      setSummary(null);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSummary = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<BookSummaryDto>('generate_book_summary', { bookId });
+        if (!cancelled) {
+          setSummary(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to generate summary');
+          setSummary(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadSummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookId]);
+
+  const refresh = useCallback(async () => {
     if (!bookId) {
       setSummary(null);
       return;
@@ -35,12 +71,8 @@ export function useBookSummary(bookId: number | null) {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadSummary();
   }, [bookId]);
 
-  return { summary, loading, error, refresh: loadSummary };
+  return { summary, loading, error, refresh };
 }
 

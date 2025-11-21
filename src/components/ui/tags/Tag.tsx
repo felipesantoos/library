@@ -42,8 +42,9 @@ export function Tag({
         baseStyles,
         sizeStyles[size],
         variantStyles[variant],
-        onClick && 'cursor-pointer hover:opacity-80',
-        onRemove && 'pr-1'
+        onClick && 'cursor-pointer hover:opacity-90 hover:scale-[1.05] active:scale-[0.95]',
+        onRemove && 'pr-1',
+        onClick && 'transition-all duration-200 ease-in-out'
       )}
       style={style}
       onClick={onClick}
@@ -55,7 +56,7 @@ export function Tag({
             e.stopPropagation();
             onRemove();
           }}
-          className="ml-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
+          className="ml-1 hover:bg-black/15 dark:hover:bg-white/15 rounded-full p-0.5 hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
           aria-label={`Remove ${name} tag`}
         >
           <span className="text-xs leading-none">×</span>

@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface SessionDto {
   id: number | null;
@@ -52,18 +52,52 @@ export function useSessions(filters?: {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadSessions();
-  }, [filters]);
+  // Extrair valores primitivos para usar como dependências estáveis
+  const bookId = filters?.book_id;
+  const startDate = filters?.start_date;
+  const endDate = filters?.end_date;
 
-  const loadSessions = async () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSessions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<SessionDto[]>('list_sessions', {
+          book_id: bookId ?? null,
+          start_date: startDate ?? null,
+          end_date: endDate ?? null,
+        });
+        if (!cancelled) {
+          setSessions(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load sessions');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadSessions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookId, startDate, endDate]);
+
+  const refresh = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const result = await invoke<SessionDto[]>('list_sessions', {
-        book_id: filters?.book_id ?? null,
-        start_date: filters?.start_date ?? null,
-        end_date: filters?.end_date ?? null,
+        book_id: bookId ?? null,
+        start_date: startDate ?? null,
+        end_date: endDate ?? null,
       });
       setSessions(result);
     } catch (err) {
@@ -71,9 +105,9 @@ export function useSessions(filters?: {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId, startDate, endDate]);
 
-  return { sessions, loading, error, refresh: loadSessions };
+  return { sessions, loading, error, refresh };
 }
 
 export function useSession(id: number | null) {
@@ -87,23 +121,50 @@ export function useSession(id: number | null) {
       setLoading(false);
       return;
     }
-    loadSession(id);
+
+    let cancelled = false;
+
+    const loadSession = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<SessionDto>('get_session', { id });
+        if (!cancelled) {
+          setSession(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load session');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  const loadSession = async (sessionId: number) => {
+  const refresh = useCallback(async () => {
+    if (id === null) return;
     try {
       setLoading(true);
       setError(null);
-      const result = await invoke<SessionDto>('get_session', { id: sessionId });
+      const result = await invoke<SessionDto>('get_session', { id });
       setSession(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load session');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  return { session, loading, error, refresh: () => id !== null && loadSession(id) };
+  return { session, loading, error, refresh };
 }
 
 export async function createSession(command: CreateSessionCommand): Promise<SessionDto> {

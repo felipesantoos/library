@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface AgendaBlockDto {
   id: number | null;
@@ -46,11 +46,7 @@ export function useAgendaBlocks(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadBlocks();
-  }, [bookId, startDate, endDate, isCompleted]);
-
-  const loadBlocks = async () => {
+  const loadBlocks = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -66,7 +62,11 @@ export function useAgendaBlocks(
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId, startDate, endDate, isCompleted]);
+
+  useEffect(() => {
+    loadBlocks();
+  }, [loadBlocks]);
 
   return { blocks, loading, error, refresh: loadBlocks };
 }
@@ -76,17 +76,12 @@ export function useAgendaBlock(id: number | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      loadBlock();
-    } else {
+  const loadBlock = useCallback(async () => {
+    if (!id) {
       setBlock(null);
       setLoading(false);
+      return;
     }
-  }, [id]);
-
-  const loadBlock = async () => {
-    if (!id) return;
     
     try {
       setLoading(true);
@@ -98,7 +93,11 @@ export function useAgendaBlock(id: number | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadBlock();
+  }, [loadBlock]);
 
   return { block, loading, error, refresh: loadBlock };
 }

@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface ReadingDto {
   id: number | null;
@@ -20,17 +20,12 @@ export function useReadings(bookId: number | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (bookId) {
-      loadReadings();
-    } else {
+  const loadReadings = useCallback(async () => {
+    if (!bookId) {
       setReadings([]);
       setLoading(false);
+      return;
     }
-  }, [bookId]);
-
-  const loadReadings = async () => {
-    if (!bookId) return;
     
     try {
       setLoading(true);
@@ -42,7 +37,11 @@ export function useReadings(bookId: number | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId]);
+
+  useEffect(() => {
+    loadReadings();
+  }, [loadReadings]);
 
   return { readings, loading, error, refresh: loadReadings };
 }
@@ -52,17 +51,12 @@ export function useCurrentReading(bookId: number | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (bookId) {
-      loadCurrentReading();
-    } else {
+  const loadCurrentReading = useCallback(async () => {
+    if (!bookId) {
       setReading(null);
       setLoading(false);
+      return;
     }
-  }, [bookId]);
-
-  const loadCurrentReading = async () => {
-    if (!bookId) return;
     
     try {
       setLoading(true);
@@ -74,7 +68,11 @@ export function useCurrentReading(bookId: number | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId]);
+
+  useEffect(() => {
+    loadCurrentReading();
+  }, [loadCurrentReading]);
 
   return { reading, loading, error, refresh: loadCurrentReading };
 }

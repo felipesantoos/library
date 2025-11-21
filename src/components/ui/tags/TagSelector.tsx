@@ -83,7 +83,7 @@ export function TagSelector({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="ml-auto flex items-center gap-1 px-2 py-1 text-sm text-text-secondary hover:text-accent-primary transition-colors"
+          className="ml-auto flex items-center gap-1 px-2 py-1 text-sm text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 rounded-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out"
         >
           <Plus className="w-4 h-4" />
           <span>Add tag</span>
@@ -140,7 +140,7 @@ export function TagSelector({
                         type="button"
                         onClick={() => setNewTagColor(color)}
                         className={cn(
-                          "w-6 h-6 rounded border border-background-border hover:scale-110 transition-transform",
+                          "w-6 h-6 rounded border border-background-border hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out",
                           newTagColor === color && "ring-2 ring-accent-primary"
                         )}
                         style={{ backgroundColor: color }}
@@ -151,7 +151,7 @@ export function TagSelector({
                       <button
                         type="button"
                         onClick={() => setNewTagColor('')}
-                        className="w-6 h-6 rounded border border-background-border flex items-center justify-center hover:bg-background-surface transition-colors"
+                        className="w-6 h-6 rounded border border-background-border flex items-center justify-center hover:bg-background-surface hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
                         disabled={creating}
                       >
                         <X className="w-3 h-3" />
@@ -162,7 +162,7 @@ export function TagSelector({
                 <button
                   type="submit"
                   disabled={!newTagName.trim() || creating}
-                  className="w-full px-3 py-1.5 text-sm rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-1.5 text-sm rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {creating ? 'Creating...' : 'Create Tag'}
                 </button>

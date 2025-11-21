@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface GoalDto {
   id: number | null;
@@ -40,11 +40,7 @@ export function useGoals(includeInactive: boolean = false) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadGoals();
-  }, [includeInactive]);
-
-  const loadGoals = async () => {
+  const loadGoals = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -57,7 +53,11 @@ export function useGoals(includeInactive: boolean = false) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [includeInactive]);
+
+  useEffect(() => {
+    loadGoals();
+  }, [loadGoals]);
 
   return { goals, loading, error, refresh: loadGoals };
 }
@@ -67,11 +67,7 @@ export function useStatistics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadStatistics();
-  }, []);
-
-  const loadStatistics = async () => {
+  const loadStatistics = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -82,7 +78,11 @@ export function useStatistics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadStatistics();
+  }, [loadStatistics]);
 
   return { statistics, loading, error, refresh: loadStatistics };
 }

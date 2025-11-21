@@ -127,6 +127,19 @@ body {
   transition-duration: 150ms;
 }
 
+/* Make all clickable elements show pointer cursor */
+button,
+a,
+[role="button"],
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Disabled buttons should show not-allowed cursor */
+button:disabled {
+  cursor: not-allowed !important;
+}
+
 /* Sonner toast styles */
 [data-sonner-toaster] {
   overflow: visible !important;

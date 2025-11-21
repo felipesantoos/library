@@ -81,7 +81,7 @@ export function CollectionSelector({
             <button
               type="button"
               onClick={() => handleToggleCollection(collection.id!)}
-              className="ml-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
+              className="ml-1 hover:bg-black/15 dark:hover:bg-white/15 rounded-full p-0.5 hover:scale-110 active:scale-95 transition-all duration-200 ease-in-out"
               aria-label={`Remove ${collection.name} collection`}
             >
               <X className="w-3 h-3" />
@@ -91,7 +91,7 @@ export function CollectionSelector({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="ml-auto flex items-center gap-1 px-2 py-1 text-sm text-text-secondary hover:text-accent-primary transition-colors"
+          className="ml-auto flex items-center gap-1 px-2 py-1 text-sm text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 rounded-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out"
         >
           <Plus className="w-4 h-4" />
           <span>Add collection</span>
@@ -112,7 +112,7 @@ export function CollectionSelector({
                       key={collection.id}
                       type="button"
                       onClick={() => handleToggleCollection(collection.id!)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-background-surface border border-background-border text-text-primary hover:bg-accent-primary/10 hover:border-accent-primary transition-colors text-sm"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md bg-background-surface border border-background-border text-text-primary hover:bg-accent-primary/10 hover:border-accent-primary hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-sm"
                     >
                       <FolderKanban className="w-3 h-3" />
                       <span>{collection.name}</span>
@@ -145,7 +145,7 @@ export function CollectionSelector({
                 <button
                   type="submit"
                   disabled={!newCollectionName.trim() || creating}
-                  className="w-full px-3 py-1.5 text-sm rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-1.5 text-sm rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {creating ? 'Creating...' : 'Create Collection'}
                 </button>

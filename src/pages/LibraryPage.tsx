@@ -111,7 +111,7 @@ export function LibraryPage() {
                 className={cn(
                   'p-2 rounded-md transition-colors',
                   viewMode === 'grid'
-                    ? 'bg-accent-primary text-white'
+                    ? 'bg-accent-primary text-dark-text-primary'
                     : 'bg-background-surface hover:bg-background-surface/80 text-text-secondary'
                 )}
                 aria-label="Grid view"
@@ -123,7 +123,7 @@ export function LibraryPage() {
                 className={cn(
                   'p-2 rounded-md transition-colors',
                   viewMode === 'list'
-                    ? 'bg-accent-primary text-white'
+                    ? 'bg-accent-primary text-dark-text-primary'
                     : 'bg-background-surface hover:bg-background-surface/80 text-text-secondary'
                 )}
                 aria-label="List view"
@@ -261,7 +261,7 @@ export function LibraryPage() {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="mt-4 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+                    className="mt-4 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
                   >
                     Clear All Filters
                   </button>
@@ -355,7 +355,7 @@ function BookCard({
   return (
     <Section
       padding="md"
-      className="hover:shadow-medium transition-shadow cursor-pointer"
+      className="hover:shadow-medium hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out cursor-pointer"
       onClick={() => navigate(`/book/${book.id}`)}
     >
       <Stack spacing="sm">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 
 export interface TagDto {
@@ -23,7 +23,7 @@ export function useTags(bookId?: number) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -34,11 +34,11 @@ export function useTags(bookId?: number) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId]);
 
   useEffect(() => {
     refresh();
-  }, [bookId]);
+  }, [refresh]);
 
   return { tags, loading, error, refresh };
 }

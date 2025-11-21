@@ -253,7 +253,7 @@ export function ProgressCorrectionPage() {
                 onClick={handleSaveAll}
                 disabled={saving || hasErrors}
                 className={cn(
-                  "flex items-center space-x-2 px-4 py-2 rounded-md text-white transition-colors",
+                  "flex items-center space-x-2 px-4 py-2 rounded-md text-dark-text-primary transition-colors",
                   hasErrors
                     ? "bg-semantic-error cursor-not-allowed opacity-50"
                     : "bg-accent-primary hover:bg-accent-primary/90"
@@ -584,7 +584,7 @@ function SessionDeleteConfirmation({
           </button>
           <button
             onClick={onConfirm}
-            className="px-3 py-1.5 text-sm rounded-md bg-semantic-error text-white hover:bg-semantic-error/90 transition-colors"
+            className="px-3 py-1.5 text-sm rounded-md bg-semantic-error text-dark-text-primary hover:bg-semantic-error/90 transition-colors"
           >
             Delete
           </button>

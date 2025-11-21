@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface JournalEntryDto {
   id: number | null;
@@ -32,11 +32,7 @@ export function useJournalEntries(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadEntries();
-  }, [bookId, startDate, endDate]);
-
-  const loadEntries = async () => {
+  const loadEntries = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -51,7 +47,11 @@ export function useJournalEntries(
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId, startDate, endDate]);
+
+  useEffect(() => {
+    loadEntries();
+  }, [loadEntries]);
 
   return { entries, loading, error, refresh: loadEntries };
 }
@@ -61,17 +61,12 @@ export function useJournalEntry(id: number | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      loadEntry();
-    } else {
+  const loadEntry = useCallback(async () => {
+    if (!id) {
       setEntry(null);
       setLoading(false);
+      return;
     }
-  }, [id]);
-
-  const loadEntry = async () => {
-    if (!id) return;
     
     try {
       setLoading(true);
@@ -83,7 +78,11 @@ export function useJournalEntry(id: number | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadEntry();
+  }, [loadEntry]);
 
   return { entry, loading, error, refresh: loadEntry };
 }

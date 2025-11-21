@@ -81,7 +81,7 @@ export function NotesPage() {
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>New Note</span>
@@ -220,7 +220,7 @@ function NoteCard({
   const book = books.find((b) => b.id === note.book_id);
 
   return (
-    <Section padding="md" className="hover:shadow-medium transition-shadow">
+    <Section padding="md" className="hover:shadow-medium hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 ease-in-out">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <Stack spacing="sm">
@@ -235,7 +235,7 @@ function NoteCard({
                   {book && (
                     <button
                       onClick={() => onBookClick(note.book_id)}
-                      className="font-semibold text-accent-primary hover:underline"
+                      className="font-semibold text-accent-primary hover:underline hover:text-accent-primary/80 transition-colors duration-200"
                     >
                       {book.title}
                     </button>
@@ -452,7 +452,7 @@ function NoteForm({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+              className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
             >
               Save Note
             </button>

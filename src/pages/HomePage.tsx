@@ -108,7 +108,7 @@ export function HomePage() {
                           <div className="flex items-center space-x-3 mt-4">
                             <button
                               onClick={() => navigate(`/session/new?bookId=${currentBook.id}`)}
-                              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+                              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
                             >
                               <Play className="w-4 h-4" />
                               <span>Continue Reading</span>
@@ -134,7 +134,7 @@ export function HomePage() {
                       </Paragraph>
                       <button
                         onClick={() => navigate('/library')}
-                        className="px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+                        className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
                       >
                         Go to Library
                       </button>
@@ -230,19 +230,19 @@ export function HomePage() {
                     <div className="space-y-2 pt-2">
                       <button
                         onClick={() => navigate('/book/new')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface transition-colors text-left"
+                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
                       >
                         Add New Book
                       </button>
                       <button
                         onClick={() => navigate('/session/new')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface transition-colors text-left"
+                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
                       >
                         Start Session
                       </button>
                       <button
                         onClick={() => navigate('/library')}
-                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface transition-colors text-left"
+                        className="w-full px-4 py-2 rounded-md border border-background-border dark:border-dark-background-border text-text-secondary dark:text-dark-text-secondary hover:bg-background-surface dark:hover:bg-dark-background-surface hover:border-accent-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-left"
                       >
                         View Library
                       </button>

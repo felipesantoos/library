@@ -175,7 +175,7 @@ export function SessionActivePage() {
                 {!isRunning && timerSeconds === 0 && (
                   <button
                     onClick={startTimer}
-                    className="flex items-center space-x-2 px-6 py-3 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+                    className="flex items-center space-x-2 px-6 py-3 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
                   >
                     <Play className="w-5 h-5" />
                     <span>Start Timer</span>
@@ -185,14 +185,14 @@ export function SessionActivePage() {
                   <>
                     <button
                       onClick={pauseTimer}
-                      className="flex items-center space-x-2 px-6 py-3 rounded-md bg-accent-secondary text-white hover:bg-accent-secondary/90 transition-colors"
+                      className="flex items-center space-x-2 px-6 py-3 rounded-md bg-accent-secondary text-text-primary dark:text-dark-text-primary hover:bg-accent-secondary/90 transition-colors"
                     >
                       <Pause className="w-5 h-5" />
                       <span>Pause</span>
                     </button>
                     <button
                       onClick={stopTimer}
-                      className="flex items-center space-x-2 px-6 py-3 rounded-md bg-semantic-error text-white hover:bg-semantic-error/90 transition-colors"
+                      className="flex items-center space-x-2 px-6 py-3 rounded-md bg-semantic-error text-dark-text-primary hover:bg-semantic-error/90 transition-colors"
                     >
                       <Square className="w-5 h-5" />
                       <span>Stop</span>
@@ -364,7 +364,7 @@ export function SessionActivePage() {
                   <button
                     type="submit"
                     disabled={loading || !bookId}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Save className="w-4 h-4" />
                     <span>{loading ? 'Saving...' : 'Save Session'}</span>

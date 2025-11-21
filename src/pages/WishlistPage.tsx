@@ -61,7 +61,7 @@ export function WishlistPage() {
             </div>
             <button
               onClick={() => navigate('/book/new?wishlist=true')}
-              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Add to Wishlist</span>
@@ -107,11 +107,11 @@ function WishlistBookCard({
   onClick: () => void;
 }) {
   return (
-    <Section padding="md" className="hover:shadow-medium transition-shadow">
+    <Section padding="md" className="hover:shadow-medium hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 ease-in-out">
       <Stack spacing="sm">
         {/* Cover */}
         <div
-          className="aspect-[3/4] bg-background-surface border border-background-border rounded-md flex items-center justify-center overflow-hidden cursor-pointer relative"
+          className="aspect-[3/4] bg-background-surface border border-background-border rounded-md flex items-center justify-center overflow-hidden cursor-pointer relative hover:border-accent-primary/50 transition-all duration-200 ease-in-out"
           onClick={onClick}
         >
           {book.cover_url ? (
@@ -154,7 +154,7 @@ function WishlistBookCard({
             e.stopPropagation();
             onMoveToLibrary(book);
           }}
-          className="flex items-center justify-center space-x-2 w-full px-3 py-2 rounded-md border border-accent-primary text-accent-primary hover:bg-accent-primary/10 transition-colors text-sm"
+          className="flex items-center justify-center space-x-2 w-full px-3 py-2 rounded-md border border-accent-primary text-accent-primary hover:bg-accent-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out text-sm"
           title="Move to library"
         >
           <Plus className="w-4 h-4" />

@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface NoteDto {
   id: number | null;
@@ -34,19 +34,55 @@ export function useNotes(filters?: {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadNotes();
-  }, [filters]);
+  // Extrair valores primitivos para usar como dependências estáveis
+  const bookId = filters?.book_id;
+  const noteType = filters?.note_type;
+  const sentiment = filters?.sentiment;
+  const searchQuery = filters?.search_query;
 
-  const loadNotes = async () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadNotes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<NoteDto[]>('list_notes', {
+          book_id: bookId ?? null,
+          note_type: noteType ?? null,
+          sentiment: sentiment ?? null,
+          search_query: searchQuery ?? null,
+        });
+        if (!cancelled) {
+          setNotes(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load notes');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadNotes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookId, noteType, sentiment, searchQuery]);
+
+  const refresh = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const result = await invoke<NoteDto[]>('list_notes', {
-        book_id: filters?.book_id ?? null,
-        note_type: filters?.note_type ?? null,
-        sentiment: filters?.sentiment ?? null,
-        search_query: filters?.search_query ?? null,
+        book_id: bookId ?? null,
+        note_type: noteType ?? null,
+        sentiment: sentiment ?? null,
+        search_query: searchQuery ?? null,
       });
       setNotes(result);
     } catch (err) {
@@ -54,9 +90,9 @@ export function useNotes(filters?: {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId, noteType, sentiment, searchQuery]);
 
-  return { notes, loading, error, refresh: loadNotes };
+  return { notes, loading, error, refresh };
 }
 
 export function useNote(id: number | null) {
@@ -70,23 +106,50 @@ export function useNote(id: number | null) {
       setLoading(false);
       return;
     }
-    loadNote(id);
+
+    let cancelled = false;
+
+    const loadNote = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<NoteDto>('get_note', { id });
+        if (!cancelled) {
+          setNote(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load note');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadNote();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  const loadNote = async (noteId: number) => {
+  const refresh = useCallback(async () => {
+    if (id === null) return;
     try {
       setLoading(true);
       setError(null);
-      const result = await invoke<NoteDto>('get_note', { id: noteId });
+      const result = await invoke<NoteDto>('get_note', { id });
       setNote(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load note');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  return { note, loading, error, refresh: () => id !== null && loadNote(id) };
+  return { note, loading, error, refresh };
 }
 
 export async function createNote(command: CreateNoteCommand): Promise<NoteDto> {

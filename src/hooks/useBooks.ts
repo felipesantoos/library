@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface BookDto {
   id: number | null;
@@ -47,19 +47,55 @@ export function useBooks(filters?: {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadBooks();
-  }, [filters]);
+  // Extrair valores primitivos para usar como dependências estáveis
+  const status = filters?.status;
+  const bookType = filters?.book_type;
+  const isArchived = filters?.is_archived;
+  const isWishlist = filters?.is_wishlist;
 
-  const loadBooks = async () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadBooks = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<BookDto[]>('list_books', {
+          status: status || null,
+          book_type: bookType || null,
+          is_archived: isArchived ?? null,
+          is_wishlist: isWishlist ?? null,
+        });
+        if (!cancelled) {
+          setBooks(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load books');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadBooks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, bookType, isArchived, isWishlist]);
+
+  const refresh = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const result = await invoke<BookDto[]>('list_books', {
-        status: filters?.status || null,
-        book_type: filters?.book_type || null,
-        is_archived: filters?.is_archived ?? null,
-        is_wishlist: filters?.is_wishlist ?? null,
+        status: status || null,
+        book_type: bookType || null,
+        is_archived: isArchived ?? null,
+        is_wishlist: isWishlist ?? null,
       });
       setBooks(result);
     } catch (err) {
@@ -67,9 +103,9 @@ export function useBooks(filters?: {
     } finally {
       setLoading(false);
     }
-  };
+  }, [status, bookType, isArchived, isWishlist]);
 
-  return { books, loading, error, refresh: loadBooks };
+  return { books, loading, error, refresh };
 }
 
 export function useBook(id: number | null) {
@@ -83,23 +119,50 @@ export function useBook(id: number | null) {
       setLoading(false);
       return;
     }
-    loadBook(id);
+
+    let cancelled = false;
+
+    const loadBook = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await invoke<BookDto>('get_book', { id });
+        if (!cancelled) {
+          setBook(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load book');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadBook();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  const loadBook = async (bookId: number) => {
+  const refresh = useCallback(async () => {
+    if (id === null) return;
     try {
       setLoading(true);
       setError(null);
-      const result = await invoke<BookDto>('get_book', { id: bookId });
+      const result = await invoke<BookDto>('get_book', { id });
       setBook(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load book');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  return { book, loading, error, refresh: () => id !== null && loadBook(id) };
+  return { book, loading, error, refresh };
 }
 
 export interface UpdateBookCommand {
