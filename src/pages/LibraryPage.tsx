@@ -9,6 +9,7 @@ import { ProgressBar } from '@/components/ui/data-display';
 import { Tag } from '@/components/ui/tags';
 import { BookOpen, Grid, List, FolderKanban, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 type ViewMode = 'grid' | 'list';
 
@@ -136,18 +137,20 @@ export function LibraryPage() {
           {/* Search */}
           <Section padding="sm">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title or author..."
-                className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary z-10" />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by title or author..."
+                  className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-text-secondary hover:text-text-primary transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-text-secondary hover:text-text-primary transition-colors z-10"
                   aria-label="Clear search"
                 >
                   <X className="w-4 h-4" />
@@ -163,73 +166,81 @@ export function LibraryPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Status
                 </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All</option>
-                  <option value="not_started">Not Started</option>
-                  <option value="reading">Reading</option>
-                  <option value="paused">Paused</option>
-                  <option value="completed">Completed</option>
-                  <option value="abandoned">Abandoned</option>
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All</option>
+                    <option value="not_started">Not Started</option>
+                    <option value="reading">Reading</option>
+                    <option value="paused">Paused</option>
+                    <option value="completed">Completed</option>
+                    <option value="abandoned">Abandoned</option>
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Type
                 </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All</option>
-                  <option value="physical_book">Physical Book</option>
-                  <option value="ebook">Ebook</option>
-                  <option value="audiobook">Audiobook</option>
-                  <option value="article">Article</option>
-                  <option value="PDF">PDF</option>
-                  <option value="comic">Comic</option>
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All</option>
+                    <option value="physical_book">Physical Book</option>
+                    <option value="ebook">Ebook</option>
+                    <option value="audiobook">Audiobook</option>
+                    <option value="article">Article</option>
+                    <option value="PDF">PDF</option>
+                    <option value="comic">Comic</option>
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Tag
                 </label>
-                <select
-                  value={tagFilter || ''}
-                  onChange={(e) => setTagFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All Tags</option>
-                  {tags.map((tag) => (
-                    <option key={tag.id} value={tag.id}>
-                      {tag.name}
-                    </option>
-                  ))}
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={tagFilter || ''}
+                    onChange={(e) => setTagFilter(e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All Tags</option>
+                    {tags.map((tag) => (
+                      <option key={tag.id} value={tag.id}>
+                        {tag.name}
+                      </option>
+                    ))}
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[180px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Collection
                 </label>
-                <select
-                  value={collectionFilter || ''}
-                  onChange={(e) => setCollectionFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All Collections</option>
-                  {collections.map((collection) => (
-                    <option key={collection.id} value={collection.id}>
-                      {collection.name}
-                    </option>
-                  ))}
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={collectionFilter || ''}
+                    onChange={(e) => setCollectionFilter(e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All Collections</option>
+                    {collections.map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {collection.name}
+                      </option>
+                    ))}
+                  </select>
+                </HandDrawnBox>
               </div>
 
               {hasActiveFilters && (

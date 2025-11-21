@@ -6,6 +6,7 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { Clock, BookOpen, Calendar, Trash2, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { deleteSession } from '@/hooks/useSessions';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function SessionsPage() {
   const [bookFilter, setBookFilter] = useState<number | null>(null);
@@ -91,34 +92,38 @@ export function SessionsPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Book
                 </label>
-                <select
-                  value={bookFilter || ''}
-                  onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All Books</option>
-                  {books.map((book) => (
-                    <option key={book.id} value={book.id || 0}>
-                      {book.title}
-                    </option>
-                  ))}
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={bookFilter || ''}
+                    onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All Books</option>
+                    {books.map((book) => (
+                      <option key={book.id} value={book.id || 0}>
+                        {book.title}
+                      </option>
+                    ))}
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[200px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Date Range
                 </label>
-                <select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="all">All Time</option>
-                  <option value="today">Today</option>
-                  <option value="week">Last 7 Days</option>
-                  <option value="month">Last 30 Days</option>
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                  </select>
+                </HandDrawnBox>
               </div>
             </Stack>
           </Section>

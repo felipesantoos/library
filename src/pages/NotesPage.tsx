@@ -8,6 +8,7 @@ import { SentimentBadge } from '@/components/ui/notes/SentimentBadge';
 import { BookOpen, Plus, Search, Trash2, FileText, Highlighter, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function NotesPage() {
   const navigate = useNavigate();
@@ -350,40 +351,40 @@ function NoteForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Book *
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-              <select
-                required
+              <HandDrawnDropdown
+                options={[
+                  { value: '', label: 'Select a book...' },
+                  ...books
+                    .filter((b) => !b.is_archived)
+                    .map((book) => ({
+                      value: book.id || 0,
+                      label: `${book.title}${book.author ? ` by ${book.author}` : ''}`,
+                    })),
+                ]}
                 value={bookId || ''}
-                onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
-                <option value="">Select a book...</option>
-                {books
-                  .filter((b) => !b.is_archived)
-                  .map((book) => (
-                    <option key={book.id} value={book.id || 0}>
-                      {book.title} {book.author ? `by ${book.author}` : ''}
-                    </option>
-                  ))}
-              </select>
-              </HandDrawnBox>
+                onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                placeholder="Select a book..."
+                searchable={books.filter((b) => !b.is_archived).length > 5}
+                borderRadius={6}
+                strokeWidth={1}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Type *
               </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
-              <select
-                required
+              <HandDrawnDropdown
+                options={[
+                  { value: 'note', label: 'Note' },
+                  { value: 'highlight', label: 'Highlight' },
+                ]}
                 value={noteType}
-                onChange={(e) => setNoteType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
-                <option value="note">Note</option>
-                <option value="highlight">Highlight</option>
-              </select>
-              </HandDrawnBox>
+                onChange={(value) => setNoteType(value as 'note' | 'highlight')}
+                placeholder="Select type..."
+                borderRadius={6}
+                strokeWidth={1}
+              />
             </div>
           </div>
 

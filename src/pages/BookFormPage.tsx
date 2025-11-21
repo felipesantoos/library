@@ -8,6 +8,8 @@ import { CollectionSelector } from '@/components/ui/collections';
 import { useTags, addTagsToBook, removeTagFromBook } from '@/hooks/useTags';
 import { useCollections, addBooksToCollection, removeBookFromCollection } from '@/hooks/useCollections';
 import { ArrowLeft, Save, X } from 'lucide-react';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 const BOOK_TYPES = [
   { value: 'physical_book', label: 'Physical Book' },
@@ -213,14 +215,16 @@ export function BookFormPage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Title *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => handleChange('title', e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    placeholder="Enter book title"
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="text"
+                      required
+                      value={formData.title}
+                      onChange={(e) => handleChange('title', e.target.value)}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      placeholder="Enter book title"
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 {/* Author */}
@@ -228,13 +232,15 @@ export function BookFormPage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Author
                   </label>
-                  <input
-                    type="text"
-                    value={formData.author}
-                    onChange={(e) => handleChange('author', e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    placeholder="Enter author name"
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="text"
+                      value={formData.author}
+                      onChange={(e) => handleChange('author', e.target.value)}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      placeholder="Enter author name"
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 {/* Type and Genre */}
@@ -243,31 +249,29 @@ export function BookFormPage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Type *
                     </label>
-                    <select
-                      required
+                    <HandDrawnDropdown
+                      options={BOOK_TYPES}
                       value={formData.book_type}
-                      onChange={(e) => handleChange('book_type', e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    >
-                      {BOOK_TYPES.map((type) => (
-                        <option key={type.value} value={type.value}>
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => handleChange('book_type', value as string)}
+                      placeholder="Select book type..."
+                      borderRadius={6}
+                      strokeWidth={1}
+                    />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Genre
                     </label>
-                    <input
-                      type="text"
-                      value={formData.genre}
-                      onChange={(e) => handleChange('genre', e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="Enter genre"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="text"
+                        value={formData.genre}
+                        onChange={(e) => handleChange('genre', e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="Enter genre"
+                      />
+                    </HandDrawnBox>
                   </div>
                 </div>
 
@@ -277,34 +281,38 @@ export function BookFormPage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Total Minutes *
                     </label>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      value={formData.total_minutes || ''}
-                      onChange={(e) =>
-                        handleChange('total_minutes', e.target.value ? parseInt(e.target.value) : undefined)
-                      }
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="Enter total minutes"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={formData.total_minutes || ''}
+                        onChange={(e) =>
+                          handleChange('total_minutes', e.target.value ? parseInt(e.target.value) : undefined)
+                        }
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="Enter total minutes"
+                      />
+                    </HandDrawnBox>
                   </div>
                 ) : (
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Total Pages *
                     </label>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      value={formData.total_pages || ''}
-                      onChange={(e) =>
-                        handleChange('total_pages', e.target.value ? parseInt(e.target.value) : undefined)
-                      }
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="Enter total pages"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={formData.total_pages || ''}
+                        onChange={(e) =>
+                          handleChange('total_pages', e.target.value ? parseInt(e.target.value) : undefined)
+                        }
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="Enter total pages"
+                      />
+                    </HandDrawnBox>
                   </div>
                 )}
 
@@ -314,33 +322,37 @@ export function BookFormPage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Publication Year
                     </label>
-                    <input
-                      type="number"
-                      min="0"
-                      max={new Date().getFullYear()}
-                      value={formData.publication_year || ''}
-                      onChange={(e) =>
-                        handleChange(
-                          'publication_year',
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
-                      }
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="Year"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        max={new Date().getFullYear()}
+                        value={formData.publication_year || ''}
+                        onChange={(e) =>
+                          handleChange(
+                            'publication_year',
+                            e.target.value ? parseInt(e.target.value) : undefined
+                          )
+                        }
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="Year"
+                      />
+                    </HandDrawnBox>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       ISBN
                     </label>
-                    <input
-                      type="text"
-                      value={formData.isbn}
-                      onChange={(e) => handleChange('isbn', e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="ISBN"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="text"
+                        value={formData.isbn}
+                        onChange={(e) => handleChange('isbn', e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="ISBN"
+                      />
+                    </HandDrawnBox>
                   </div>
                 </div>
 
@@ -373,26 +385,30 @@ export function BookFormPage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Cover URL
                   </label>
-                  <input
-                    type="url"
-                    value={formData.cover_url}
-                    onChange={(e) => handleChange('cover_url', e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    placeholder="https://example.com/cover.jpg"
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="url"
+                      value={formData.cover_url}
+                      onChange={(e) => handleChange('cover_url', e.target.value)}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      placeholder="https://example.com/cover.jpg"
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     URL (for articles, PDFs, etc.)
                   </label>
-                  <input
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => handleChange('url', e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    placeholder="https://example.com/article"
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="url"
+                      value={formData.url}
+                      onChange={(e) => handleChange('url', e.target.value)}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      placeholder="https://example.com/article"
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 {/* Actions */}

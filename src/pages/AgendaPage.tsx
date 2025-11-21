@@ -6,6 +6,8 @@ import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { Calendar, Plus, Edit2, Trash2, BookOpen, Clock, CheckCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function AgendaPage() {
   const [showForm, setShowForm] = useState(false);
@@ -506,30 +508,35 @@ function AgendaBlockForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Date *
               </label>
-              <input
-                type="date"
-                required
-                value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="date"
+                  required
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Book (optional)
               </label>
-              <select
+              <HandDrawnDropdown
+                options={[
+                  { value: '', label: 'No book' },
+                  ...books.map((book) => ({
+                    value: book.id || 0,
+                    label: book.title || 'Untitled',
+                  })),
+                ]}
                 value={bookId || ''}
-                onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
-                <option value="">No book</option>
-                {books.map((book) => (
-                  <option key={book.id} value={book.id || 0}>
-                    {book.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
+                placeholder="No book"
+                searchable={books.length > 5}
+                borderRadius={6}
+                strokeWidth={1}
+              />
             </div>
           </div>
 
@@ -538,23 +545,27 @@ function AgendaBlockForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Start Time (optional)
               </label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1">
                 End Time (optional)
               </label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
           </div>
 
@@ -562,13 +573,15 @@ function AgendaBlockForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Notes (optional)
             </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-              placeholder="Optional notes about this reading block..."
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                placeholder="Optional notes about this reading block..."
+              />
+            </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">

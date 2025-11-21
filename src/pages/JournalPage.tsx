@@ -5,6 +5,7 @@ import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { BookOpen, Plus, Edit2, Trash2, Calendar, Filter, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function JournalPage() {
   const [showForm, setShowForm] = useState(false);
@@ -131,42 +132,48 @@ export function JournalPage() {
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Book
                 </label>
-                <select
-                  value={bookFilter || ''}
-                  onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                >
-                  <option value="">All Books</option>
-                  {books.map((book) => (
-                    <option key={book.id} value={book.id || 0}>
-                      {book.title}
-                    </option>
-                  ))}
-                </select>
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <select
+                    value={bookFilter || ''}
+                    onChange={(e) => setBookFilter(e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="">All Books</option>
+                    {books.map((book) => (
+                      <option key={book.id} value={book.id || 0}>
+                        {book.title}
+                      </option>
+                    ))}
+                  </select>
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[150px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   Start Date
                 </label>
-                <input
-                  type="date"
-                  value={startDate || ''}
-                  onChange={(e) => setStartDate(e.target.value || null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="date"
+                    value={startDate || ''}
+                    onChange={(e) => setStartDate(e.target.value || null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  />
+                </HandDrawnBox>
               </div>
 
               <div className="flex-1 min-w-[150px]">
                 <label className="block text-sm font-medium text-text-secondary mb-1">
                   End Date
                 </label>
-                <input
-                  type="date"
-                  value={endDate || ''}
-                  onChange={(e) => setEndDate(e.target.value || null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="date"
+                    value={endDate || ''}
+                    onChange={(e) => setEndDate(e.target.value || null)}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  />
+                </HandDrawnBox>
               </div>
 
               {hasFilters && (
@@ -360,30 +367,34 @@ function JournalEntryForm({
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Date *
               </label>
-              <input
-                type="date"
-                required
-                value={entryDate}
-                onChange={(e) => setEntryDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="date"
+                  required
+                  value={entryDate}
+                  onChange={(e) => setEntryDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1">
                 Book (optional)
               </label>
-              <select
-                value={bookId || ''}
-                onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              >
-                <option value="">No book</option>
-                {books.map((book) => (
-                  <option key={book.id} value={book.id || 0}>
-                    {book.title}
-                  </option>
-                ))}
-              </select>
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <select
+                  value={bookId || ''}
+                  onChange={(e) => setBookId(e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                >
+                  <option value="">No book</option>
+                  {books.map((book) => (
+                    <option key={book.id} value={book.id || 0}>
+                      {book.title}
+                    </option>
+                  ))}
+                </select>
+              </HandDrawnBox>
             </div>
           </div>
 
@@ -391,14 +402,16 @@ function JournalEntryForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Content *
             </label>
-            <textarea
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={8}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none font-serif"
-              placeholder="Write your thoughts, reflections, or insights here..."
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <textarea
+                required
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={8}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none font-serif"
+                placeholder="Write your thoughts, reflections, or insights here..."
+              />
+            </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">

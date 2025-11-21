@@ -5,6 +5,7 @@ import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ArrowLeft, Plus, Edit, Trash2, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function CollectionsPage() {
   const navigate = useNavigate();
@@ -219,26 +220,30 @@ function CollectionForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Name *
             </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              placeholder="Collection name"
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                placeholder="Collection name"
+              />
+            </HandDrawnBox>
           </div>
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1">
               Description
             </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-              placeholder="Optional description"
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                placeholder="Optional description"
+              />
+            </HandDrawnBox>
           </div>
           <div className="flex items-center justify-end space-x-3">
             <button

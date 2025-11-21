@@ -6,6 +6,7 @@ import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ArrowLeft, Save, Trash2, AlertTriangle, RotateCcw, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function ProgressCorrectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -431,30 +432,36 @@ function EditableSessionCard({
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="block text-xs text-text-secondary mb-1">Date</label>
-              <input
-                type="date"
-                value={session.session_date || ''}
-                onChange={(e) => onChange('session_date', e.target.value)}
-                className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="date"
+                  value={session.session_date || ''}
+                  onChange={(e) => onChange('session_date', e.target.value)}
+                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
             <div>
               <label className="block text-xs text-text-secondary mb-1">Start Time</label>
-              <input
-                type="time"
-                value={session.start_time?.substring(0, 5) || ''}
-                onChange={(e) => onChange('start_time', e.target.value ? `${e.target.value}:00` : null)}
-                className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="time"
+                  value={session.start_time?.substring(0, 5) || ''}
+                  onChange={(e) => onChange('start_time', e.target.value ? `${e.target.value}:00` : null)}
+                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
             <div>
               <label className="block text-xs text-text-secondary mb-1">End Time</label>
-              <input
-                type="time"
-                value={session.end_time?.substring(0, 5) || ''}
-                onChange={(e) => onChange('end_time', e.target.value ? `${e.target.value}:00` : null)}
-                className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="time"
+                  value={session.end_time?.substring(0, 5) || ''}
+                  onChange={(e) => onChange('end_time', e.target.value ? `${e.target.value}:00` : null)}
+                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
           </div>
 
@@ -463,59 +470,69 @@ function EditableSessionCard({
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-xs text-text-secondary mb-1">Start Page</label>
-                <input
-                  type="number"
-                  min="0"
-                  max={book.total_pages || undefined}
-                  value={session.start_page ?? ''}
-                  onChange={(e) => onChange('start_page', e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="number"
+                    min="0"
+                    max={book.total_pages || undefined}
+                    value={session.start_page ?? ''}
+                    onChange={(e) => onChange('start_page', e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  />
+                </HandDrawnBox>
               </div>
               <div>
                 <label className="block text-xs text-text-secondary mb-1">End Page</label>
-                <input
-                  type="number"
-                  min={session.start_page ?? 0}
-                  max={book.total_pages || undefined}
-                  value={session.end_page ?? ''}
-                  onChange={(e) => onChange('end_page', e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="number"
+                    min={session.start_page ?? 0}
+                    max={book.total_pages || undefined}
+                    value={session.end_page ?? ''}
+                    onChange={(e) => onChange('end_page', e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  />
+                </HandDrawnBox>
               </div>
               <div>
                 <label className="block text-xs text-text-secondary mb-1">Pages Read</label>
-                <input
-                  type="number"
-                  value={session.pages_read ?? ''}
-                  readOnly
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface/50 border border-background-border text-text-secondary cursor-not-allowed"
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="number"
+                    value={session.pages_read ?? ''}
+                    readOnly
+                    className="w-full px-2 py-1 text-sm rounded-md bg-background-surface/50 text-text-secondary cursor-not-allowed"
+                  />
+                </HandDrawnBox>
               </div>
             </div>
           ) : (
             <div>
               <label className="block text-xs text-text-secondary mb-1">Minutes Read</label>
-              <input
-                type="number"
-                min="0"
-                value={session.minutes_read ?? ''}
-                onChange={(e) => onChange('minutes_read', e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              />
+              <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                <input
+                  type="number"
+                  min="0"
+                  value={session.minutes_read ?? ''}
+                  onChange={(e) => onChange('minutes_read', e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                />
+              </HandDrawnBox>
             </div>
           )}
 
           {/* Notes */}
           <div>
             <label className="block text-xs text-text-secondary mb-1">Notes</label>
-            <textarea
-              value={session.notes || ''}
-              onChange={(e) => onChange('notes', e.target.value || null)}
-              rows={2}
-              className="w-full px-2 py-1 text-sm rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-              placeholder="Optional notes..."
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <textarea
+                value={session.notes || ''}
+                onChange={(e) => onChange('notes', e.target.value || null)}
+                rows={2}
+                className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                placeholder="Optional notes..."
+              />
+            </HandDrawnBox>
           </div>
 
           {/* Errors & Warnings */}

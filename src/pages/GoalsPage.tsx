@@ -5,6 +5,8 @@ import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
 import { Target, Plus, BookOpen, Trash2, Trophy, Award, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
+import { HandDrawnDropdown } from '@/components/ui/inputs';
 
 export function GoalsPage() {
   const [showForm, setShowForm] = useState(false);
@@ -454,16 +456,18 @@ function GoalForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Goal Type *
             </label>
-            <select
-              required
+            <HandDrawnDropdown
+              options={[
+                { value: 'pages_monthly', label: 'Pages (Monthly)' },
+                { value: 'books_yearly', label: 'Books (Yearly)' },
+                { value: 'minutes_daily', label: 'Minutes (Daily)' },
+              ]}
               value={goalType}
-              onChange={(e) => setGoalType(e.target.value as any)}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-            >
-              <option value="pages_monthly">Pages (Monthly)</option>
-              <option value="books_yearly">Books (Yearly)</option>
-              <option value="minutes_daily">Minutes (Daily)</option>
-            </select>
+              onChange={(value) => setGoalType(value as 'pages_monthly' | 'books_yearly' | 'minutes_daily')}
+              placeholder="Select goal type..."
+              borderRadius={6}
+              strokeWidth={1}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -473,32 +477,36 @@ function GoalForm({
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Year
                   </label>
-                  <input
-                    type="number"
-                    required
-                    value={periodYear}
-                    onChange={(e) => setPeriodYear(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    min={2020}
-                    max={2100}
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="number"
+                      required
+                      value={periodYear}
+                      onChange={(e) => setPeriodYear(parseInt(e.target.value))}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      min={2020}
+                      max={2100}
+                    />
+                  </HandDrawnBox>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Month
                   </label>
-                  <select
-                    required
-                    value={periodMonth}
-                    onChange={(e) => setPeriodMonth(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                      <option key={month} value={month}>
-                        {new Date(2000, month - 1).toLocaleString('en-US', { month: 'long' })}
-                      </option>
-                    ))}
-                  </select>
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <select
+                      required
+                      value={periodMonth}
+                      onChange={(e) => setPeriodMonth(parseInt(e.target.value))}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    >
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                        <option key={month} value={month}>
+                          {new Date(2000, month - 1).toLocaleString('en-US', { month: 'long' })}
+                        </option>
+                      ))}
+                    </select>
+                  </HandDrawnBox>
                 </div>
               </>
             )}
@@ -508,15 +516,17 @@ function GoalForm({
                 <label className="block text-sm font-medium text-text-primary mb-1">
                   Year
                 </label>
-                <input
-                  type="number"
-                  required
-                  value={periodYear}
-                  onChange={(e) => setPeriodYear(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  min={2020}
-                  max={2100}
-                />
+                <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                  <input
+                    type="number"
+                    required
+                    value={periodYear}
+                    onChange={(e) => setPeriodYear(parseInt(e.target.value))}
+                    className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    min={2020}
+                    max={2100}
+                  />
+                </HandDrawnBox>
               </div>
             )}
 
@@ -533,21 +543,23 @@ function GoalForm({
             <label className="block text-sm font-medium text-text-primary mb-1">
               Target *
             </label>
-            <input
-              type="number"
-              required
-              min={1}
-              value={targetValue}
-              onChange={(e) => setTargetValue(parseInt(e.target.value))}
-              className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              placeholder={
-                goalType === 'pages_monthly'
-                  ? 'e.g., 500 pages'
-                  : goalType === 'books_yearly'
-                  ? 'e.g., 24 books'
-                  : 'e.g., 60 minutes'
-              }
-            />
+            <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+              <input
+                type="number"
+                required
+                min={1}
+                value={targetValue}
+                onChange={(e) => setTargetValue(parseInt(e.target.value))}
+                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                placeholder={
+                  goalType === 'pages_monthly'
+                    ? 'e.g., 500 pages'
+                    : goalType === 'books_yearly'
+                    ? 'e.g., 24 books'
+                    : 'e.g., 60 minutes'
+                }
+              />
+            </HandDrawnBox>
           </div>
 
           <div className="flex items-center justify-end space-x-3">

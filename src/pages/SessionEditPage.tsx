@@ -5,6 +5,7 @@ import { useBooks } from '@/hooks/useBooks';
 import { Container, Stack, Section } from '@/components/ui/layout';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { ArrowLeft, Save } from 'lucide-react';
+import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 export function SessionEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -142,13 +143,15 @@ export function SessionEditPage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Date *
                   </label>
-                  <input
-                    type="date"
-                    required
-                    value={sessionDate}
-                    onChange={(e) => setSessionDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <input
+                      type="date"
+                      required
+                      value={sessionDate}
+                      onChange={(e) => setSessionDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 {/* Time Range */}
@@ -157,23 +160,27 @@ export function SessionEditPage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Start Time
                     </label>
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      />
+                    </HandDrawnBox>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       End Time
                     </label>
-                    <input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                      />
+                    </HandDrawnBox>
                   </div>
                 </div>
 
@@ -184,31 +191,35 @@ export function SessionEditPage() {
                       <label className="block text-sm font-medium text-text-primary mb-1">
                         Start Page
                       </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={startPage || ''}
-                        onChange={(e) =>
-                          setStartPage(e.target.value ? parseInt(e.target.value) : null)
-                        }
-                        className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                        placeholder="Page number"
-                      />
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                        <input
+                          type="number"
+                          min="0"
+                          value={startPage || ''}
+                          onChange={(e) =>
+                            setStartPage(e.target.value ? parseInt(e.target.value) : null)
+                          }
+                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                          placeholder="Page number"
+                        />
+                      </HandDrawnBox>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-text-primary mb-1">
                         End Page
                       </label>
-                      <input
-                        type="number"
-                        min={startPage || 0}
-                        value={endPage || ''}
-                        onChange={(e) =>
-                          setEndPage(e.target.value ? parseInt(e.target.value) : null)
-                        }
-                        className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                        placeholder="Page number"
-                      />
+                      <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                        <input
+                          type="number"
+                          min={startPage || 0}
+                          value={endPage || ''}
+                          onChange={(e) =>
+                            setEndPage(e.target.value ? parseInt(e.target.value) : null)
+                          }
+                          className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                          placeholder="Page number"
+                        />
+                      </HandDrawnBox>
                       {startPage !== null && endPage !== null && endPage >= startPage && (
                         <Paragraph variant="secondary" className="text-xs mt-1">
                           Pages read: {endPage - startPage}
@@ -224,16 +235,18 @@ export function SessionEditPage() {
                     <label className="block text-sm font-medium text-text-primary mb-1">
                       Minutes Read
                     </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={minutesRead || ''}
-                      onChange={(e) =>
-                        setMinutesRead(e.target.value ? parseInt(e.target.value) : null)
-                      }
-                      className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
-                      placeholder="Minutes"
-                    />
+                    <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        value={minutesRead || ''}
+                        onChange={(e) =>
+                          setMinutesRead(e.target.value ? parseInt(e.target.value) : null)
+                        }
+                        className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                        placeholder="Minutes"
+                      />
+                    </HandDrawnBox>
                   </div>
                 )}
 
@@ -242,13 +255,15 @@ export function SessionEditPage() {
                   <label className="block text-sm font-medium text-text-primary mb-1">
                     Notes
                   </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 rounded-md bg-background-surface border border-background-border text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
-                    placeholder="Quick notes about this session..."
-                  />
+                  <HandDrawnBox borderRadius={6} strokeWidth={1} className="w-full">
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary resize-none"
+                      placeholder="Quick notes about this session..."
+                    />
+                  </HandDrawnBox>
                 </div>
 
                 {/* Actions */}
