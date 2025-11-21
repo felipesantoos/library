@@ -31,8 +31,9 @@ use adapters::tauri::commands::{
     create_agenda_block, update_agenda_block, delete_agenda_block,
     get_agenda_block, list_agenda_blocks, mark_agenda_block_completed,
     create_reading, list_readings, get_reading, get_current_reading,
-    register_backup, get_last_backup_date, get_backup_metadata, validate_backup_json,
-};
+    register_backup, get_last_backup_date, get_backup_metadata,            validate_backup_json,
+           check_integrity,
+       };
 
 pub fn run() {
     // Initialize database connection
@@ -106,8 +107,9 @@ pub fn run() {
             register_backup,
             get_last_backup_date,
             get_backup_metadata,
-            validate_backup_json,
-        ])
+                   validate_backup_json,
+                   check_integrity,
+               ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -9,6 +9,7 @@ pub mod journal_commands;
 pub mod agenda_commands;
 pub mod reading_commands;
 pub mod backup_commands;
+pub mod integrity_commands;
 
 pub use book_commands::*;
 pub use session_commands::*;
@@ -21,3 +22,4 @@ pub use journal_commands::*;
 pub use agenda_commands::*;
 pub use reading_commands::*;
 pub use backup_commands::*;
+pub use integrity_commands::*;
