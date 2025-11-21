@@ -50,7 +50,7 @@ export default {
       },
       fontFamily: {
         heading: ['Literata', 'Merriweather', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        body: ['Literata', 'Merriweather', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {

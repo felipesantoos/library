@@ -21,17 +21,17 @@ import { DecorativeArrow } from './DecorativeArrow';
 import { HandDrawnBorder } from './HandDrawnBorder';
 
 const navigation = [
-  { name: 'Home', path: '/', icon: Home },
-  { name: 'Library', path: '/library', icon: BookOpen },
-  { name: 'Sessions', path: '/sessions', icon: Clock },
-  { name: 'Notes', path: '/notes', icon: FileText },
-  { name: 'Goals & Stats', path: '/goals', icon: Target },
-  { name: 'Journal', path: '/journal', icon: BookMarked },
+  { name: 'The Reading Desk', path: '/', icon: Home },
+  { name: 'The Grand Bookshelf', path: '/library', icon: BookOpen },
+  { name: 'Reading Logbook', path: '/sessions', icon: Clock },
+  { name: 'Marginalia & Annotations', path: '/notes', icon: FileText },
+  { name: 'The Scholar\'s Compendium', path: '/goals', icon: Target },
+  { name: 'The Reader\'s Chronicle', path: '/journal', icon: BookMarked },
   { name: 'Collections', path: '/collections', icon: FolderKanban },
-  { name: 'Agenda', path: '/agenda', icon: Calendar },
-  { name: 'Archive', path: '/archive', icon: Archive },
-  { name: 'Wishlist', path: '/wishlist', icon: Heart },
-  { name: 'Settings', path: '/settings', icon: Settings },
+  { name: 'The Reading Almanac', path: '/agenda', icon: Calendar },
+  { name: 'The Dusty Archives', path: '/archive', icon: Archive },
+  { name: 'The Wish Ledger', path: '/wishlist', icon: Heart },
+  { name: 'The Study\'s Instruments', path: '/settings', icon: Settings },
 ];
 
 const SIDEBAR_STATE_KEY = 'sidebar-expanded';
@@ -78,7 +78,7 @@ export function Sidebar() {
       ref={sidebarRef}
       className={cn(
         'relative flex flex-col bg-background-surface dark:bg-dark-background-surface transition-all duration-300',
-        isExpanded ? 'w-64' : 'w-20'
+        isExpanded ? 'w-80' : 'w-20'
       )}
     >
       {dimensions.width > 0 && dimensions.height > 0 && (
@@ -107,7 +107,7 @@ export function Sidebar() {
         )}
       >
         <HandDrawnBorder
-          width={isExpanded ? 256 : 80}
+          width={isExpanded ? 320 : 80}
           height={64}
           borderRadius={0}
           strokeWidth={1}
@@ -120,7 +120,7 @@ export function Sidebar() {
               <BookOpen className="w-5 h-5 text-background-surface dark:text-dark-text-primary" />
             </div>
             <span className="text-lg font-semibold text-text-primary dark:text-dark-text-primary whitespace-nowrap">
-              Library
+              The Grand Bookshelf
             </span>
           </div>
         ) : (
@@ -195,7 +195,7 @@ export function Sidebar() {
         isExpanded ? 'px-4 py-3' : 'px-0 py-3 flex justify-center'
       )}>
         <HandDrawnBorder
-          width={isExpanded ? 256 : 80}
+          width={isExpanded ? 320 : 80}
           height={60}
           borderRadius={0}
           strokeWidth={1}
