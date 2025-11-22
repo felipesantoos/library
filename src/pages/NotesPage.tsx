@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNotes, NoteDto, createNote, deleteNote, CreateNoteCommand } from '@/hooks/useNotes';
+import { useNotes } from '@/hooks/useNotes';
 import { useBooks } from '@/hooks/useBooks';
 import { Container, Stack, Section } from '@/components/ui/layout';
-import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
-import { SentimentBadge } from '@/components/ui/notes/SentimentBadge';
-import { BookOpen, Plus, Search, Trash2, FileText, Highlighter, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
-import { HandDrawnDropdown } from '@/components/ui/inputs';
+import { Paragraph } from '@/components/ui/typography';
+import {
+  NotesHeader,
+  NotesSearch,
+  NotesFilters,
+  NotesList,
+  EmptyNotesState,
+  NoteForm,
+  useNoteActions,
+} from '@/components/notes';
 
 export function NotesPage() {
   const navigate = useNavigate();
@@ -26,25 +30,13 @@ export function NotesPage() {
     search_query: searchQuery || undefined,
   });
 
-  const handleCreate = async (command: CreateNoteCommand) => {
-    try {
-      await createNote(command);
-      setShowForm(false);
-      refresh();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to create note');
-    }
-  };
+  const { handleCreate, handleDelete } = useNoteActions(() => {
+    setShowForm(false);
+    refresh();
+  });
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this note?')) {
-      try {
-        await deleteNote(id);
-        refresh();
-      } catch (err) {
-        alert(err instanceof Error ? err.message : 'Failed to delete note');
-      }
-    }
+  const handleFormSubmit = (command: any) => {
+    handleCreate(command);
   };
 
   if (loading) {
@@ -73,425 +65,46 @@ export function NotesPage() {
     <Container>
       <div className="py-8">
         <Stack spacing="lg">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Heading level={1}>Marginalia & Annotations</Heading>
-              <Paragraph variant="secondary" className="mt-2">
-                {notes.length} {notes.length === 1 ? 'note' : 'notes'} recorded
-              </Paragraph>
-            </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>New Note</span>
-            </button>
-          </div>
+          <NotesHeader
+            notesCount={notes.length}
+            onNewNoteClick={() => setShowForm(!showForm)}
+          />
 
-          {/* Search */}
-          <Section padding="sm">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary z-10" />
-              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-              <input
-                type="text"
-                placeholder="Search notes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
-              />
-              </HandDrawnBox>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-text-secondary hover:text-text-primary transition-colors z-10"
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </Section>
+          <NotesSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
 
-          {/* Filters */}
-          <Section padding="sm">
-            <Stack direction="row" spacing="md" className="flex-wrap">
+          <NotesFilters
+            typeFilter={typeFilter}
+            sentimentFilter={sentimentFilter}
+            bookFilter={bookFilter}
+            books={books}
+            onTypeFilterChange={setTypeFilter}
+            onSentimentFilterChange={setSentimentFilter}
+            onBookFilterChange={setBookFilter}
+          />
 
-              <div className="flex-1 min-w-[150px]">
-                <label className="block text-sm font-medium text-text-secondary mb-1">
-                  Type
-                </label>
-                <HandDrawnDropdown
-                  options={[
-                    { value: 'all', label: 'All Types' },
-                    { value: 'note', label: 'Notes' },
-                    { value: 'highlight', label: 'Highlights' },
-                  ]}
-                  value={typeFilter}
-                  onChange={(value) => setTypeFilter(value ? (value as 'all' | 'note' | 'highlight') : 'all')}
-                  placeholder="All Types"
-                  borderRadius={6}
-                  strokeWidth={1}
-                />
-              </div>
-
-              <div className="flex-1 min-w-[180px]">
-                <label className="block text-sm font-medium text-text-secondary mb-1">
-                  Sentiment
-                </label>
-                <HandDrawnDropdown
-                  options={[
-                    { value: 'all', label: 'All Sentiments' },
-                    { value: 'inspiration', label: 'Inspiration' },
-                    { value: 'doubt', label: 'Doubt' },
-                    { value: 'reflection', label: 'Reflection' },
-                    { value: 'learning', label: 'Learning' },
-                  ]}
-                  value={sentimentFilter}
-                  onChange={(value) => setSentimentFilter(value ? (value as 'all' | 'inspiration' | 'doubt' | 'reflection' | 'learning') : 'all')}
-                  placeholder="All Sentiments"
-                  borderRadius={6}
-                  strokeWidth={1}
-                />
-              </div>
-
-              <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-text-secondary mb-1">
-                  Book
-                </label>
-                <HandDrawnDropdown
-                  options={[
-                    { value: 0, label: 'All Books' },
-                    ...books.map((book) => ({
-                      value: book.id || 0,
-                      label: book.title,
-                    })),
-                  ]}
-                  value={bookFilter || 0}
-                  onChange={(value) => {
-                    const numValue = value ? (typeof value === 'number' ? value : parseInt(value as string)) : 0;
-                    setBookFilter(numValue === 0 ? null : numValue);
-                  }}
-                  placeholder="All Books"
-                  searchable={books.length > 5}
-                  borderRadius={6}
-                  strokeWidth={1}
-                />
-              </div>
-            </Stack>
-          </Section>
-
-          {/* Note Form */}
           {showForm && (
             <NoteForm
               books={books}
-              onSubmit={handleCreate}
+              onSubmit={handleFormSubmit}
               onCancel={() => setShowForm(false)}
             />
           )}
 
-          {/* Notes List */}
           {notes.length === 0 ? (
-            <Section padding="lg">
-              <div className="text-center py-12">
-                <FileText className="w-16 h-16 mx-auto text-text-secondary mb-4" />
-                <Heading level={3}>No notes yet</Heading>
-                <Paragraph variant="secondary" className="mt-2">
-                  Create your first note or highlight to get started
-                </Paragraph>
-              </div>
-            </Section>
+            <EmptyNotesState />
           ) : (
-            <Stack spacing="sm">
-              {notes.map((note) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  books={books}
-                  onDelete={handleDelete}
-                  onBookClick={(bookId) => navigate(`/book/${bookId}`)}
-                />
-              ))}
-            </Stack>
+            <NotesList
+              notes={notes}
+              books={books}
+              onDelete={handleDelete}
+              onBookClick={(bookId) => navigate(`/book/${bookId}`)}
+            />
           )}
         </Stack>
       </div>
     </Container>
   );
 }
-
-function NoteCard({
-  note,
-  books,
-  onDelete,
-  onBookClick,
-}: {
-  note: NoteDto;
-  books: any[];
-  onDelete: (id: number) => void;
-  onBookClick: (bookId: number) => void;
-}) {
-  const book = books.find((b) => b.id === note.book_id);
-
-  return (
-    <Section padding="md" className="hover:shadow-medium hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 ease-in-out">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <Stack spacing="sm">
-            <div className="flex items-center space-x-3">
-              {note.note_type === 'highlight' ? (
-                <Highlighter className="w-5 h-5 text-accent-secondary" />
-              ) : (
-                <FileText className="w-5 h-5 text-text-secondary" />
-              )}
-              <div>
-                <div className="flex items-center space-x-2">
-                  {book && (
-                    <button
-                      onClick={() => onBookClick(note.book_id)}
-                      className="font-semibold text-accent-primary hover:underline hover:text-accent-primary/80 transition-colors duration-200"
-                    >
-                      {book.title}
-                    </button>
-                  )}
-                  {note.page && (
-                    <MetaText className="text-xs">Page {note.page}</MetaText>
-                  )}
-                </div>
-                {note.sentiment && (
-                  <SentimentBadge sentiment={note.sentiment as any} size="sm" />
-                )}
-              </div>
-            </div>
-
-            {note.excerpt && (
-              <div className="pl-8 p-3 rounded-md bg-background-surface border-l-4 border-accent-secondary">
-                <Paragraph variant="secondary" className="italic text-sm">
-                  "{note.excerpt}"
-                </Paragraph>
-              </div>
-            )}
-
-            <div className="pl-8">
-              <Paragraph className="text-sm whitespace-pre-wrap">{note.content}</Paragraph>
-            </div>
-
-            <MetaText className="pl-8 text-xs">
-              {new Date(note.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </MetaText>
-          </Stack>
-        </div>
-
-        {note.id && (
-          <button
-            onClick={() => onDelete(note.id!)}
-            className="p-2 text-text-secondary hover:text-semantic-error transition-colors"
-            aria-label="Delete note"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-    </Section>
-  );
-}
-
-function NoteForm({
-  books,
-  onSubmit,
-  onCancel,
-}: {
-  books: any[];
-  onSubmit: (command: CreateNoteCommand) => void;
-  onCancel: () => void;
-}) {
-  const [bookId, setBookId] = useState<number | null>(null);
-  const [noteType, setNoteType] = useState<'note' | 'highlight'>('note');
-  const [page, setPage] = useState<number | null>(null);
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [sentiment, setSentiment] = useState<string>('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bookId || !content.trim()) {
-      alert('Please select a book and enter note content');
-      return;
-    }
-
-    if (noteType === 'highlight' && !excerpt.trim()) {
-      alert('Highlight excerpt is required');
-      return;
-    }
-
-    onSubmit({
-      book_id: bookId,
-      note_type: noteType,
-      page: page || null,
-      excerpt: noteType === 'highlight' ? excerpt : null,
-      content: content.trim(),
-      sentiment: sentiment ? (sentiment as any) : null,
-    });
-
-    // Reset form
-    setBookId(null);
-    setNoteType('note');
-    setPage(null);
-    setExcerpt('');
-    setContent('');
-    setSentiment('');
-  };
-
-  return (
-    <Section padding="md" className="bg-background-surface border-2 border-accent-primary">
-      <form onSubmit={handleSubmit}>
-        <Stack spacing="md">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Book *
-              </label>
-              <HandDrawnDropdown
-                options={[
-                  { value: '', label: 'Select a book...' },
-                  ...books
-                    .filter((b) => !b.is_archived)
-                    .map((book) => ({
-                      value: book.id || 0,
-                      label: `${book.title}${book.author ? ` by ${book.author}` : ''}`,
-                    })),
-                ]}
-                value={bookId || ''}
-                onChange={(value) => setBookId(value ? (typeof value === 'number' ? value : parseInt(value as string)) : null)}
-                placeholder="Select a book..."
-                searchable={books.filter((b) => !b.is_archived).length > 5}
-                borderRadius={6}
-                strokeWidth={1}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Type *
-              </label>
-              <HandDrawnDropdown
-                options={[
-                  { value: 'note', label: 'Note' },
-                  { value: 'highlight', label: 'Highlight' },
-                ]}
-                value={noteType}
-                onChange={(value) => setNoteType(value as 'note' | 'highlight')}
-                placeholder="Select type..."
-                borderRadius={6}
-                strokeWidth={1}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Page
-              </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-              <input
-                type="number"
-                min="0"
-                value={page || ''}
-                onChange={(e) => setPage(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none"
-                placeholder="Optional"
-              />
-              </HandDrawnBox>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Sentiment (optional)
-              </label>
-              <div className="flex items-center gap-2">
-                <HandDrawnDropdown
-                  options={[
-                    { value: '', label: 'None' },
-                    { value: 'inspiration', label: 'Inspiration' },
-                    { value: 'doubt', label: 'Doubt' },
-                    { value: 'reflection', label: 'Reflection' },
-                    { value: 'learning', label: 'Learning' },
-                  ]}
-                  value={sentiment}
-                  onChange={(value) => setSentiment(value ? String(value) : '')}
-                  placeholder="None"
-                  borderRadius={6}
-                  strokeWidth={1}
-                  className="flex-1"
-                />
-                {sentiment && (
-                  <SentimentBadge sentiment={sentiment as any} size="md" variant="outline" />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {noteType === 'highlight' && (
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Excerpt *
-              </label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-              <textarea
-                required
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                rows={2}
-                  className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
-                placeholder="Selected text..."
-              />
-              </HandDrawnBox>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              Content *
-            </label>
-            <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-            <textarea
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={4}
-                className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
-              placeholder="Your note or comment..."
-            />
-            </HandDrawnBox>
-          </div>
-
-          <div className="flex items-center justify-end space-x-3">
-            <HandDrawnBox borderRadius={6} strokeWidth={1}>
-            <button
-              type="button"
-              onClick={onCancel}
-                className="px-4 py-2 rounded-md text-text-secondary hover:bg-background-surface transition-colors"
-            >
-              Cancel
-            </button>
-            </HandDrawnBox>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 transition-colors"
-            >
-              Save Note
-            </button>
-          </div>
-        </Stack>
-      </form>
-    </Section>
-  );
-}
-
