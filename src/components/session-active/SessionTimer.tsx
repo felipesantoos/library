@@ -1,16 +1,15 @@
 import { Section } from '@/components/ui/layout';
 import { Button } from '@/components/ui/Button';
-import { Play, Pause, Square } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 
 interface SessionTimerProps {
   seconds: number;
   isRunning: boolean;
   onStart: () => void;
-  onPause: () => void;
   onStop: () => void;
 }
 
-export function SessionTimer({ seconds, isRunning, onStart, onPause, onStop }: SessionTimerProps) {
+export function SessionTimer({ seconds, isRunning, onStart, onStop }: SessionTimerProps) {
   const formatTimer = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -39,25 +38,15 @@ export function SessionTimer({ seconds, isRunning, onStart, onPause, onStop }: S
             </Button>
           )}
           {isRunning && (
-            <>
-              <Button
-                onClick={onPause}
-                variant="secondary"
-                icon={<Pause />}
-                iconPosition="left"
-              >
-                Pause
-              </Button>
-              <Button
-                onClick={onStop}
-                variant="secondary"
-                icon={<Square />}
-                iconPosition="left"
-                className="bg-semantic-error hover:bg-semantic-error/90"
-              >
-                Stop
-              </Button>
-            </>
+            <Button
+              onClick={onStop}
+              variant="secondary"
+              icon={<Square />}
+              iconPosition="left"
+              className="bg-semantic-error hover:bg-semantic-error/90"
+            >
+              Stop
+            </Button>
           )}
         </div>
       </div>

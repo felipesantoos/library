@@ -28,7 +28,6 @@ export function SessionActivePage() {
     startPage,
     endPage,
     minutesRead,
-    notes,
     setBookId,
     setSessionDate,
     setStartTime,
@@ -36,7 +35,6 @@ export function SessionActivePage() {
     setStartPage,
     setEndPage,
     setMinutesRead,
-    setNotes,
   } = useSessionForm({ initialBookId });
 
   const selectedBook = books.find((b) => b.id === bookId);
@@ -49,7 +47,7 @@ export function SessionActivePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBook?.id]);
 
-  const { seconds, isRunning, startTimer, pauseTimer, stopTimer } = useSessionTimer(
+  const { seconds, isRunning, startTimer, stopTimer } = useSessionTimer(
     () => {
       if (!startTime) {
         const now = new Date();
@@ -91,7 +89,6 @@ export function SessionActivePage() {
       start_page: startPage || null,
       end_page: endPage || null,
       minutes_read: minutesRead || null,
-      notes: notes || null,
     };
 
     handleSubmit(command, validate);
@@ -109,7 +106,6 @@ export function SessionActivePage() {
             seconds={seconds}
             isRunning={isRunning}
             onStart={startTimer}
-            onPause={pauseTimer}
             onStop={stopTimer}
           />
 
@@ -123,7 +119,6 @@ export function SessionActivePage() {
             startPage={startPage}
             endPage={endPage}
             minutesRead={minutesRead}
-            notes={notes}
             loading={loading}
             onBookIdChange={setBookId}
             onSessionDateChange={setSessionDate}
@@ -132,7 +127,6 @@ export function SessionActivePage() {
             onStartPageChange={setStartPage}
             onEndPageChange={setEndPage}
             onMinutesReadChange={setMinutesRead}
-            onNotesChange={setNotes}
             onSubmit={onSubmit}
           />
         </Stack>

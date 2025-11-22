@@ -13,7 +13,6 @@ interface SessionFormProps {
   startPage: number | null;
   endPage: number | null;
   minutesRead: number | null;
-  notes: string;
   loading: boolean;
   onBookIdChange: (value: number | null) => void;
   onSessionDateChange: (value: string) => void;
@@ -22,7 +21,6 @@ interface SessionFormProps {
   onStartPageChange: (value: number | null) => void;
   onEndPageChange: (value: number | null) => void;
   onMinutesReadChange: (value: number | null) => void;
-  onNotesChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -36,7 +34,6 @@ export function SessionForm({
   startPage,
   endPage,
   minutesRead,
-  notes,
   loading,
   onBookIdChange,
   onSessionDateChange,
@@ -45,7 +42,6 @@ export function SessionForm({
   onStartPageChange,
   onEndPageChange,
   onMinutesReadChange,
-  onNotesChange,
   onSubmit,
 }: SessionFormProps) {
   return (
@@ -62,7 +58,6 @@ export function SessionForm({
             startPage={startPage}
             endPage={endPage}
             minutesRead={minutesRead}
-            notes={notes}
             onBookIdChange={onBookIdChange}
             onSessionDateChange={onSessionDateChange}
             onStartTimeChange={onStartTimeChange}
@@ -70,7 +65,6 @@ export function SessionForm({
             onStartPageChange={onStartPageChange}
             onEndPageChange={onEndPageChange}
             onMinutesReadChange={onMinutesReadChange}
-            onNotesChange={onNotesChange}
           />
 
           <SessionFormActions loading={loading} disabled={!bookId} />

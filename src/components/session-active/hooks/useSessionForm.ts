@@ -13,7 +13,6 @@ export function useSessionForm({ initialBookId = null, initialDate }: UseSession
   const [startPage, setStartPage] = useState<number | null>(null);
   const [endPage, setEndPage] = useState<number | null>(null);
   const [minutesRead, setMinutesRead] = useState<number | null>(null);
-  const [notes, setNotes] = useState('');
 
   return {
     bookId,
@@ -23,7 +22,6 @@ export function useSessionForm({ initialBookId = null, initialDate }: UseSession
     startPage,
     endPage,
     minutesRead,
-    notes,
     setBookId,
     setSessionDate,
     setStartTime,
@@ -31,7 +29,6 @@ export function useSessionForm({ initialBookId = null, initialDate }: UseSession
     setStartPage,
     setEndPage,
     setMinutesRead,
-    setNotes,
   };
 }
 

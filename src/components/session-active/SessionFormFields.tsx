@@ -14,7 +14,6 @@ interface SessionFormFieldsProps {
   startPage: number | null;
   endPage: number | null;
   minutesRead: number | null;
-  notes: string;
   onBookIdChange: (value: number | null) => void;
   onSessionDateChange: (value: string) => void;
   onStartTimeChange: (value: string) => void;
@@ -22,7 +21,6 @@ interface SessionFormFieldsProps {
   onStartPageChange: (value: number | null) => void;
   onEndPageChange: (value: number | null) => void;
   onMinutesReadChange: (value: number | null) => void;
-  onNotesChange: (value: string) => void;
 }
 
 export function SessionFormFields({
@@ -35,7 +33,6 @@ export function SessionFormFields({
   startPage,
   endPage,
   minutesRead,
-  notes,
   onBookIdChange,
   onSessionDateChange,
   onStartTimeChange,
@@ -43,7 +40,6 @@ export function SessionFormFields({
   onStartPageChange,
   onEndPageChange,
   onMinutesReadChange,
-  onNotesChange,
 }: SessionFormFieldsProps) {
   return (
     <>
@@ -174,21 +170,6 @@ export function SessionFormFields({
           </div>
         </div>
       )}
-
-      <div>
-        <label className="block text-sm font-medium text-text-primary mb-1">
-          Notes
-        </label>
-        <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-          <textarea
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
-            placeholder="Quick notes about this session..."
-          />
-        </HandDrawnBox>
-      </div>
     </>
   );
 }
