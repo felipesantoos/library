@@ -21,17 +21,17 @@ import { DecorativeArrow } from './DecorativeArrow';
 import { HandDrawnBorder } from './HandDrawnBorder';
 
 const navigation = [
-  { name: 'The Reading Desk', path: '/', icon: Home },
-  { name: 'The Grand Bookshelf', path: '/library', icon: BookOpen },
-  { name: 'Reading Logbook', path: '/sessions', icon: Clock },
-  { name: 'Marginalia & Annotations', path: '/notes', icon: FileText },
-  { name: 'The Scholar\'s Compendium', path: '/goals', icon: Target },
-  { name: 'The Reader\'s Chronicle', path: '/journal', icon: BookMarked },
+  { name: 'Home', path: '/', icon: Home },
+  { name: 'Library', path: '/library', icon: BookOpen },
+  { name: 'Sessions', path: '/sessions', icon: Clock },
+  { name: 'Notes', path: '/notes', icon: FileText },
+  { name: 'Goals', path: '/goals', icon: Target },
+  { name: 'Journal', path: '/journal', icon: BookMarked },
   { name: 'Collections', path: '/collections', icon: FolderKanban },
-  { name: 'The Reading Almanac', path: '/agenda', icon: Calendar },
-  { name: 'The Dusty Archives', path: '/archive', icon: Archive },
-  { name: 'The Wish Ledger', path: '/wishlist', icon: Heart },
-  { name: 'The Study\'s Instruments', path: '/settings', icon: Settings },
+  { name: 'Agenda', path: '/agenda', icon: Calendar },
+  { name: 'Archive', path: '/archive', icon: Archive },
+  { name: 'Wishlist', path: '/wishlist', icon: Heart },
+  { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
 const SIDEBAR_STATE_KEY = 'sidebar-expanded';
@@ -78,7 +78,7 @@ export function Sidebar() {
       ref={sidebarRef}
       className={cn(
         'relative flex flex-col bg-background-surface dark:bg-dark-background-surface transition-all duration-300',
-        isExpanded ? 'w-80' : 'w-20'
+        isExpanded ? 'w-56' : 'w-16'
       )}
     >
       {dimensions.width > 0 && dimensions.height > 0 && (
@@ -107,7 +107,7 @@ export function Sidebar() {
         )}
       >
         <HandDrawnBorder
-          width={isExpanded ? 320 : 80}
+          width={isExpanded ? 224 : 64}
           height={64}
           borderRadius={0}
           strokeWidth={1}
@@ -120,7 +120,7 @@ export function Sidebar() {
               <BookOpen className="w-5 h-5 text-background-surface dark:text-dark-text-primary" />
             </div>
             <span className="text-lg font-semibold text-text-primary dark:text-dark-text-primary whitespace-nowrap">
-              The Grand Bookshelf
+              Library
             </span>
           </div>
         ) : (
@@ -133,7 +133,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className={cn(
         'flex flex-col flex-1 overflow-y-auto transition-all duration-300',
-        isExpanded ? 'px-2 py-4 space-y-1' : 'py-1 space-y-0'
+        isExpanded ? 'px-2 py-4' : 'py-1 space-y-0'
       )}>
         {navigation.map((item) => {
           const isActive = item.path === '/' 
@@ -150,7 +150,7 @@ export function Sidebar() {
                 'hover:scale-[1.02] active:scale-[0.98]',
                 isExpanded 
                   ? 'px-3 py-2.5 space-x-3' 
-                  : 'flex-col justify-center p-1 mx-2',
+                  : 'flex-col justify-center',
                 // Expanded version: more visible active state
                 isExpanded && isActive && 'bg-accent-primary/25 text-accent-primary dark:text-dark-accent-primary font-semibold',
                 // Collapsed version: subtle background
@@ -170,17 +170,17 @@ export function Sidebar() {
                 </>
               ) : (
                 <div className="relative flex flex-col items-center justify-center w-full">
-                  <div className="relative flex items-center justify-center w-12 h-12">
+                  <div className="relative flex items-center justify-center w-10 h-10">
                   {isActive && (
                       <HandDrawnCircle 
                         key={`circle-${item.path}-${location.pathname}`}
-                        size={60} 
+                        size={48} 
                         strokeWidth={1.5}
                         animate={true}
                         className="text-accent-primary dark:text-dark-accent-primary" 
                       />
                   )}
-                    <item.icon className="w-6 h-6 flex-shrink-0 relative z-10" />
+                    <item.icon className="w-5 h-5 flex-shrink-0 relative z-10" />
                   </div>
                 </div>
               )}
@@ -195,7 +195,7 @@ export function Sidebar() {
         isExpanded ? 'px-4 py-3' : 'px-0 py-3 flex justify-center'
       )}>
         <HandDrawnBorder
-          width={isExpanded ? 320 : 80}
+          width={isExpanded ? 224 : 64}
           height={60}
           borderRadius={0}
           strokeWidth={1}

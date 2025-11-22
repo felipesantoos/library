@@ -18,15 +18,11 @@ export function NotesPage() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'note' | 'highlight'>('all');
   const [bookFilter, setBookFilter] = useState<number | null>(null);
-  const [sentimentFilter, setSentimentFilter] = useState<'all' | 'inspiration' | 'doubt' | 'reflection' | 'learning'>('all');
 
   const { books } = useBooks({});
   const { notes, loading, error, refresh } = useNotes({
     book_id: bookFilter ?? undefined,
-    note_type: typeFilter !== 'all' ? typeFilter : undefined,
-    sentiment: sentimentFilter !== 'all' ? sentimentFilter : undefined,
     search_query: searchQuery || undefined,
   });
 
@@ -76,12 +72,8 @@ export function NotesPage() {
           />
 
           <NotesFilters
-            typeFilter={typeFilter}
-            sentimentFilter={sentimentFilter}
             bookFilter={bookFilter}
             books={books}
-            onTypeFilterChange={setTypeFilter}
-            onSentimentFilterChange={setSentimentFilter}
             onBookFilterChange={setBookFilter}
           />
 

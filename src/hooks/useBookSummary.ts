@@ -6,9 +6,7 @@ export interface BookSummaryDto {
   book_title: string;
   book_author: string | null;
   total_notes: number;
-  total_highlights: number;
   notes_summary: string;
-  highlights_text: string[];
   key_themes: string[];
   generated_at: string;
 }

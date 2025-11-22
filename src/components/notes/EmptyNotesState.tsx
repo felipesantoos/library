@@ -9,7 +9,7 @@ export function EmptyNotesState() {
         <FileText className="w-16 h-16 mx-auto text-text-secondary mb-4" />
         <Heading level={3}>No notes yet</Heading>
         <Paragraph variant="secondary" className="mt-2">
-          Create your first note or highlight to get started
+          Create your first note to get started
         </Paragraph>
       </div>
     </Section>

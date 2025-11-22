@@ -10,7 +10,7 @@ export function JournalHeader({ onNewEntryClick }: JournalHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <Heading level={1}>Reading Journal</Heading>
+        <Heading level={1}>Journal</Heading>
         <Paragraph variant="secondary" className="mt-2">
           Reflect on your reading journey
         </Paragraph>

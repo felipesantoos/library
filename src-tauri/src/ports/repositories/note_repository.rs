@@ -1,4 +1,4 @@
-use crate::domain::entities::{Note, NoteType, Sentiment};
+use crate::domain::entities::Note;
 
 /// Repository trait for Note entity (Port/Interface)
 pub trait NoteRepository: Send + Sync {
@@ -22,12 +22,6 @@ pub trait NoteRepository: Send + Sync {
 
     /// Finds notes by reading ID (for rereads)
     fn find_by_reading_id(&self, reading_id: i64) -> Result<Vec<Note>, String>;
-
-    /// Finds notes by type
-    fn find_by_type(&self, note_type: NoteType) -> Result<Vec<Note>, String>;
-
-    /// Finds notes by sentiment
-    fn find_by_sentiment(&self, sentiment: Sentiment) -> Result<Vec<Note>, String>;
 
     /// Searches notes by content
     fn search_by_content(&self, query: &str) -> Result<Vec<Note>, String>;

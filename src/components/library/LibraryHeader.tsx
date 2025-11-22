@@ -20,7 +20,7 @@ export function LibraryHeader({
   return (
     <div className="flex items-center justify-between">
       <div>
-        <Heading level={1}>The Grand Bookshelf</Heading>
+        <Heading level={1}>Library</Heading>
         <Paragraph variant="secondary" className="mt-2">
           {bookCount} {bookCount === 1 ? 'book' : 'books'} in your library
           {hasActiveFilters && (

@@ -17,22 +17,10 @@ export function NotesTab({ notes }: NotesTabProps) {
       {notes.map((note) => (
         <Section key={note.id || Math.random()} padding="md" className="hover:shadow-medium transition-shadow">
           <Stack spacing="sm">
-            <div className="flex items-center space-x-2">
-              {note.note_type === 'highlight' && (
-                <div className="w-2 h-2 rounded-full bg-accent-secondary" />
-              )}
-              <MetaText className="text-xs">
-                {note.page && `Page ${note.page} • `}
-                {new Date(note.created_at).toLocaleDateString()}
-              </MetaText>
-            </div>
-            {note.excerpt && (
-              <div className="p-3 rounded-md bg-background-surface border-l-4 border-accent-secondary">
-                <Paragraph variant="secondary" className="text-sm italic">
-                  "{note.excerpt}"
-                </Paragraph>
-              </div>
-            )}
+            <MetaText className="text-xs">
+              {note.page && `Page ${note.page} • `}
+              {new Date(note.created_at).toLocaleDateString()}
+            </MetaText>
             <Paragraph className="text-sm">{note.content}</Paragraph>
           </Stack>
         </Section>

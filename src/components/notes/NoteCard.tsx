@@ -3,8 +3,7 @@ import { BookDto } from '@/hooks/useBooks';
 import { Section, Stack } from '@/components/ui/layout';
 import { Paragraph, MetaText } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
-import { SentimentBadge } from '@/components/ui/notes/SentimentBadge';
-import { FileText, Highlighter, Trash2 } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface NoteCardProps {
@@ -21,11 +20,7 @@ export function NoteCard({ note, book, onDelete, onBookClick }: NoteCardProps) {
         <div className="flex-1">
           <Stack spacing="sm">
             <div className="flex items-center space-x-3">
-              {note.note_type === 'highlight' ? (
-                <Highlighter className="w-5 h-5 text-accent-secondary" />
-              ) : (
-                <FileText className="w-5 h-5 text-text-secondary" />
-              )}
+              <FileText className="w-5 h-5 text-text-secondary" />
               <div>
                 <div className="flex items-center space-x-2">
                   {book && (
@@ -40,24 +35,8 @@ export function NoteCard({ note, book, onDelete, onBookClick }: NoteCardProps) {
                     <MetaText className="text-xs">Page {note.page}</MetaText>
                   )}
                 </div>
-                {note.sentiment && (
-                  <SentimentBadge sentiment={note.sentiment as any} size="sm" />
-                )}
               </div>
             </div>
-
-            {note.excerpt && (
-              <HandDrawnBox
-                borderRadius={6}
-                strokeWidth={1}
-                linearCorners={true}
-                className="pl-8 p-3 bg-background-surface border-l-4 border-accent-secondary"
-              >
-                <Paragraph variant="secondary" className="italic text-sm">
-                  "{note.excerpt}"
-                </Paragraph>
-              </HandDrawnBox>
-            )}
 
             <div className="pl-8">
               <Paragraph className="text-sm whitespace-pre-wrap">{note.content}</Paragraph>

@@ -55,7 +55,7 @@ export function WishlistPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <Heading level={1}>The Wish Ledger</Heading>
+              <Heading level={1}>Wishlist</Heading>
               <Paragraph variant="secondary" className="mt-2">
                 {books.length} {books.length === 1 ? 'book' : 'books'} in your wishlist
               </Paragraph>

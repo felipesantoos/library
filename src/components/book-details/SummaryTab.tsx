@@ -7,10 +7,8 @@ import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 interface Summary {
   generated_at: string;
   total_notes: number;
-  total_highlights: number;
   key_themes: string[];
   notes_summary: string | null;
-  highlights_text: string[];
 }
 
 interface SummaryTabProps {
@@ -42,7 +40,7 @@ export function SummaryTab({ summary, loading, error }: SummaryTabProps) {
     );
   }
 
-  if (!summary || (summary.total_notes === 0 && summary.total_highlights === 0)) {
+  if (!summary || summary.total_notes === 0) {
     return <EmptyState type="summary" />;
   }
 
@@ -60,15 +58,9 @@ export function SummaryTab({ summary, loading, error }: SummaryTabProps) {
               Generated {new Date(summary.generated_at).toLocaleDateString()}
             </MetaText>
           </div>
-          <div className="grid grid-cols-2 gap-4 pt-4">
-            <div>
-              <MetaText>Total Notes</MetaText>
-              <Paragraph className="text-2xl font-bold mt-1">{summary.total_notes}</Paragraph>
-            </div>
-            <div>
-              <MetaText>Total Highlights</MetaText>
-              <Paragraph className="text-2xl font-bold mt-1">{summary.total_highlights}</Paragraph>
-            </div>
+          <div className="pt-4">
+            <MetaText>Total Notes</MetaText>
+            <Paragraph className="text-2xl font-bold mt-1">{summary.total_notes}</Paragraph>
           </div>
         </Stack>
       </Section>
@@ -114,29 +106,6 @@ export function SummaryTab({ summary, loading, error }: SummaryTabProps) {
         </Section>
       )}
 
-      {/* Highlights */}
-      {summary.highlights_text.length > 0 && (
-        <Section padding="md">
-          <Stack spacing="sm">
-            <Heading level={4}>Highlights</Heading>
-            <div className="space-y-3">
-              {summary.highlights_text.map((highlight, index) => (
-                <HandDrawnBox
-                  key={index}
-                  borderRadius={6}
-                  strokeWidth={1}
-                  linearCorners={true}
-                  className="p-3 bg-background-surface border-l-4 border-accent-secondary"
-                >
-                  <Paragraph variant="secondary" className="text-sm italic">
-                    {highlight}
-                  </Paragraph>
-                </HandDrawnBox>
-              ))}
-            </div>
-          </Stack>
-        </Section>
-      )}
     </Stack>
   );
 }

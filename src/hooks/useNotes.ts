@@ -6,10 +6,7 @@ export interface NoteDto {
   book_id: number;
   reading_id: number | null;
   page: number | null;
-  note_type: 'note' | 'highlight';
-  excerpt: string | null;
   content: string;
-  sentiment: 'inspiration' | 'doubt' | 'reflection' | 'learning' | null;
   created_at: string;
   updated_at: string;
 }
@@ -18,16 +15,11 @@ export interface CreateNoteCommand {
   book_id: number;
   reading_id?: number | null;
   page?: number | null;
-  note_type: 'note' | 'highlight';
-  excerpt?: string | null;
   content: string;
-  sentiment?: 'inspiration' | 'doubt' | 'reflection' | 'learning' | null;
 }
 
 export function useNotes(filters?: {
   book_id?: number;
-  note_type?: 'note' | 'highlight';
-  sentiment?: 'inspiration' | 'doubt' | 'reflection' | 'learning';
   search_query?: string;
 }) {
   const [notes, setNotes] = useState<NoteDto[]>([]);
@@ -36,8 +28,6 @@ export function useNotes(filters?: {
 
   // Extrair valores primitivos para usar como dependências estáveis
   const bookId = filters?.book_id;
-  const noteType = filters?.note_type;
-  const sentiment = filters?.sentiment;
   const searchQuery = filters?.search_query;
 
   useEffect(() => {
@@ -49,8 +39,6 @@ export function useNotes(filters?: {
         setError(null);
         const result = await invoke<NoteDto[]>('list_notes', {
           book_id: bookId ?? null,
-          note_type: noteType ?? null,
-          sentiment: sentiment ?? null,
           search_query: searchQuery ?? null,
         });
         if (!cancelled) {
@@ -72,7 +60,7 @@ export function useNotes(filters?: {
     return () => {
       cancelled = true;
     };
-  }, [bookId, noteType, sentiment, searchQuery]);
+  }, [bookId, searchQuery]);
 
   const refresh = useCallback(async () => {
     try {
@@ -80,8 +68,6 @@ export function useNotes(filters?: {
       setError(null);
       const result = await invoke<NoteDto[]>('list_notes', {
         book_id: bookId ?? null,
-        note_type: noteType ?? null,
-        sentiment: sentiment ?? null,
         search_query: searchQuery ?? null,
       });
       setNotes(result);
@@ -90,7 +76,7 @@ export function useNotes(filters?: {
     } finally {
       setLoading(false);
     }
-  }, [bookId, noteType, sentiment, searchQuery]);
+  }, [bookId, searchQuery]);
 
   return { notes, loading, error, refresh };
 }

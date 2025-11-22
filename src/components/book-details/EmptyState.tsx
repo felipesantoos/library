@@ -16,12 +16,12 @@ export function EmptyState({ type }: EmptyStateProps) {
     notes: {
       icon: FileText,
       title: 'No notes yet',
-      message: 'Add notes or highlights to this book',
+      message: 'Add notes to this book',
     },
     summary: {
       icon: Sparkles,
       title: 'No Summary Available',
-      message: 'Add notes or highlights to generate an automatic summary',
+      message: 'Add notes to generate an automatic summary',
     },
   };
 

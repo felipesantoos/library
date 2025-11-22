@@ -70,17 +70,13 @@ CREATE TABLE reading_sessions (
     CHECK(duration_seconds IS NULL OR duration_seconds >= 0)
 );
 
--- notes: Unified table for notes and highlights
--- Uses type field to distinguish between 'note' and 'highlight'
+-- notes: Table for book annotations and notes
 CREATE TABLE notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     book_id INTEGER NOT NULL,
     reading_id INTEGER, -- FK to book_readings (null for first reading cycle)
     page INTEGER,
-    type TEXT NOT NULL CHECK(type IN ('note', 'highlight')),
-    excerpt TEXT, -- Text that was highlighted (for highlights)
-    content TEXT NOT NULL, -- Note text or highlight content
-    sentiment TEXT CHECK(sentiment IN ('inspiration', 'doubt', 'reflection', 'learning')),
+    content TEXT NOT NULL, -- Note content
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
@@ -232,9 +228,7 @@ CREATE INDEX idx_reading_sessions_date_book ON reading_sessions(session_date, bo
 -- notes indexes
 CREATE INDEX idx_notes_book_id ON notes(book_id);
 CREATE INDEX idx_notes_reading_id ON notes(reading_id);
-CREATE INDEX idx_notes_type ON notes(type);
 CREATE INDEX idx_notes_page ON notes(page);
-CREATE INDEX idx_notes_sentiment ON notes(sentiment);
 CREATE INDEX idx_notes_created_at ON notes(created_at);
 
 -- tags indexes

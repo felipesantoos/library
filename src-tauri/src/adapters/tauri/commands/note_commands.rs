@@ -36,8 +36,6 @@ pub fn get_note(
 #[tauri::command]
 pub fn list_notes(
     book_id: Option<i64>,
-    note_type: Option<String>,
-    sentiment: Option<String>,
     search_query: Option<String>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<NoteDto>, String> {
@@ -46,7 +44,7 @@ pub fn list_notes(
     let repository = SqliteNoteRepository::new(sqlite_conn);
     
     let use_case = ListNotesUseCase::new(&repository);
-    use_case.execute(book_id, note_type, sentiment, search_query)
+    use_case.execute(book_id, search_query)
 }
 
 /// Tauri command: Delete a note by ID

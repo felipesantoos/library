@@ -12,7 +12,7 @@ export function AgendaHeader({ onNewBlockClick, showForm }: AgendaHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <Heading level={1}>The Reading Almanac</Heading>
+        <Heading level={1}>Agenda</Heading>
         <Paragraph variant="secondary" className="mt-2">
           Plan your reading schedule and track sessions
         </Paragraph>

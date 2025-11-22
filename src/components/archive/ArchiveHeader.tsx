@@ -7,7 +7,7 @@ interface ArchiveHeaderProps {
 export function ArchiveHeader({ bookCount }: ArchiveHeaderProps) {
   return (
     <div>
-      <Heading level={1}>The Dusty Archives</Heading>
+        <Heading level={1}>Archive</Heading>
       <Paragraph variant="secondary" className="mt-2">
         {bookCount} {bookCount === 1 ? 'book' : 'books'} archived
       </Paragraph>

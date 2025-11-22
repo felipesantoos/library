@@ -1,7 +1,7 @@
 use crate::ports::repositories::{BookRepository, NoteRepository};
-use crate::domain::entities::{Book, Note, NoteType};
+use crate::domain::entities::Note;
 
-/// Use case for generating automatic book summary from notes and highlights
+/// Use case for generating automatic book summary from notes
 pub struct GenerateBookSummaryUseCase<'a> {
     book_repository: &'a dyn BookRepository,
     note_repository: &'a dyn NoteRepository,
@@ -13,9 +13,7 @@ pub struct BookSummary {
     pub book_title: String,
     pub book_author: Option<String>,
     pub total_notes: usize,
-    pub total_highlights: usize,
     pub notes_summary: String,
-    pub highlights_text: Vec<String>,
     pub key_themes: Vec<String>, // Extracted themes (simple keyword extraction for now)
     pub generated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -40,16 +38,11 @@ impl<'a> GenerateBookSummaryUseCase<'a> {
         // Get all notes for the book
         let notes = self.note_repository.find_by_book_id(book_id)?;
 
-        // Separate notes and highlights
-        let (notes_list, highlights_list): (Vec<_>, Vec<_>) = notes
-            .into_iter()
-            .partition(|note| note.note_type == NoteType::Note);
-
         // Compile notes summary
-        let notes_summary = if notes_list.is_empty() {
+        let notes_summary = if notes.is_empty() {
             "No notes recorded for this book.".to_string()
         } else {
-            notes_list
+            notes
                 .iter()
                 .filter_map(|note| {
                     if !note.content.trim().is_empty() {
@@ -62,34 +55,16 @@ impl<'a> GenerateBookSummaryUseCase<'a> {
                 .join("\n\n")
         };
 
-        // Extract highlights text
-        let highlights_text: Vec<String> = highlights_list
-            .iter()
-            .filter_map(|highlight| {
-                if let Some(excerpt) = &highlight.excerpt {
-                    if !excerpt.trim().is_empty() {
-                        let page_info = highlight.page
-                            .map(|p| format!(" (Page {})", p))
-                            .unwrap_or_default();
-                        return Some(format!("\"{}\"{}", excerpt.trim(), page_info));
-                    }
-                }
-                None
-            })
-            .collect();
-
         // Simple keyword extraction for themes (basic implementation)
-        // Extract common words from notes and highlights (future: use better NLP)
-        let key_themes = self.extract_themes(&notes_list, &highlights_list);
+        // Extract common words from notes (future: use better NLP)
+        let key_themes = self.extract_themes(&notes);
 
         Ok(BookSummary {
             book_id: book.id.unwrap_or(0),
             book_title: book.title,
             book_author: book.author,
-            total_notes: notes_list.len(),
-            total_highlights: highlights_list.len(),
+            total_notes: notes.len(),
             notes_summary,
-            highlights_text,
             key_themes,
             generated_at: chrono::Utc::now(),
         })
@@ -97,7 +72,7 @@ impl<'a> GenerateBookSummaryUseCase<'a> {
 
     /// Simple theme extraction (basic keyword frequency analysis)
     /// Future: implement more sophisticated NLP-based extraction
-    fn extract_themes(&self, notes: &[Note], highlights: &[Note]) -> Vec<String> {
+    fn extract_themes(&self, notes: &[Note]) -> Vec<String> {
         use std::collections::HashMap;
 
         // Collect all text content
@@ -105,15 +80,6 @@ impl<'a> GenerateBookSummaryUseCase<'a> {
         
         for note in notes {
             all_text.push_str(&note.content);
-            all_text.push_str(" ");
-        }
-        
-        for highlight in highlights {
-            if let Some(excerpt) = &highlight.excerpt {
-                all_text.push_str(excerpt);
-                all_text.push_str(" ");
-            }
-            all_text.push_str(&highlight.content);
             all_text.push_str(" ");
         }
 
