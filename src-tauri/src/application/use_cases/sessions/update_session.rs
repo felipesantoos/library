@@ -74,19 +74,59 @@ impl<'a> UpdateSessionUseCase<'a> {
         // Save via repository
         self.session_repository.update(&session)?;
 
-        // Update last page read with the end page of the section
-        if let Some(end_page) = session.end_page {
-            let mut book = self.book_repository
-                .find_by_id(session.book_id)?
-                .ok_or_else(|| "Book not found".to_string())?;
-
-            // Always update last page read with the end page of the section
-            book.update_current_page(end_page)?;
-            self.book_repository.update(&book)?;
-        }
+        // Recalculate book progress based on all sessions
+        self.recalculate_book_progress(session.book_id)?;
 
         // Convert to DTO and return
         Ok(SessionDto::from(session))
+    }
+
+    /// Recalculates book progress based on all sessions for the book
+    /// Sets current_page_text to the end_page of the most recent session
+    /// Sets current_minutes_audio to the sum of all minutes_read from all sessions
+    fn recalculate_book_progress(&self, book_id: i64) -> Result<(), String> {
+        let mut book = self.book_repository
+            .find_by_id(book_id)?
+            .ok_or_else(|| "Book not found".to_string())?;
+
+        // Get all sessions for this book
+        let mut sessions = self.session_repository.find_by_book_id(book_id)?;
+
+        // Sort sessions by date (most recent first), then by created_at if dates are equal
+        sessions.sort_by(|a, b| {
+            let date_cmp = b.session_date.cmp(&a.session_date);
+            if date_cmp == std::cmp::Ordering::Equal {
+                b.created_at.cmp(&a.created_at)
+            } else {
+                date_cmp
+            }
+        });
+
+        // Get end_page from the most recent session
+        let last_end_page = sessions
+            .iter()
+            .find_map(|s| s.end_page);
+
+        // Sum all minutes_read from all sessions
+        let total_minutes: i32 = sessions
+            .iter()
+            .filter_map(|s| s.minutes_read)
+            .sum();
+
+        // Update current_page_text with the end_page of the most recent session
+        if let Some(last_page) = last_end_page {
+            book.update_current_page(last_page)?;
+        }
+
+        // Update current_minutes_audio
+        if total_minutes > 0 {
+            book.update_current_minutes_audio(total_minutes)?;
+        }
+
+        // Save the book
+        self.book_repository.update(&book)?;
+
+        Ok(())
     }
 }
 

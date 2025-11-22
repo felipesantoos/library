@@ -11,9 +11,10 @@ interface SessionsTabProps {
   book: BookDto;
   sessions: SessionDto[];
   onEdit: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-export function SessionsTab({ book, sessions, onEdit }: SessionsTabProps) {
+export function SessionsTab({ book, sessions, onEdit, onDelete }: SessionsTabProps) {
   const navigate = useNavigate();
 
   if (sessions.length === 0) {
@@ -40,6 +41,7 @@ export function SessionsTab({ book, sessions, onEdit }: SessionsTabProps) {
           key={session.id}
           session={session}
           onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </Stack>

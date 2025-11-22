@@ -7,10 +7,12 @@ import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 interface ProgressDataPoint {
   date: string;
   progress: number;
+  cumulative?: number; // Page number reached at this point
 }
 
 interface ProgressChartProps {
   data: ProgressDataPoint[];
+  totalPages?: number; // Total pages of the book
 }
 
 // Generate hand-drawn path with organic imperfections for chart lines
@@ -77,16 +79,16 @@ function generateHandDrawnLinePath(
   return path;
 }
 
-export function ProgressChart({ data }: ProgressChartProps) {
+export function ProgressChart({ data, totalPages }: ProgressChartProps) {
   if (data.length === 0) return null;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(400);
-  const [hoveredPoint, setHoveredPoint] = useState<{ index: number; x: number; y: number; progress: number } | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<{ index: number; x: number; y: number; progress: number; pages?: number } | null>(null);
   const [isDark, setIsDark] = useState(false);
 
-  // Detect dark mode
+  // Detect dark mode for popover background
   useEffect(() => {
     const checkDarkMode = () => {
       setIsDark(document.documentElement.classList.contains('dark'));
@@ -262,6 +264,7 @@ export function ProgressChart({ data }: ProgressChartProps) {
                             x: screenPoint.x - containerRect.left,
                             y: screenPoint.y - containerRect.top,
                             progress: d.progress,
+                            pages: d.cumulative,
                           });
                         }
                       }
@@ -290,6 +293,7 @@ export function ProgressChart({ data }: ProgressChartProps) {
                             x: screenPoint.x - containerRect.left,
                             y: screenPoint.y - containerRect.top,
                             progress: d.progress,
+                            pages: d.cumulative,
                           });
                         }
                       }
@@ -316,32 +320,57 @@ export function ProgressChart({ data }: ProgressChartProps) {
             </svg>
             
             {/* Tooltip popover */}
-            {hoveredPoint && svgContainerRef.current && (
-              <div
-                className="absolute pointer-events-none z-10"
-                style={{
-                  left: `${hoveredPoint.x}px`,
-                  top: `${hoveredPoint.y - 40}px`,
-                  transform: 'translateX(-50%)',
-                }}
-              >
-                <HandDrawnBox
-                  borderRadius={6}
-                  strokeWidth={1}
-                  linearCorners={true}
-                  className="px-3 py-2 shadow-medium"
+            {hoveredPoint && svgContainerRef.current && (() => {
+              const containerWidth = svgContainerRef.current.offsetWidth;
+              const popoverWidth = 120; // Estimated popover width
+              const halfPopoverWidth = popoverWidth / 2;
+              
+              // Calculate left position to avoid clipping
+              let leftPosition = hoveredPoint.x;
+              let transform = 'translateX(-50%)';
+              
+              // If too close to left edge, align to left
+              if (hoveredPoint.x < halfPopoverWidth) {
+                leftPosition = halfPopoverWidth;
+                transform = 'translateX(0)';
+              }
+              // If too close to right edge, align to right
+              else if (hoveredPoint.x > containerWidth - halfPopoverWidth) {
+                leftPosition = containerWidth - halfPopoverWidth;
+                transform = 'translateX(0)';
+              }
+              
+              return (
+                <div
+                  className="absolute pointer-events-none z-10"
                   style={{
-                    backgroundColor: isDark 
-                      ? '#27211D' // Smoked Parchment (dark)
-                      : '#FAF7EF', // Linen White (light)
+                    left: `${leftPosition}px`,
+                    top: `${hoveredPoint.y - 70}px`,
+                    transform,
                   }}
                 >
-                  <div className="text-sm font-medium text-text-primary">
-                    {hoveredPoint.progress.toFixed(1)}%
-                  </div>
-                </HandDrawnBox>
-              </div>
-            )}
+                  <HandDrawnBox
+                    borderRadius={6}
+                    strokeWidth={1}
+                    linearCorners={true}
+                    className="px-3 py-2 shadow-medium whitespace-nowrap"
+                    style={{
+                      backgroundColor: isDark ? '#27211D' : '#FAF7EF',
+                      minWidth: '100px',
+                    }}
+                  >
+                    <div className="text-sm font-medium text-text-primary">
+                      {hoveredPoint.progress.toFixed(1)}%
+                    </div>
+                    {hoveredPoint.pages !== undefined && totalPages && (
+                      <div className="text-xs text-text-secondary mt-1">
+                        Page {hoveredPoint.pages} of {totalPages}
+                      </div>
+                    )}
+                  </HandDrawnBox>
+                </div>
+              );
+            })()}
           </div>
 
           {/* X-axis labels */}

@@ -34,12 +34,13 @@ export function BookInfoSection({
   onRefreshReadings,
   onRefreshCurrentReading,
   onNoteCreated,
+  onSessionCreated,
 }: BookInfoSectionProps) {
   return (
     <div className="md:col-span-2">
       <Section padding="md">
         <Stack spacing="md">
-          <BookProgressSection book={book} onRefresh={onRefresh} />
+          <BookProgressSection book={book} onRefresh={onRefresh} onSessionCreated={onSessionCreated} />
 
           <BookMetadataSection book={book} readingsCount={readings.length} />
 

@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBook } from '@/hooks/useBooks';
-import { useSessions } from '@/hooks/useSessions';
+import { useSessions, deleteSession } from '@/hooks/useSessions';
+import { toast } from 'sonner';
 import { useNotes } from '@/hooks/useNotes';
 import { useTags } from '@/hooks/useTags';
 import { useCollections } from '@/hooks/useCollections';
@@ -49,7 +50,7 @@ export function BookDetailsPage() {
   }
 
   const { book, loading, error, refresh } = useBook(bookId);
-  const { sessions } = useSessions({ book_id: bookId ?? undefined });
+  const { sessions, refresh: refreshSessions } = useSessions({ book_id: bookId ?? undefined });
   const { notes, refresh: refreshNotes } = useNotes({ book_id: bookId ?? undefined });
   const { tags } = useTags(bookId ?? undefined);
   const { collections } = useCollections(bookId ?? undefined);
@@ -104,6 +105,21 @@ export function BookDetailsPage() {
     navigate(`/session/${sessionId}/edit`);
   };
 
+  const handleDeleteSession = async (sessionId: number) => {
+    if (!confirm('Are you sure you want to delete this session?')) {
+      return;
+    }
+
+    try {
+      await deleteSession(sessionId);
+      toast.success('Session deleted successfully');
+      refreshSessions(); // Refresh sessions list
+      refresh(); // Refresh book to update progress
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete session');
+    }
+  };
+
   return (
     <Container>
       <div className="py-8">
@@ -125,6 +141,7 @@ export function BookDetailsPage() {
               onRefreshReadings={refreshReadings}
               onRefreshCurrentReading={refreshCurrentReading}
               onNoteCreated={refreshNotes}
+              onSessionCreated={refreshSessions}
             />
           </div>
 
@@ -144,6 +161,8 @@ export function BookDetailsPage() {
               sessions={sessions}
               notesCount={notes.length}
               progressData={progressData}
+              onRefresh={refresh}
+              onRefreshSessions={refreshSessions}
             />
           )}
 
@@ -152,6 +171,7 @@ export function BookDetailsPage() {
               book={book}
               sessions={filteredSessions}
               onEdit={handleEditSession}
+              onDelete={handleDeleteSession}
             />
           )}
 

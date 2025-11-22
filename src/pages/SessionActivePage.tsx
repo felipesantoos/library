@@ -78,13 +78,6 @@ export function SessionActivePage() {
   const [notePage, setNotePage] = useState<number | null>(null);
   const [savingNote, setSavingNote] = useState(false);
 
-  // Auto-set note page when end page is set
-  useEffect(() => {
-    if (endPage !== null) {
-      setNotePage(endPage);
-    }
-  }, [endPage]);
-
   const handleCreateNote = async () => {
     if (!bookId) {
       toast.error('Please select a book first');

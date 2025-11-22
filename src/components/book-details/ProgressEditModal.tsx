@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BookDto, updateBook } from '@/hooks/useBooks';
+import { createSession, CreateSessionCommand } from '@/hooks/useSessions';
 import { Button } from '@/components/ui/Button';
 import { Paragraph } from '@/components/ui/typography';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
@@ -12,6 +13,7 @@ interface ProgressEditModalProps {
   book: BookDto;
   onClose: () => void;
   onUpdate: () => void;
+  onSessionCreated?: () => void;
 }
 
 export function ProgressEditModal({
@@ -19,6 +21,7 @@ export function ProgressEditModal({
   book,
   onClose,
   onUpdate,
+  onSessionCreated,
 }: ProgressEditModalProps) {
   const [currentPage, setCurrentPage] = useState(book.current_page_text);
   const [currentMinutes, setCurrentMinutes] = useState(book.current_minutes_audio);
@@ -103,23 +106,82 @@ export function ProgressEditModal({
 
     setIsSaving(true);
     try {
-      const updateCommand: any = {
-        id: book.id!,
-      };
+      const now = new Date();
+      const sessionDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const currentTime = now.toTimeString().split(' ')[0]; // HH:MM:SS
 
-      if (book.total_pages) {
-        updateCommand.current_page_text = currentPage;
+      // Check if there are any changes that warrant creating a session
+      const pageChanged = book.total_pages && book.current_page_text !== currentPage;
+      const minutesChanged = book.total_minutes && book.current_minutes_audio !== currentMinutes;
+
+      // Create a session to track this progress update if there are changes
+      if (pageChanged || minutesChanged) {
+        const sessionCommand: CreateSessionCommand = {
+          book_id: book.id!,
+          session_date: sessionDate,
+          start_time: currentTime,
+          end_time: currentTime,
+        };
+
+        // Add page information if pages changed
+        if (pageChanged) {
+          // Always use current page as start and new page as end
+          // If new page is less than current, it means user is correcting progress backwards
+          // In that case, we'll create a session with start = new page and end = new page
+          if (currentPage < book.current_page_text) {
+            // Correction backwards: create a session marking the new page as the end
+            sessionCommand.start_page = currentPage;
+            sessionCommand.end_page = currentPage;
+          } else {
+            // Normal progress: from current page to new page
+            sessionCommand.start_page = book.current_page_text;
+            sessionCommand.end_page = currentPage;
+          }
+        }
+
+        // Add minutes information if minutes changed
+        if (minutesChanged) {
+          const minutesDiff = currentMinutes - book.current_minutes_audio;
+          sessionCommand.minutes_read = minutesDiff > 0 ? minutesDiff : null;
+        }
+
+        try {
+          await createSession(sessionCommand);
+          // Session creation will automatically recalculate book progress
+          // based on the most recent session's end_page
+          toast.success('Progress updated successfully');
+          onUpdate();
+          // Refresh sessions list - await to ensure it completes
+          if (onSessionCreated) {
+            await onSessionCreated();
+          }
+          onClose();
+        } catch (sessionError) {
+          toast.error(`Failed to create session: ${sessionError instanceof Error ? sessionError.message : 'Unknown error'}`);
+          // If session creation fails, still try to update book directly as fallback
+          const updateCommand: any = {
+            id: book.id!,
+          };
+
+          if (book.total_pages) {
+            updateCommand.current_page_text = currentPage;
+          }
+
+          if (book.total_minutes) {
+            updateCommand.current_minutes_audio = currentMinutes;
+          }
+
+          await updateBook(updateCommand);
+          toast.success('Progress updated (session creation failed)');
+          onUpdate();
+          onClose();
+        }
+      } else {
+        // No changes, just close
+        onClose();
       }
-
-      if (book.total_minutes) {
-        updateCommand.current_minutes_audio = currentMinutes;
-      }
-
-      await updateBook(updateCommand);
-      toast.success('Progress updated successfully');
-      onUpdate();
-      onClose();
     } catch (error) {
+      console.error('Error updating progress:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to update progress');
     } finally {
       setIsSaving(false);

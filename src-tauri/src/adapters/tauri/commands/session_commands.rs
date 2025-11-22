@@ -71,9 +71,10 @@ pub fn delete_session(
 ) -> Result<(), String> {
     let db_conn = state.db_connection.lock().map_err(|e| format!("Lock error: {}", e))?;
     let sqlite_conn = db_conn.get_connection();
-    let repository = SqliteSessionRepository::new(sqlite_conn);
+    let session_repository = SqliteSessionRepository::new(sqlite_conn.clone());
+    let book_repository = SqliteBookRepository::new(sqlite_conn);
     
-    let use_case = DeleteSessionUseCase::new(&repository);
+    let use_case = DeleteSessionUseCase::new(&session_repository, &book_repository);
     use_case.execute(id)
 }
 

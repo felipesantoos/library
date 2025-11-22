@@ -2,14 +2,15 @@ import { SessionDto } from '@/hooks/useSessions';
 import { Section, Stack } from '@/components/ui/layout';
 import { MetaText, Paragraph } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
-import { Edit } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 
 interface SessionCardProps {
   session: SessionDto;
   onEdit: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-export function SessionCard({ session, onEdit }: SessionCardProps) {
+export function SessionCard({ session, onEdit, onDelete }: SessionCardProps) {
   return (
     <Section padding="md" className="hover:shadow-medium transition-shadow">
       <div className="flex items-start justify-between">
@@ -45,14 +46,29 @@ export function SessionCard({ session, onEdit }: SessionCardProps) {
           </Stack>
         </div>
         {session.id && (
-          <Button
-            onClick={() => onEdit(session.id!)}
-            variant="ghost"
-            size="sm"
-            iconOnly
-            icon={<Edit className="w-4 h-4" />}
-            aria-label="Edit session"
-          />
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => onEdit(session.id!)}
+              variant="ghost"
+              size="sm"
+              iconOnly
+              icon={<Edit className="w-4 h-4" />}
+              aria-label="Edit session"
+              title="Edit session"
+            />
+            {onDelete && (
+              <Button
+                onClick={() => onDelete(session.id!)}
+                variant="ghost"
+                size="sm"
+                iconOnly
+                icon={<Trash2 className="w-4 h-4" />}
+                aria-label="Delete session"
+                title="Delete session"
+                className="text-semantic-error hover:text-semantic-error hover:bg-semantic-error/10"
+              />
+            )}
+          </div>
         )}
       </div>
     </Section>
