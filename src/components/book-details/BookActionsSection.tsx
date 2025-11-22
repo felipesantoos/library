@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookDto } from '@/hooks/useBooks';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Repeat, Plus } from 'lucide-react';
+import { Calendar, Repeat, Plus, Settings } from 'lucide-react';
 import { createReading } from '@/hooks/useReadings';
 import { createNote, CreateNoteCommand } from '@/hooks/useNotes';
 import { HandDrawnModal } from '@/components/ui/HandDrawnModal';
@@ -10,11 +10,13 @@ import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 import { Stack } from '@/components/ui/layout';
 import { Save } from 'lucide-react';
 import { toast } from '@/utils/toast';
+import { SessionDto } from '@/hooks/useSessions';
 
 interface BookActionsSectionProps {
   book: BookDto;
   selectedReadingId: number | null;
   readingsCount: number;
+  sessions?: SessionDto[];
   onRefresh: () => void;
   onRefreshReadings: () => void;
   onRefreshCurrentReading: () => void;
@@ -25,6 +27,7 @@ export function BookActionsSection({
   book,
   selectedReadingId,
   readingsCount,
+  sessions = [],
   onRefresh,
   onRefreshReadings,
   onRefreshCurrentReading,
@@ -95,6 +98,16 @@ export function BookActionsSection({
         >
           Add Note
         </Button>
+        {sessions.length > 0 && (
+          <Button
+            onClick={() => navigate(`/book/${book.id}/progress-correction`)}
+            variant="outline"
+            icon={<Settings className="w-4 h-4" />}
+            iconPosition="left"
+          >
+            Correct Progress
+          </Button>
+        )}
         {book.status === 'completed' && (
           <Button
             onClick={handleStartReread}

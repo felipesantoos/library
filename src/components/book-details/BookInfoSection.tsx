@@ -59,6 +59,7 @@ export function BookInfoSection({
             book={book}
             selectedReadingId={selectedReadingId}
             readingsCount={readings.length}
+            sessions={sessions}
             onRefresh={onRefresh}
             onRefreshReadings={onRefreshReadings}
             onRefreshCurrentReading={onRefreshCurrentReading}
