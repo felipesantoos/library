@@ -20,36 +20,38 @@ export function SessionTimer({ seconds, isRunning, onStart, onStop }: SessionTim
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const hasButtons = (!isRunning && seconds === 0) || isRunning;
+
   return (
     <Section padding="lg" className="text-center">
-      <div className="mb-4">
-        <div className="text-4xl font-mono font-bold text-text-primary mb-2">
+        <div className={`text-4xl font-mono font-bold text-text-primary ${hasButtons ? "mb-2" : ""}`}>
           {formatTimer(seconds)}
         </div>
-        <div className="flex items-center justify-center space-x-3">
-          {!isRunning && seconds === 0 && (
-            <Button
-              onClick={onStart}
-              variant="primary"
-              icon={<Play />}
-              iconPosition="left"
-            >
-              Start Timer
-            </Button>
-          )}
-          {isRunning && (
-            <Button
-              onClick={onStop}
-              variant="secondary"
-              icon={<Square />}
-              iconPosition="left"
-              className="bg-semantic-error hover:bg-semantic-error/90"
-            >
-              Stop
-            </Button>
-          )}
-        </div>
-      </div>
+        {hasButtons && (
+          <div className="flex items-center justify-center space-x-3">
+            {!isRunning && seconds === 0 && (
+              <Button
+                onClick={onStart}
+                variant="primary"
+                icon={<Play />}
+                iconPosition="left"
+              >
+                Start Timer
+              </Button>
+            )}
+            {isRunning && (
+              <Button
+                onClick={onStop}
+                variant="secondary"
+                icon={<Square />}
+                iconPosition="left"
+                className="bg-semantic-error hover:bg-semantic-error/90"
+              >
+                Stop
+              </Button>
+            )}
+          </div>
+        )}
     </Section>
   );
 }

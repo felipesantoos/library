@@ -11,11 +11,15 @@ export interface ProgressDataPoint {
 
 export function useBookProgressData(book: BookDto | null, sessions: SessionDto[]): ProgressDataPoint[] {
   return useMemo(() => {
-    if (!book || sessions.length === 0) return [];
+    if (!book || sessions.length === 0 || !book.total_pages) return [];
 
-    // Group sessions by date and calculate cumulative progress
+    // Filter sessions that have end_page (required for progress calculation)
+    const sessionsWithEndPage = sessions.filter(s => s.end_page !== null && s.end_page !== undefined);
+    if (sessionsWithEndPage.length === 0) return [];
+
+    // Group sessions by date
     const sessionsByDate = new Map<string, SessionDto[]>();
-    sessions.forEach(session => {
+    sessionsWithEndPage.forEach(session => {
       const date = session.session_date;
       if (!sessionsByDate.has(date)) {
         sessionsByDate.set(date, []);
@@ -23,26 +27,42 @@ export function useBookProgressData(book: BookDto | null, sessions: SessionDto[]
       sessionsByDate.get(date)!.push(session);
     });
 
-    // Calculate cumulative pages read
-    let cumulativePages = 0;
+    // Sort sessions by date (oldest first) to calculate progress chronologically
     const sortedDates = Array.from(sessionsByDate.keys()).sort();
     
+    console.log('[useBookProgressData] Book info:', {
+      current_page_text: book.current_page_text,
+      total_pages: book.total_pages,
+      sessions_count: sessions.length,
+      sessions_with_end_page: sessionsWithEndPage.length,
+    });
+    
+    // Calculate progress at each date point using the maximum end_page for that date
+    // (in case there are multiple sessions on the same date)
     return sortedDates.map(date => {
       const dateSessions = sessionsByDate.get(date)!;
-      const pagesRead = dateSessions.reduce((sum, s) => sum + (s.pages_read || 0), 0);
-      cumulativePages += pagesRead;
       
-      const startPage = book.current_page_text - cumulativePages;
+      // Get the maximum end_page for this date (most recent progress)
+      const maxEndPage = Math.max(...dateSessions.map(s => s.end_page!).filter(p => p !== null));
+      
+      // Calculate total pages read on this date
+      const pagesRead = dateSessions.reduce((sum, s) => sum + (s.pages_read || 0), 0);
+      
+      // Progress at this point = end_page / total_pages
       const progress = book.total_pages 
-        ? ((startPage + cumulativePages) / book.total_pages * 100).toFixed(1)
+        ? Math.min(100, (maxEndPage / book.total_pages) * 100)
         : 0;
 
-      return {
+      const result = {
         date,
         pages: pagesRead,
-        cumulative: cumulativePages,
-        progress: parseFloat(progress),
+        cumulative: maxEndPage, // Use end_page as cumulative (it's the actual page reached)
+        progress: parseFloat(progress.toFixed(1)),
       };
+      
+      console.log(`[useBookProgressData] Date: ${date}, End page: ${maxEndPage}, Pages read: ${pagesRead}, Progress: ${result.progress}%`);
+      
+      return result;
     });
   }, [book, sessions]);
 }

@@ -83,11 +83,10 @@ impl<'a> CreateSessionUseCase<'a> {
             .find_by_id(session.book_id)?
             .ok_or_else(|| "Book not found".to_string())?;
 
+        // Always update last page read with the end page of the section
         if let Some(end_page) = session.end_page {
-            if book.current_page_text < end_page {
-                book.update_current_page(end_page)?;
-                self.book_repository.update(&book)?;
-            }
+            book.update_current_page(end_page)?;
+            self.book_repository.update(&book)?;
         }
 
         Ok(())

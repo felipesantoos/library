@@ -13,6 +13,29 @@ impl SqliteSessionRepository {
         SqliteSessionRepository { connection }
     }
 
+    fn parse_datetime(s: &str) -> Result<chrono::DateTime<chrono::Utc>, rusqlite::Error> {
+        // Try RFC3339 first (used when saving)
+        if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(s) {
+            return Ok(dt.with_timezone(&chrono::Utc));
+        }
+        
+        // Try SQLite datetime format (YYYY-MM-DD HH:MM:SS)
+        if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S") {
+            return Ok(dt.and_utc());
+        }
+        
+        // Try SQLite datetime format with microseconds (YYYY-MM-DD HH:MM:SS.ffffff)
+        if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f") {
+            return Ok(dt.and_utc());
+        }
+        
+        Err(rusqlite::Error::InvalidColumnType(
+            0,
+            format!("Invalid datetime format: {}", s),
+            rusqlite::types::Type::Text,
+        ))
+    }
+
     fn row_to_session(row: &rusqlite::Row) -> Result<ReadingSession, rusqlite::Error> {
         let session_date_str: String = row.get(3)?;
         let session_date = chrono::NaiveDate::parse_from_str(&session_date_str, "%Y-%m-%d")
@@ -25,6 +48,14 @@ impl SqliteSessionRepository {
         let end_time_str: Option<String> = row.get(5)?;
         let end_time = end_time_str
             .and_then(|s| chrono::NaiveTime::parse_from_str(&s, "%H:%M:%S").ok());
+
+        let created_at_str: String = row.get(13)?;
+        let created_at = Self::parse_datetime(&created_at_str)
+            .map_err(|e| rusqlite::Error::InvalidColumnType(13, format!("Invalid created_at: {}", e), rusqlite::types::Type::Text))?;
+
+        let updated_at_str: String = row.get(14)?;
+        let updated_at = Self::parse_datetime(&updated_at_str)
+            .map_err(|e| rusqlite::Error::InvalidColumnType(14, format!("Invalid updated_at: {}", e), rusqlite::types::Type::Text))?;
 
         Ok(ReadingSession {
             id: Some(row.get(0)?),
@@ -40,12 +71,8 @@ impl SqliteSessionRepository {
             duration_seconds: row.get(10)?,
             notes: row.get(11)?,
             photo_path: row.get(12)?,
-            created_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(13)?)
-                .map_err(|_| rusqlite::Error::InvalidColumnType(13, "Invalid datetime".to_string(), rusqlite::types::Type::Text))?
-                .with_timezone(&chrono::Utc),
-            updated_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(14)?)
-                .map_err(|_| rusqlite::Error::InvalidColumnType(14, "Invalid datetime".to_string(), rusqlite::types::Type::Text))?
-                .with_timezone(&chrono::Utc),
+            created_at,
+            updated_at,
         })
     }
 }

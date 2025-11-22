@@ -14,8 +14,8 @@ interface OverviewTabProps {
 export function OverviewTab({ book, sessions, notesCount, progressData }: OverviewTabProps) {
   return (
     <Stack spacing="md">
-      <ProgressChart data={progressData} />
       <StatisticsSection book={book} sessions={sessions} notesCount={notesCount} />
+      <ProgressChart data={progressData} />
     </Stack>
   );
 }
