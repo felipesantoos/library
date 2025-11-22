@@ -19,7 +19,17 @@ export function useSessionEditing(
   const [deletingSessions, setDeletingSessions] = useState<Set<number>>(new Set());
 
   const sortedSessions = useMemo(() => {
-    return [...sessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
+    return [...sessions].sort((a, b) => {
+      // Sort by date (most recent first), then by created_at if dates are equal
+      const dateCompare = b.session_date.localeCompare(a.session_date);
+      if (dateCompare !== 0) return dateCompare;
+      
+      // If dates are equal, sort by created_at (most recent first)
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return 0;
+    });
   }, [sessions]);
 
   const handleEditSession = (sessionId: number, field: keyof SessionDto, value: any) => {

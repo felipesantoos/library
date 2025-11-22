@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { SessionDto } from '@/hooks/useSessions';
 import { BookDto } from '@/hooks/useBooks';
 
@@ -12,7 +12,17 @@ export function useSessionValidation(
   book: BookDto | null
 ): UseSessionValidationResult {
   const sortedSessions = useMemo(() => {
-    return [...sessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
+    return [...sessions].sort((a, b) => {
+      // Sort by date (most recent first), then by created_at if dates are equal
+      const dateCompare = b.session_date.localeCompare(a.session_date);
+      if (dateCompare !== 0) return dateCompare;
+      
+      // If dates are equal, sort by created_at (most recent first)
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return 0;
+    });
   }, [sessions]);
 
   const { errors, warnings } = useMemo(() => {
@@ -36,10 +46,11 @@ export function useSessionValidation(
       }
 
       // Check for large gaps between sessions
-      if (index > 0 && book?.total_pages) {
-        const prevSession = sortedSessions[index - 1];
-        if (prevSession.end_page && session.start_page !== null) {
-          const gap = session.start_page - prevSession.end_page;
+      // Since sessions are sorted most recent first, we need to check the next session (chronologically older)
+      if (index < sortedSessions.length - 1 && book?.total_pages) {
+        const nextSession = sortedSessions[index + 1]; // Next in array = chronologically older
+        if (nextSession.end_page && session.start_page !== null) {
+          const gap = session.start_page - nextSession.end_page;
           if (gap > 50) {
             newWarnings.set(
               session.id,

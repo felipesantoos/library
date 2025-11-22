@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateSession, deleteSession, UpdateSessionCommand, SessionDto } from '@/hooks/useSessions';
 import { toast } from '@/utils/toast';
-import { toast } from '@/utils/toast';
 
 interface UseProgressCorrectionActionsProps {
   editingSessions: Map<number, Partial<SessionDto>>;
@@ -75,18 +74,8 @@ export function useProgressCorrectionActions({
     }
   };
 
-  const handleRecalculateProgress = async () => {
-    try {
-      await onRefresh();
-      toast.info('Progress will be recalculated after saving all sessions');
-    } catch (err) {
-      toast.handleError(err, 'Failed to recalculate progress');
-    }
-  };
-
   return {
     handleSaveAll,
-    handleRecalculateProgress,
     saving,
   };
 }

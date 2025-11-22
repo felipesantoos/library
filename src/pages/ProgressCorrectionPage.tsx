@@ -54,7 +54,7 @@ export function ProgressCorrectionPage() {
     clearEditing,
   } = useSessionEditing(sessions, setErrors);
 
-  const { handleSaveAll, handleRecalculateProgress, saving } = useProgressCorrectionActions({
+  const { handleSaveAll, saving } = useProgressCorrectionActions({
     editingSessions,
     deletingSessions,
     errors,
@@ -136,7 +136,10 @@ export function ProgressCorrectionPage() {
             <ProgressActions
               editedSessionsCount={editingSessions.size}
               deletingSessionsCount={deletingSessions.size}
-              onRecalculateProgress={handleRecalculateProgress}
+              hasChanges={hasChanges}
+              hasErrors={hasErrors}
+              saving={saving}
+              onSave={handleSaveAll}
             />
           )}
         </Stack>

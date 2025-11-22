@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Save } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface ProgressCorrectionHeaderProps {
   bookTitle: string;
