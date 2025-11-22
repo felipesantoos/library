@@ -18,6 +18,12 @@ export interface CreateNoteCommand {
   content: string;
 }
 
+export interface UpdateNoteCommand {
+  id: number;
+  page?: number | null;
+  content?: string | null;
+}
+
 export function useNotes(filters?: {
   book_id?: number;
   search_query?: string;
@@ -140,6 +146,10 @@ export function useNote(id: number | null) {
 
 export async function createNote(command: CreateNoteCommand): Promise<NoteDto> {
   return await invoke<NoteDto>('create_note', { command });
+}
+
+export async function updateNote(command: UpdateNoteCommand): Promise<NoteDto> {
+  return await invoke<NoteDto>('update_note', { command });
 }
 
 export async function deleteNote(id: number): Promise<void> {

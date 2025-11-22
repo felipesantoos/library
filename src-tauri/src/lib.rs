@@ -20,7 +20,7 @@ use adapters::tauri::AppState;
 use adapters::tauri::commands::{
     create_book, get_book, list_books, update_book, delete_book,
     create_session, get_session, list_sessions, update_session, delete_session,
-    create_note, get_note, list_notes, delete_note,
+    create_note, get_note, list_notes, update_note, delete_note,
     create_goal, get_goal, list_goals, delete_goal, get_statistics,
     get_setting, set_setting, get_all_settings,
     create_tag, list_tags, delete_tag, add_tags_to_book, remove_tag_from_book,
@@ -70,6 +70,7 @@ pub fn run() {
             create_note,
             get_note,
             list_notes,
+            update_note,
             delete_note,
             create_goal,
             get_goal,

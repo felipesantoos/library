@@ -19,6 +19,7 @@ interface BookInfoSectionProps {
   onRefresh: () => void;
   onRefreshReadings: () => void;
   onRefreshCurrentReading: () => void;
+  onNoteCreated?: () => void;
 }
 
 export function BookInfoSection({
@@ -32,6 +33,7 @@ export function BookInfoSection({
   onRefresh,
   onRefreshReadings,
   onRefreshCurrentReading,
+  onNoteCreated,
 }: BookInfoSectionProps) {
   return (
     <div className="md:col-span-2">
@@ -59,6 +61,7 @@ export function BookInfoSection({
             onRefresh={onRefresh}
             onRefreshReadings={onRefreshReadings}
             onRefreshCurrentReading={onRefreshCurrentReading}
+            onNoteCreated={onNoteCreated}
           />
         </Stack>
       </Section>

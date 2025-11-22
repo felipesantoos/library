@@ -50,7 +50,7 @@ export function BookDetailsPage() {
 
   const { book, loading, error, refresh } = useBook(bookId);
   const { sessions } = useSessions({ book_id: bookId ?? undefined });
-  const { notes } = useNotes({ book_id: bookId ?? undefined });
+  const { notes, refresh: refreshNotes } = useNotes({ book_id: bookId ?? undefined });
   const { tags } = useTags(bookId ?? undefined);
   const { collections } = useCollections(bookId ?? undefined);
   const { readings, refresh: refreshReadings } = useReadings(bookId);
@@ -124,6 +124,7 @@ export function BookDetailsPage() {
               onRefresh={refresh}
               onRefreshReadings={refreshReadings}
               onRefreshCurrentReading={refreshCurrentReading}
+              onNoteCreated={refreshNotes}
             />
           </div>
 
@@ -155,7 +156,13 @@ export function BookDetailsPage() {
           )}
 
           {activeTab === 'notes' && (
-            <NotesTab notes={notes} />
+            <NotesTab 
+              notes={notes} 
+              bookId={book.id!}
+              onNoteCreated={refreshNotes}
+              onNoteUpdated={refreshNotes}
+              onNoteDeleted={refreshNotes}
+            />
           )}
 
           {activeTab === 'summary' && (
