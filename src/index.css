@@ -128,15 +128,16 @@ body {
 }
 
 /* Make all clickable elements show pointer cursor */
-button,
+button:not(:disabled),
 a,
-[role="button"],
+[role="button"]:not([aria-disabled="true"]),
 .cursor-pointer {
   cursor: pointer !important;
 }
 
 /* Disabled buttons should show not-allowed cursor */
-button:disabled {
+button:disabled,
+[role="button"][aria-disabled="true"] {
   cursor: not-allowed !important;
 }
 

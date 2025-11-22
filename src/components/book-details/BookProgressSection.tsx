@@ -3,7 +3,6 @@ import { BookDto } from '@/hooks/useBooks';
 import { ProgressBar, HybridProgressBar } from '@/components/ui/data-display';
 import { MetaText } from '@/components/ui/typography';
 import { ProgressEditModal } from './ProgressEditModal';
-import { Pencil } from 'lucide-react';
 
 interface BookProgressSectionProps {
   book: BookDto;
@@ -54,13 +53,6 @@ export function BookProgressSection({ book, onRefresh }: BookProgressSectionProp
             totalMinutes={book.total_minutes}
             showBreakdown={true}
             size="md"
-            actionSlot={
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-background-surface dark:bg-dark-background-surface rounded-full p-1 shadow-sm border border-border-primary">
-                  <Pencil className="w-3 h-3 text-text-secondary" />
-                </div>
-              </div>
-            }
           />
         </div>
         <ProgressEditModal
@@ -88,21 +80,9 @@ export function BookProgressSection({ book, onRefresh }: BookProgressSectionProp
         }}
         aria-label="Click to edit progress"
       >
-        <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-          <div className="bg-background-surface dark:bg-dark-background-surface rounded-full p-1.5 shadow-sm border border-border-primary">
-            <Pencil className="w-3.5 h-3.5 text-text-secondary" />
-          </div>
-        </div>
         <div className="flex items-center justify-between mb-2">
           <MetaText>Progress</MetaText>
-          <div className="flex items-center gap-2">
-            <MetaText>{Math.round(book.progress_percentage)}%</MetaText>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="bg-background-surface dark:bg-dark-background-surface rounded-full p-1 shadow-sm border border-border-primary">
-                <Pencil className="w-3 h-3 text-text-secondary" />
-              </div>
-            </div>
-          </div>
+          <MetaText>{Math.round(book.progress_percentage)}%</MetaText>
         </div>
         <ProgressBar
           value={book.progress_percentage}

@@ -35,7 +35,7 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 transition-all duration-200 ease-in-out font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 transition-all duration-200 ease-in-out font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
   
   const sizeStyles = {
     sm: iconOnly ? 'p-1.5' : 'px-3 py-1.5 text-sm',
@@ -132,7 +132,7 @@ export function Button({
         sizeStyles[size],
         variantStyles[variant],
         fullWidth && 'w-full',
-        !isDisabled && 'hover:scale-[1.02] active:scale-[0.98]',
+        !showBorder && !isDisabled && 'hover:scale-[1.02] active:scale-[0.98]',
         !showBorder && 'rounded-md',
         variant === 'outline' && !showBorder && 'relative',
         iconOnly && 'aspect-square',
@@ -165,8 +165,10 @@ export function Button({
       color={borderColor}
       linearCorners={linearCorners}
       className={cn(
-        'inline-block',
-        fullWidth && 'w-full'
+        'inline-block transition-transform duration-200 ease-in-out',
+        fullWidth && 'w-full',
+        isDisabled && 'cursor-not-allowed',
+        !isDisabled && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
       )}
     >
       {buttonElement}

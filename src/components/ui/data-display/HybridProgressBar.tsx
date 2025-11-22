@@ -53,10 +53,13 @@ export function HybridProgressBar({
           showPercentage={size !== 'sm'}
         />
         <div className="flex items-center justify-between text-sm text-text-secondary mt-1">
-          <span className="flex items-center gap-1">
-            <BookOpen className="w-3 h-3" />
-            <span>Page {currentPageText} of {totalPages}</span>
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1">
+              <BookOpen className="w-3 h-3" />
+              <span>Page {currentPageText} of {totalPages}</span>
+            </span>
+            {actionSlot}
+          </div>
           <span>{Math.round(textProgress)}%</span>
         </div>
       </div>
@@ -72,10 +75,13 @@ export function HybridProgressBar({
           showPercentage={size !== 'sm'}
         />
         <div className="flex items-center justify-between text-sm text-text-secondary mt-1">
-          <span className="flex items-center gap-1">
-            <Headphones className="w-3 h-3" />
-            <span>{currentMinutesAudio} / {totalMinutes} minutes</span>
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1">
+              <Headphones className="w-3 h-3" />
+              <span>{currentMinutesAudio} / {totalMinutes} minutes</span>
+            </span>
+            {actionSlot}
+          </div>
           <span>{Math.round(audioProgress)}%</span>
         </div>
       </div>
