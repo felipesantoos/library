@@ -2,6 +2,7 @@ export * from './BookDetailsHeader';
 export * from './BookCover';
 export * from './BookInfoSection';
 export * from './BookProgressSection';
+export * from './ProgressEditModal';
 export * from './BookMetadataSection';
 export * from './BookTagsSection';
 export * from './BookCollectionsSection';

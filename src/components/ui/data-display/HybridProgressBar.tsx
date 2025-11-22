@@ -11,6 +11,7 @@ interface HybridProgressBarProps {
   showBreakdown?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  actionSlot?: React.ReactNode;
 }
 
 export function HybridProgressBar({
@@ -21,6 +22,7 @@ export function HybridProgressBar({
   showBreakdown = true,
   size = 'md',
   className,
+  actionSlot,
 }: HybridProgressBarProps) {
   // Calculate individual progress percentages
   const textProgress = totalPages && totalPages > 0
@@ -88,7 +90,10 @@ export function HybridProgressBar({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-text-primary">Overall Progress</span>
-            <span className="text-sm text-text-secondary">{Math.round(combinedProgress)}%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-text-secondary">{Math.round(combinedProgress)}%</span>
+              {actionSlot}
+            </div>
           </div>
           <ProgressBar
             value={combinedProgress}

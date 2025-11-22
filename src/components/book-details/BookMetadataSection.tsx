@@ -1,5 +1,6 @@
 import { BookDto } from '@/hooks/useBooks';
 import { MetaText, Paragraph } from '@/components/ui/typography';
+import { formatBookStatus } from '@/lib/utils';
 
 interface BookMetadataSectionProps {
   book: BookDto;
@@ -27,8 +28,8 @@ export function BookMetadataSection({ book, readingsCount }: BookMetadataSection
       </div>
       <div>
         <MetaText>Status</MetaText>
-        <Paragraph className="mt-0.5 capitalize">
-          {book.status}
+        <Paragraph className="mt-0.5">
+          {formatBookStatus(book.status)}
           {readingsCount > 0 && (
             <span className="text-accent-primary ml-2">
               ({readingsCount + 1}x)

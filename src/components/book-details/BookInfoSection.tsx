@@ -37,7 +37,7 @@ export function BookInfoSection({
     <div className="md:col-span-2">
       <Section padding="md">
         <Stack spacing="md">
-          <BookProgressSection book={book} />
+          <BookProgressSection book={book} onRefresh={onRefresh} />
 
           <BookMetadataSection book={book} readingsCount={readings.length} />
 

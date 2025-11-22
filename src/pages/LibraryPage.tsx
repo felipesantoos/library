@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useBooks } from '@/hooks/useBooks';
 import { useTags } from '@/hooks/useTags';
 import { useCollections } from '@/hooks/useCollections';
+import { useBookCollections } from '@/hooks/useBookCollections';
 import { Container, Stack } from '@/components/ui/layout';
 import { Paragraph } from '@/components/ui/typography';
 import {
@@ -35,6 +36,10 @@ export function LibraryPage() {
     typeFilter,
     searchQuery,
   });
+
+  // Get all book IDs to load their collections
+  const bookIds = useMemo(() => books.map((b) => b.id!).filter((id): id is number => id !== undefined), [books]);
+  const { bookCollections } = useBookCollections(bookIds);
 
   const clearFilters = () => {
     setStatusFilter('');
@@ -109,6 +114,7 @@ export function LibraryPage() {
               viewMode={viewMode}
               tagFilter={tagFilter}
               collectionFilter={collectionFilter}
+              bookCollections={bookCollections}
             />
           )}
         </Stack>

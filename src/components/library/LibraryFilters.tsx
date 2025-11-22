@@ -5,6 +5,7 @@ import { HandDrawnDropdown } from '@/components/ui/inputs';
 import { TagDto } from '@/hooks/useTags';
 import { CollectionDto } from '@/hooks/useCollections';
 import { X } from 'lucide-react';
+import { formatBookStatus } from '@/lib/utils';
 
 interface LibraryFiltersProps {
   statusFilter: string;
@@ -45,11 +46,12 @@ export function LibraryFilters({
           <HandDrawnDropdown
             options={[
               { value: '', label: 'All' },
-              { value: 'not_started', label: 'Not Started' },
-              { value: 'reading', label: 'Reading' },
-              { value: 'paused', label: 'Paused' },
-              { value: 'completed', label: 'Completed' },
-              { value: 'abandoned', label: 'Abandoned' },
+              { value: 'not_started', label: formatBookStatus('not_started') },
+              { value: 'reading', label: formatBookStatus('reading') },
+              { value: 'paused', label: formatBookStatus('paused') },
+              { value: 'completed', label: formatBookStatus('completed') },
+              { value: 'abandoned', label: formatBookStatus('abandoned') },
+              { value: 'rereading', label: formatBookStatus('rereading') },
             ]}
             value={statusFilter}
             onChange={(value) => onStatusFilterChange(value ? String(value) : '')}

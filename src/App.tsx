@@ -17,6 +17,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { ArchivePage } from "./pages/ArchivePage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { CollectionsPage } from "./pages/CollectionsPage";
+import { CollectionDetailsPage } from "./pages/CollectionDetailsPage";
 import { JournalPage } from "./pages/JournalPage";
 import { AgendaPage } from "./pages/AgendaPage";
 
@@ -25,7 +26,7 @@ function RouteContent() {
   
   // Extract ID from pathname manually since we're not using Routes/Route
   const extractId = (pathname: string): string | null => {
-    const match = pathname.match(/\/(book|session)\/(\d+)/);
+    const match = pathname.match(/\/(book|session|collection)\/(\d+)/);
     return match ? match[2] : null;
   };
   
@@ -48,6 +49,7 @@ function RouteContent() {
   if (location.pathname === "/archive") return <ArchivePage />;
   if (location.pathname === "/wishlist") return <WishlistPage />;
   if (location.pathname === "/collections") return <CollectionsPage />;
+  if (id && location.pathname.startsWith("/collection/")) return <CollectionDetailsPage />;
   if (location.pathname === "/settings") return <SettingsPage />;
   
   return null;

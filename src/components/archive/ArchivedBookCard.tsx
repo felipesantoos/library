@@ -5,6 +5,7 @@ import { ProgressBar } from '@/components/ui/data-display';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 import { Button } from '@/components/ui/Button';
 import { BookOpen, RotateCcw } from 'lucide-react';
+import { formatBookStatus } from '@/lib/utils';
 
 interface ArchivedBookCardProps {
   book: BookDto;
@@ -67,7 +68,7 @@ export function ArchivedBookCard({ book, onRestore, onClick }: ArchivedBookCardP
         )}
 
         {/* Status */}
-        <MetaText className="text-xs capitalize opacity-60">{book.status}</MetaText>
+        <MetaText className="text-xs opacity-60">{formatBookStatus(book.status)}</MetaText>
 
         {/* Actions */}
         <Button

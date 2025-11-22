@@ -7,28 +7,43 @@ import { Heading, Paragraph } from '@/components/ui/typography';
 import { ProgressBar } from '@/components/ui/data-display';
 import { Tag } from '@/components/ui/tags';
 import { BookOpen, FolderKanban } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatBookStatus } from '@/lib/utils';
 import { HandDrawnBox } from '@/components/ui/HandDrawnBox';
 
 interface BookCardProps {
   book: BookDto;
   tagFilter?: number | null;
   collectionFilter?: number | null;
+  bookCollectionIds?: number[]; // Pre-loaded collection IDs for this book
 }
 
-export function BookCard({ book, tagFilter, collectionFilter }: BookCardProps) {
+export function BookCard({ book, tagFilter, collectionFilter, bookCollectionIds }: BookCardProps) {
   const navigate = useNavigate();
-  const { tags } = useTags(book.id || undefined);
-  const { collections } = useCollections(book.id || undefined);
+  const { tags, loading: tagsLoading } = useTags(book.id || undefined);
+  const { collections, loading: collectionsLoading } = useCollections(book.id || undefined);
 
-  const matchesTagFilter = !tagFilter || tags.some((tag) => tag.id === tagFilter);
-  const matchesCollectionFilter = !collectionFilter || collections.some((c) => c.id === collectionFilter);
+  // Use pre-loaded collection IDs if available, otherwise use collections from hook
+  const collectionIds = bookCollectionIds !== undefined 
+    ? bookCollectionIds 
+    : collections.map((c) => c.id).filter((id): id is number => id !== undefined);
+  
+  // If we have pre-loaded IDs, we know they're loaded. Otherwise, check if hook is done loading
+  const hasCollectionsLoaded = bookCollectionIds !== undefined || !collectionsLoading;
 
-  if (tagFilter && !matchesTagFilter) {
+  // Calculate matches - only filter when data is loaded
+  const matchesTagFilter = !tagFilter || (tagsLoading ? true : tags.some((tag) => tag.id === tagFilter));
+  const matchesCollectionFilter = !collectionFilter || (hasCollectionsLoaded && collectionIds.includes(collectionFilter));
+
+  // Apply filters only when data is loaded (don't filter while loading to avoid flickering)
+  if (tagFilter && !tagsLoading && !matchesTagFilter) {
     return null;
   }
-  if (collectionFilter && !matchesCollectionFilter) {
-    return null;
+  // Only filter by collection if we have the filter AND collections are loaded
+  if (collectionFilter !== null && collectionFilter !== undefined) {
+    if (hasCollectionsLoaded && !matchesCollectionFilter) {
+      return null;
+    }
+    // If collections are still loading, show the card (to avoid flickering)
   }
 
   const handleClick = () => {
@@ -142,7 +157,7 @@ export function BookCard({ book, tagFilter, collectionFilter }: BookCardProps) {
                 : 'bg-text-secondary/20 text-text-secondary'
             )}
           >
-            {book.status.replace('_', ' ')}
+            {formatBookStatus(book.status)}
           </span>
         </div>
       </Stack>

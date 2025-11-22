@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { CollectionDto } from '@/hooks/useCollections';
 import { Section, Stack } from '@/components/ui/layout';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
@@ -11,8 +12,24 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ collection, onEdit, onDelete }: CollectionCardProps) {
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    if (collection.id) {
+      navigate(`/collection/${collection.id}`);
+    }
+  };
+
   return (
-    <Section padding="md" className="hover:shadow-medium transition-shadow">
+    <Section 
+      padding="md" 
+      className="hover:shadow-medium transition-shadow cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <Stack spacing="sm">
@@ -31,7 +48,10 @@ export function CollectionCard({ collection, onEdit, onDelete }: CollectionCardP
         </div>
         <div className="flex items-center space-x-2">
           <Button
-            onClick={onEdit}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
             variant="ghost"
             size="sm"
             iconOnly
@@ -39,7 +59,10 @@ export function CollectionCard({ collection, onEdit, onDelete }: CollectionCardP
             aria-label="Edit collection"
           />
           <Button
-            onClick={onDelete}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
             variant="ghost"
             size="sm"
             iconOnly

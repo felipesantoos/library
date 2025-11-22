@@ -2,15 +2,17 @@ import { BookDto } from '@/hooks/useBooks';
 import { BookCard } from './BookCard';
 import { ViewMode } from './LibraryHeader';
 import { cn } from '@/lib/utils';
+import { BookCollectionMap } from '@/hooks/useBookCollections';
 
 interface BooksGridProps {
   books: BookDto[];
   viewMode: ViewMode;
   tagFilter: number | null;
   collectionFilter: number | null;
+  bookCollections?: BookCollectionMap;
 }
 
-export function BooksGrid({ books, viewMode, tagFilter, collectionFilter }: BooksGridProps) {
+export function BooksGrid({ books, viewMode, tagFilter, collectionFilter, bookCollections }: BooksGridProps) {
   return (
     <div
       className={cn(
@@ -25,6 +27,7 @@ export function BooksGrid({ books, viewMode, tagFilter, collectionFilter }: Book
           book={book}
           tagFilter={tagFilter}
           collectionFilter={collectionFilter}
+          bookCollectionIds={book.id ? bookCollections?.[book.id] : undefined}
         />
       ))}
     </div>
