@@ -35,7 +35,7 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'flex items-center justify-center transition-all duration-200 ease-in-out font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 transition-all duration-200 ease-in-out font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
   
   const sizeStyles = {
     sm: iconOnly ? 'p-1.5' : 'px-3 py-1.5 text-sm',
@@ -87,21 +87,40 @@ export function Button({
   // Render icon
   const renderIcon = () => {
     if (loading) {
-      return <Loader2 className={cn(iconSizeStyles[size], 'animate-spin')} aria-hidden="true" />;
+      return (
+        <Loader2 
+          className={cn(iconSizeStyles[size], 'animate-spin flex-shrink-0')} 
+          aria-hidden="true" 
+        />
+      );
     }
     if (icon) {
-      return <span className={cn(iconSizeStyles[size], 'flex-shrink-0')} aria-hidden="true">{icon}</span>;
+      // Clone icon element to add size classes directly if it's a React element
+      if (React.isValidElement(icon)) {
+        return React.cloneElement(icon as React.ReactElement<any>, {
+          className: cn(iconSizeStyles[size], 'flex-shrink-0', (icon as React.ReactElement<any>).props?.className),
+          'aria-hidden': 'true',
+        });
+      }
+      return (
+        <span 
+          className={cn(iconSizeStyles[size], 'flex-shrink-0')} 
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+      );
     }
     return null;
   };
 
-  // Determine content order
+  // Determine content order with proper alignment
   const content = iconOnly ? (
     renderIcon()
   ) : (
     <>
       {icon && iconPosition === 'left' && renderIcon()}
-      {children && <span className={icon ? (iconPosition === 'left' ? 'ml-2' : 'mr-2') : ''}>{children}</span>}
+      {children}
       {icon && iconPosition === 'right' && renderIcon()}
     </>
   );
