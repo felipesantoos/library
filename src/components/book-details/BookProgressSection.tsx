@@ -16,6 +16,35 @@ export function BookProgressSection({ book, onRefresh }: BookProgressSectionProp
     return null;
   }
 
+  // Calculate progress percentage based on current values
+  const calculateProgress = () => {
+    const currentPage = typeof book.current_page_text === 'number' ? book.current_page_text : 0;
+    const currentMinutes = typeof book.current_minutes_audio === 'number' ? book.current_minutes_audio : 0;
+    const totalPages = typeof book.total_pages === 'number' ? book.total_pages : null;
+    const totalMinutes = typeof book.total_minutes === 'number' ? book.total_minutes : null;
+
+    // For hybrid books, calculate combined progress
+    if (totalPages && totalPages > 0 && totalMinutes && totalMinutes > 0) {
+      const textProgress = (currentPage / totalPages) * 100;
+      const audioProgress = (currentMinutes / totalMinutes) * 100;
+      return (textProgress * 0.5) + (audioProgress * 0.5);
+    }
+
+    // For text-only books
+    if (totalPages && totalPages > 0) {
+      return (currentPage / totalPages) * 100;
+    }
+
+    // For audio-only books
+    if (totalMinutes && totalMinutes > 0) {
+      return (currentMinutes / totalMinutes) * 100;
+    }
+
+    return 0;
+  };
+
+  const progressPercentage = calculateProgress();
+
   const handleProgressClick = () => {
     setIsModalOpen(true);
   };
@@ -82,10 +111,10 @@ export function BookProgressSection({ book, onRefresh }: BookProgressSectionProp
       >
         <div className="flex items-center justify-between mb-2">
           <MetaText>Progress</MetaText>
-          <MetaText>{Math.round(book.progress_percentage)}%</MetaText>
+          <MetaText>{Math.round(progressPercentage)}%</MetaText>
         </div>
         <ProgressBar
-          value={book.progress_percentage}
+          value={progressPercentage}
           size="md"
           showPercentage
         />
