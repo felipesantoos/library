@@ -49,13 +49,13 @@ impl SqliteSessionRepository {
         let end_time = end_time_str
             .and_then(|s| chrono::NaiveTime::parse_from_str(&s, "%H:%M:%S").ok());
 
-        let created_at_str: String = row.get(13)?;
+        let created_at_str: String = row.get(12)?;
         let created_at = Self::parse_datetime(&created_at_str)
-            .map_err(|e| rusqlite::Error::InvalidColumnType(13, format!("Invalid created_at: {}", e), rusqlite::types::Type::Text))?;
+            .map_err(|e| rusqlite::Error::InvalidColumnType(12, format!("Invalid created_at: {}", e), rusqlite::types::Type::Text))?;
 
-        let updated_at_str: String = row.get(14)?;
+        let updated_at_str: String = row.get(13)?;
         let updated_at = Self::parse_datetime(&updated_at_str)
-            .map_err(|e| rusqlite::Error::InvalidColumnType(14, format!("Invalid updated_at: {}", e), rusqlite::types::Type::Text))?;
+            .map_err(|e| rusqlite::Error::InvalidColumnType(13, format!("Invalid updated_at: {}", e), rusqlite::types::Type::Text))?;
 
         Ok(ReadingSession {
             id: Some(row.get(0)?),
@@ -69,8 +69,7 @@ impl SqliteSessionRepository {
             pages_read: row.get(8)?,
             minutes_read: row.get(9)?,
             duration_seconds: row.get(10)?,
-            notes: row.get(11)?,
-            photo_path: row.get(12)?,
+            photo_path: row.get(11)?,
             created_at,
             updated_at,
         })
@@ -91,8 +90,8 @@ impl SessionRepository for SqliteSessionRepository {
             "INSERT INTO reading_sessions (
                 book_id, reading_id, session_date, start_time, end_time,
                 start_page, end_page, pages_read, minutes_read, duration_seconds,
-                notes, photo_path, created_at, updated_at
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
+                photo_path, created_at, updated_at
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             params![
                 session.book_id,
                 session.reading_id,
@@ -104,7 +103,6 @@ impl SessionRepository for SqliteSessionRepository {
                 session.pages_read,
                 session.minutes_read,
                 session.duration_seconds,
-                session.notes,
                 session.photo_path,
                 created_at,
                 updated_at
@@ -129,7 +127,7 @@ impl SessionRepository for SqliteSessionRepository {
             "UPDATE reading_sessions SET
                 book_id = ?2, reading_id = ?3, session_date = ?4, start_time = ?5, end_time = ?6,
                 start_page = ?7, end_page = ?8, pages_read = ?9, minutes_read = ?10,
-                duration_seconds = ?11, notes = ?12, photo_path = ?13, updated_at = ?14
+                duration_seconds = ?11, photo_path = ?12, updated_at = ?13
             WHERE id = ?1",
             params![
                 id,
@@ -143,7 +141,6 @@ impl SessionRepository for SqliteSessionRepository {
                 session.pages_read,
                 session.minutes_read,
                 session.duration_seconds,
-                session.notes,
                 session.photo_path,
                 updated_at
             ],
@@ -169,7 +166,7 @@ impl SessionRepository for SqliteSessionRepository {
             .prepare(
                 "SELECT id, book_id, reading_id, session_date, start_time, end_time,
                  start_page, end_page, pages_read, minutes_read, duration_seconds,
-                 notes, photo_path, created_at, updated_at
+                 photo_path, created_at, updated_at
                  FROM reading_sessions WHERE id = ?1"
             )
             .map_err(|e| format!("Failed to prepare statement: {}", e))?;
@@ -191,7 +188,7 @@ impl SessionRepository for SqliteSessionRepository {
             .prepare(
                 "SELECT id, book_id, reading_id, session_date, start_time, end_time,
                  start_page, end_page, pages_read, minutes_read, duration_seconds,
-                 notes, photo_path, created_at, updated_at
+                 photo_path, created_at, updated_at
                  FROM reading_sessions ORDER BY session_date DESC, created_at DESC"
             )
             .map_err(|e| format!("Failed to prepare statement: {}", e))?;
@@ -215,7 +212,7 @@ impl SessionRepository for SqliteSessionRepository {
             .prepare(
                 "SELECT id, book_id, reading_id, session_date, start_time, end_time,
                  start_page, end_page, pages_read, minutes_read, duration_seconds,
-                 notes, photo_path, created_at, updated_at
+                 photo_path, created_at, updated_at
                  FROM reading_sessions WHERE book_id = ?1
                  ORDER BY session_date DESC, created_at DESC"
             )
@@ -240,7 +237,7 @@ impl SessionRepository for SqliteSessionRepository {
             .prepare(
                 "SELECT id, book_id, reading_id, session_date, start_time, end_time,
                  start_page, end_page, pages_read, minutes_read, duration_seconds,
-                 notes, photo_path, created_at, updated_at
+                 photo_path, created_at, updated_at
                  FROM reading_sessions WHERE reading_id = ?1
                  ORDER BY session_date DESC, created_at DESC"
             )
@@ -272,7 +269,7 @@ impl SessionRepository for SqliteSessionRepository {
             .prepare(
                 "SELECT id, book_id, reading_id, session_date, start_time, end_time,
                  start_page, end_page, pages_read, minutes_read, duration_seconds,
-                 notes, photo_path, created_at, updated_at
+                 photo_path, created_at, updated_at
                  FROM reading_sessions 
                  WHERE session_date >= ?1 AND session_date <= ?2
                  ORDER BY session_date DESC, created_at DESC"

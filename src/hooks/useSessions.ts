@@ -13,7 +13,6 @@ export interface SessionDto {
   pages_read: number | null;
   minutes_read: number | null;
   duration_seconds: number | null;
-  notes: string | null;
   photo_path: string | null;
   created_at: string;
   updated_at: string;
@@ -29,7 +28,6 @@ export interface CreateSessionCommand {
   start_page?: number | null;
   end_page?: number | null;
   minutes_read?: number | null;
-  notes?: string | null;
 }
 
 export interface UpdateSessionCommand {
@@ -40,7 +38,6 @@ export interface UpdateSessionCommand {
   start_page?: number | null;
   end_page?: number | null;
   minutes_read?: number | null;
-  notes?: string | null;
 }
 
 export function useSessions(filters?: {

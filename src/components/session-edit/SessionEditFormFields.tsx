@@ -10,14 +10,12 @@ interface SessionEditFormFieldsProps {
   startPage: number | null;
   endPage: number | null;
   minutesRead: number | null;
-  notes: string;
   onSessionDateChange: (value: string) => void;
   onStartTimeChange: (value: string) => void;
   onEndTimeChange: (value: string) => void;
   onStartPageChange: (value: number | null) => void;
   onEndPageChange: (value: number | null) => void;
   onMinutesReadChange: (value: number | null) => void;
-  onNotesChange: (value: string) => void;
 }
 
 export function SessionEditFormFields({
@@ -28,14 +26,12 @@ export function SessionEditFormFields({
   startPage,
   endPage,
   minutesRead,
-  notes,
   onSessionDateChange,
   onStartTimeChange,
   onEndTimeChange,
   onStartPageChange,
   onEndPageChange,
   onMinutesReadChange,
-  onNotesChange,
 }: SessionEditFormFieldsProps) {
   return (
     <>
@@ -140,21 +136,6 @@ export function SessionEditFormFields({
           </HandDrawnBox>
         </div>
       )}
-
-      <div>
-        <label className="block text-sm font-medium text-text-primary mb-1">
-          Notes
-        </label>
-        <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-          <textarea
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
-            placeholder="Quick notes about this session..."
-          />
-        </HandDrawnBox>
-      </div>
     </>
   );
 }

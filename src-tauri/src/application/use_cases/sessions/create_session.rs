@@ -50,7 +50,6 @@ impl<'a> CreateSessionUseCase<'a> {
         session.start_time = start_time;
         session.end_time = end_time;
         session.minutes_read = command.minutes_read;
-        session.notes = command.notes;
 
         // Calculate duration if times are provided
         if start_time.is_some() && end_time.is_some() {

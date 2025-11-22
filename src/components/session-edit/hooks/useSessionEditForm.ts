@@ -12,7 +12,6 @@ export function useSessionEditForm({ session }: UseSessionEditFormProps) {
   const [startPage, setStartPage] = useState<number | null>(null);
   const [endPage, setEndPage] = useState<number | null>(null);
   const [minutesRead, setMinutesRead] = useState<number | null>(null);
-  const [notes, setNotes] = useState('');
 
   // Initialize form with session data
   useEffect(() => {
@@ -23,7 +22,6 @@ export function useSessionEditForm({ session }: UseSessionEditFormProps) {
       setStartPage(session.start_page);
       setEndPage(session.end_page);
       setMinutesRead(session.minutes_read);
-      setNotes(session.notes || '');
     }
   }, [session]);
 
@@ -34,14 +32,12 @@ export function useSessionEditForm({ session }: UseSessionEditFormProps) {
     startPage,
     endPage,
     minutesRead,
-    notes,
     setSessionDate,
     setStartTime,
     setEndTime,
     setStartPage,
     setEndPage,
     setMinutesRead,
-    setNotes,
   };
 }
 

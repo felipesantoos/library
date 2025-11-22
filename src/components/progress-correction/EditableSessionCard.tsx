@@ -137,21 +137,6 @@ export function EditableSessionCard({
             </div>
           )}
 
-          {/* Notes - Only show if session has notes or is being edited */}
-          {(session.notes || isEdited) && (
-            <div>
-              <label className="block text-xs text-text-secondary mb-1">Notes</label>
-              <HandDrawnBox borderRadius={6} strokeWidth={1} linearCorners={true} className="w-full">
-                <textarea
-                  value={session.notes || ''}
-                  onChange={(e) => onChange('notes', e.target.value || null)}
-                  rows={2}
-                  className="w-full px-2 py-1 text-sm rounded-md bg-background-surface text-text-primary focus:outline-none resize-none"
-                  placeholder="Optional notes..."
-                />
-              </HandDrawnBox>
-            </div>
-          )}
 
           {/* Errors & Warnings */}
           {hasError && errorMessage && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { createNote, deleteNote, CreateNoteCommand } from '@/hooks/useNotes';
+import { createNote, deleteNote, updateNote, CreateNoteCommand, UpdateNoteCommand } from '@/hooks/useNotes';
+import { toast } from 'sonner';
 
 export function useNoteActions(onSuccess?: () => void) {
   const [loading, setLoading] = useState(false);
@@ -10,11 +11,28 @@ export function useNoteActions(onSuccess?: () => void) {
       setLoading(true);
       setError(null);
       await createNote(command);
+      toast.success('Note created successfully');
       onSuccess?.();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create note';
       setError(message);
-      alert(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (command: UpdateNoteCommand) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await updateNote(command);
+      toast.success('Note updated successfully');
+      onSuccess?.();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update note';
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -29,11 +47,12 @@ export function useNoteActions(onSuccess?: () => void) {
       setLoading(true);
       setError(null);
       await deleteNote(id);
+      toast.success('Note deleted successfully');
       onSuccess?.();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to delete note';
       setError(message);
-      alert(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -41,6 +60,7 @@ export function useNoteActions(onSuccess?: () => void) {
 
   return {
     handleCreate,
+    handleUpdate,
     handleDelete,
     loading,
     error,

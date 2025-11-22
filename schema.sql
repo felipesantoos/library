@@ -60,7 +60,6 @@ CREATE TABLE reading_sessions (
     pages_read INTEGER,
     minutes_read INTEGER,
     duration_seconds INTEGER, -- Total duration in seconds
-    notes TEXT, -- Quick session notes
     photo_path TEXT, -- Path to page scan photo (if used)
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),

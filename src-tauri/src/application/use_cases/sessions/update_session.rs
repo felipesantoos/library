@@ -58,14 +58,6 @@ impl<'a> UpdateSessionUseCase<'a> {
             session.minutes_read = Some(minutes_read);
         }
 
-        if let Some(notes) = command.notes {
-            session.notes = if notes.is_empty() {
-                None
-            } else {
-                Some(notes)
-            };
-        }
-
         // Recalculate pages_read if start/end page changed
         if session.start_page.is_some() && session.end_page.is_some() {
             session.update_pages_read()?;

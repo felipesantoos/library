@@ -6,11 +6,12 @@ import { NoteCard } from './NoteCard';
 interface NotesListProps {
   notes: NoteDto[];
   books: BookDto[];
+  onEdit?: (note: NoteDto) => void;
   onDelete: (id: number) => void;
   onBookClick: (bookId: number) => void;
 }
 
-export function NotesList({ notes, books, onDelete, onBookClick }: NotesListProps) {
+export function NotesList({ notes, books, onEdit, onDelete, onBookClick }: NotesListProps) {
   return (
     <Stack spacing="sm">
       {notes.map((note) => {
@@ -20,6 +21,7 @@ export function NotesList({ notes, books, onDelete, onBookClick }: NotesListProp
             key={note.id}
             note={note}
             book={book}
+            onEdit={onEdit}
             onDelete={onDelete}
             onBookClick={onBookClick}
           />

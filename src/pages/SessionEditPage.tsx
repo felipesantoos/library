@@ -35,14 +35,12 @@ export function SessionEditPage() {
     startPage,
     endPage,
     minutesRead,
-    notes,
     setSessionDate,
     setStartTime,
     setEndTime,
     setStartPage,
     setEndPage,
     setMinutesRead,
-    setNotes,
   } = useSessionEditForm({ session });
 
   const selectedBook = books.find((b) => b.id === session?.book_id);
@@ -74,7 +72,6 @@ export function SessionEditPage() {
       start_page: startPage,
       end_page: endPage,
       minutes_read: minutesRead,
-      notes: notes || null,
     };
 
     handleSubmit(command, validate);
@@ -120,7 +117,6 @@ export function SessionEditPage() {
             startPage={startPage}
             endPage={endPage}
             minutesRead={minutesRead}
-            notes={notes}
             loading={saving}
             onSessionDateChange={setSessionDate}
             onStartTimeChange={setStartTime}
@@ -128,7 +124,6 @@ export function SessionEditPage() {
             onStartPageChange={setStartPage}
             onEndPageChange={setEndPage}
             onMinutesReadChange={setMinutesRead}
-            onNotesChange={setNotes}
             onSubmit={onSubmit}
           />
         </Stack>

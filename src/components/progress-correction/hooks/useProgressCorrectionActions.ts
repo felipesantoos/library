@@ -54,7 +54,6 @@ export function useProgressCorrectionActions({
           start_page: editedSession.start_page,
           end_page: editedSession.end_page,
           minutes_read: editedSession.minutes_read,
-          notes: editedSession.notes || null,
         };
         await updateSession(command);
       }

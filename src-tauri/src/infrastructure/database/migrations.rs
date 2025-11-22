@@ -50,6 +50,7 @@ impl Migration {
         // Run incremental migrations for existing databases
         Self::migrate_remove_note_type_and_excerpt(conn)?;
         Self::migrate_remove_sentiment(conn)?;
+        Self::migrate_remove_session_notes(conn)?;
 
         Ok(())
     }
@@ -229,6 +230,104 @@ impl Migration {
         tx.execute("CREATE INDEX IF NOT EXISTS idx_notes_page ON notes(page)", [])
             .map_err(|e| format!("Failed to create index: {}", e))?;
         tx.execute("CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes(created_at)", [])
+            .map_err(|e| format!("Failed to create index: {}", e))?;
+
+        // Commit transaction
+        tx.commit()
+            .map_err(|e| format!("Failed to commit migration: {}", e))?;
+
+        Ok(())
+    }
+
+    /// Migration to remove notes column from reading_sessions table
+    /// SQLite doesn't support DROP COLUMN, so we recreate the table
+    fn migrate_remove_session_notes(conn: &Connection) -> Result<(), String> {
+        // Check if reading_sessions table has notes column
+        let mut stmt = conn
+            .prepare("PRAGMA table_info(reading_sessions)")
+            .map_err(|e| format!("Failed to inspect reading_sessions table: {}", e))?;
+
+        let mut column_names = Vec::new();
+        let info_rows = stmt
+            .query_map([], |row| {
+                let name: String = row.get(1)?;
+                Ok(name)
+            })
+            .map_err(|e| format!("Failed to iterate table info: {}", e))?;
+
+        for col in info_rows {
+            column_names.push(col.map_err(|e| format!("Failed to read column info: {}", e))?);
+        }
+
+        let has_notes_column = column_names.iter().any(|c| c == "notes");
+
+        // If notes column doesn't exist, migration is already done
+        if !has_notes_column {
+            return Ok(());
+        }
+
+        // Begin transaction
+        let tx = conn.unchecked_transaction()
+            .map_err(|e| format!("Failed to begin transaction: {}", e))?;
+
+        // Create new reading_sessions table without notes
+        tx.execute(
+            "CREATE TABLE reading_sessions_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                book_id INTEGER NOT NULL,
+                reading_id INTEGER,
+                session_date TEXT NOT NULL,
+                start_time TEXT,
+                end_time TEXT,
+                start_page INTEGER,
+                end_page INTEGER,
+                pages_read INTEGER,
+                minutes_read INTEGER,
+                duration_seconds INTEGER,
+                photo_path TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+                FOREIGN KEY (reading_id) REFERENCES book_readings(id) ON DELETE SET NULL,
+                CHECK(end_page IS NULL OR start_page IS NULL OR end_page >= start_page),
+                CHECK(duration_seconds IS NULL OR duration_seconds >= 0)
+            )",
+            [],
+        )
+        .map_err(|e| format!("Failed to create new reading_sessions table: {}", e))?;
+
+        // Copy data from old table to new, excluding notes
+        tx.execute(
+            "INSERT INTO reading_sessions_new (
+                id, book_id, reading_id, session_date, start_time, end_time,
+                start_page, end_page, pages_read, minutes_read, duration_seconds,
+                photo_path, created_at, updated_at
+            )
+            SELECT 
+                id, book_id, reading_id, session_date, start_time, end_time,
+                start_page, end_page, pages_read, minutes_read, duration_seconds,
+                photo_path, created_at, updated_at
+            FROM reading_sessions",
+            [],
+        )
+        .map_err(|e| format!("Failed to copy data to new table: {}", e))?;
+
+        // Drop old table (this also drops indexes)
+        tx.execute("DROP TABLE reading_sessions", [])
+            .map_err(|e| format!("Failed to drop old reading_sessions table: {}", e))?;
+
+        // Rename new table to reading_sessions
+        tx.execute("ALTER TABLE reading_sessions_new RENAME TO reading_sessions", [])
+            .map_err(|e| format!("Failed to rename new reading_sessions table: {}", e))?;
+
+        // Recreate indexes
+        tx.execute("CREATE INDEX IF NOT EXISTS idx_reading_sessions_book_id ON reading_sessions(book_id)", [])
+            .map_err(|e| format!("Failed to create index: {}", e))?;
+        tx.execute("CREATE INDEX IF NOT EXISTS idx_reading_sessions_reading_id ON reading_sessions(reading_id)", [])
+            .map_err(|e| format!("Failed to create index: {}", e))?;
+        tx.execute("CREATE INDEX IF NOT EXISTS idx_reading_sessions_session_date ON reading_sessions(session_date)", [])
+            .map_err(|e| format!("Failed to create index: {}", e))?;
+        tx.execute("CREATE INDEX IF NOT EXISTS idx_reading_sessions_date_book ON reading_sessions(session_date, book_id)", [])
             .map_err(|e| format!("Failed to create index: {}", e))?;
 
         // Commit transaction

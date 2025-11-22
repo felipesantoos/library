@@ -11,7 +11,6 @@ interface SessionEditFormProps {
   startPage: number | null;
   endPage: number | null;
   minutesRead: number | null;
-  notes: string;
   loading: boolean;
   onSessionDateChange: (value: string) => void;
   onStartTimeChange: (value: string) => void;
@@ -19,7 +18,6 @@ interface SessionEditFormProps {
   onStartPageChange: (value: number | null) => void;
   onEndPageChange: (value: number | null) => void;
   onMinutesReadChange: (value: number | null) => void;
-  onNotesChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -31,7 +29,6 @@ export function SessionEditForm({
   startPage,
   endPage,
   minutesRead,
-  notes,
   loading,
   onSessionDateChange,
   onStartTimeChange,
@@ -39,7 +36,6 @@ export function SessionEditForm({
   onStartPageChange,
   onEndPageChange,
   onMinutesReadChange,
-  onNotesChange,
   onSubmit,
 }: SessionEditFormProps) {
   return (
@@ -54,14 +50,12 @@ export function SessionEditForm({
             startPage={startPage}
             endPage={endPage}
             minutesRead={minutesRead}
-            notes={notes}
             onSessionDateChange={onSessionDateChange}
             onStartTimeChange={onStartTimeChange}
             onEndTimeChange={onEndTimeChange}
             onStartPageChange={onStartPageChange}
             onEndPageChange={onEndPageChange}
             onMinutesReadChange={onMinutesReadChange}
-            onNotesChange={onNotesChange}
           />
 
           <SessionEditFormActions loading={loading} />

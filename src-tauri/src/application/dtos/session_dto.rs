@@ -15,7 +15,6 @@ pub struct SessionDto {
     pub pages_read: Option<i32>,
     pub minutes_read: Option<i32>,
     pub duration_seconds: Option<i32>,
-    pub notes: Option<String>,
     pub photo_path: Option<String>,
     pub created_at: String, // ISO8601 string
     pub updated_at: String, // ISO8601 string
@@ -42,7 +41,6 @@ impl From<ReadingSession> for SessionDto {
             pages_read: session.pages_read,
             minutes_read: session.minutes_read,
             duration_seconds: session.duration_seconds,
-            notes: session.notes,
             photo_path: session.photo_path,
             created_at: session.created_at.to_rfc3339(),
             updated_at: session.updated_at.to_rfc3339(),
@@ -77,7 +75,6 @@ pub struct CreateSessionCommand {
     pub start_page: Option<i32>,
     pub end_page: Option<i32>,
     pub minutes_read: Option<i32>, // For audiobooks
-    pub notes: Option<String>,
 }
 
 /// Command for updating a session
@@ -90,6 +87,5 @@ pub struct UpdateSessionCommand {
     pub start_page: Option<i32>,
     pub end_page: Option<i32>,
     pub minutes_read: Option<i32>,
-    pub notes: Option<String>,
 }
 
