@@ -6,12 +6,14 @@ interface SectionProps {
   children: ReactNode;
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export function Section({ 
   children, 
   className,
-  padding = 'md'
+  padding = 'md',
+  onClick
 }: SectionProps) {
   const paddingClasses = {
     none: 'p-0',
@@ -32,6 +34,7 @@ export function Section({
         paddingClasses[padding],
         className
       )}
+      onClick={onClick}
     >
       {children}
     </HandDrawnBox>

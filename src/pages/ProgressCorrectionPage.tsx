@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useBook } from '@/hooks/useBooks';
 import { useSessions, deleteSession } from '@/hooks/useSessions';
 import { Container, Stack } from '@/components/ui/layout';
@@ -17,7 +17,15 @@ import {
 } from '@/components/progress-correction';
 
 export function ProgressCorrectionPage() {
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  
+  // Extract ID from pathname manually since we're not using Routes/Route
+  const extractId = (pathname: string): string | null => {
+    const match = pathname.match(/\/book\/(\d+)\/progress-correction/);
+    return match ? match[1] : null;
+  };
+  
+  const id = extractId(location.pathname);
   const bookId = id ? parseInt(id) : null;
 
   const { book, loading: loadingBook, error: bookError } = useBook(bookId);

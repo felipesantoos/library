@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useBook } from '@/hooks/useBooks';
 import { useSessions } from '@/hooks/useSessions';
 import { useNotes } from '@/hooks/useNotes';
@@ -23,8 +23,16 @@ import {
 } from '@/components/book-details';
 
 export function BookDetailsPage() {
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  
+  // Extract ID from pathname manually since we're not using Routes/Route
+  const extractId = (pathname: string): string | null => {
+    const match = pathname.match(/\/book\/(\d+)/);
+    return match ? match[1] : null;
+  };
+  
+  const id = extractId(location.pathname);
   const bookId = id ? parseInt(id, 10) : null;
   
   // Validate that bookId is a valid number

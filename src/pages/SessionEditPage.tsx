@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useSession } from '@/hooks/useSessions';
 import { useBooks } from '@/hooks/useBooks';
 import { UpdateSessionCommand } from '@/hooks/useSessions';
@@ -14,7 +14,15 @@ import {
 } from '@/components/session-edit';
 
 export function SessionEditPage() {
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  
+  // Extract ID from pathname manually since we're not using Routes/Route
+  const extractId = (pathname: string): string | null => {
+    const match = pathname.match(/\/session\/(\d+)\/edit/);
+    return match ? match[1] : null;
+  };
+  
+  const id = extractId(location.pathname);
   const sessionId = id ? parseInt(id) : null;
 
   const { session, loading, error } = useSession(sessionId);

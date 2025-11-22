@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useBook } from '@/hooks/useBooks';
 import { useTags } from '@/hooks/useTags';
 import { useCollections } from '@/hooks/useCollections';
@@ -17,8 +17,16 @@ import {
 } from '@/components/book-form';
 
 export function BookFormPage() {
-  const { id } = useParams<{ id?: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  
+  // Extract ID from pathname manually since we're not using Routes/Route
+  const extractId = (pathname: string): string | null => {
+    const match = pathname.match(/\/book\/(\d+)\/edit/);
+    return match ? match[1] : null;
+  };
+  
+  const id = extractId(location.pathname);
   const isEditing = !!id;
   const isWishlist = searchParams.get('wishlist') === 'true';
   

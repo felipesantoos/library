@@ -31,11 +31,17 @@ export function BookCard({ book, tagFilter, collectionFilter }: BookCardProps) {
     return null;
   }
 
+  const handleClick = () => {
+    if (book.id) {
+      navigate(`/book/${book.id}`);
+    }
+  };
+
   return (
     <Section
       padding="md"
       className="hover:shadow-medium hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out cursor-pointer"
-      onClick={() => navigate(`/book/${book.id}`)}
+      onClick={handleClick}
     >
       <Stack spacing="sm">
         <HandDrawnBox
