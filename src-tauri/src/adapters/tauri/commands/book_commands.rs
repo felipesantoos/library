@@ -2,6 +2,7 @@ use crate::application::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, Bo
 use crate::application::use_cases::books::{CreateBookUseCase, GetBookUseCase, ListBooksUseCase, UpdateBookUseCase, DeleteBookUseCase, GenerateBookSummaryUseCase};
 use crate::infrastructure::repositories::{SqliteBookRepository, SqliteNoteRepository};
 use crate::adapters::tauri::AppState;
+use serde::Deserialize;
 
 /// Tauri command: Create a new book
 #[tauri::command]
@@ -31,13 +32,21 @@ pub fn get_book(
     use_case.execute(id)
 }
 
+/// Filters for listing books
+#[derive(Debug, Deserialize)]
+pub struct ListBooksFilters {
+    pub status: Option<String>,
+    pub book_type: Option<String>,
+    #[serde(default)]
+    pub is_archived: Option<bool>,
+    #[serde(default)]
+    pub is_wishlist: Option<bool>,
+}
+
 /// Tauri command: List all books with optional filters
 #[tauri::command]
 pub fn list_books(
-    status: Option<String>,
-    book_type: Option<String>,
-    is_archived: Option<bool>,
-    is_wishlist: Option<bool>,
+    filters: Option<ListBooksFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<BookDto>, String> {
     let db_conn = state.db_connection.lock().map_err(|e| format!("Lock error: {}", e))?;
@@ -45,7 +54,12 @@ pub fn list_books(
     let repository = SqliteBookRepository::new(sqlite_conn);
     
     let use_case = ListBooksUseCase::new(&repository);
-    use_case.execute(status, book_type, is_archived, is_wishlist)
+    
+    if let Some(f) = filters {
+        use_case.execute(f.status, f.book_type, f.is_archived, f.is_wishlist)
+    } else {
+        use_case.execute(None, None, None, None)
+    }
 }
 
 /// Tauri command: Update an existing book

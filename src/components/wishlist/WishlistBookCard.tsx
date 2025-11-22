@@ -23,20 +23,24 @@ export function WishlistBookCard({
           borderRadius={8}
           strokeWidth={1}
           linearCorners={true}
-          className="aspect-[3/4] bg-background-surface rounded-md flex items-center justify-center overflow-hidden cursor-pointer relative transition-all duration-200 ease-in-out"
+          className="aspect-[3/4] bg-background-surface rounded-md cursor-pointer relative transition-all duration-200 ease-in-out"
           onClick={onClick}
         >
-          {book.cover_url ? (
-            <img
-              src={book.cover_url}
-              alt={book.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <BookOpen className="w-12 h-12 text-text-secondary" />
-          )}
-          <div className="absolute top-2 right-2">
-            <Heart className="w-5 h-5 text-accent-primary fill-accent-primary" />
+          <div className="w-full h-full overflow-hidden rounded-md relative">
+            {book.cover_url ? (
+              <img
+                src={book.cover_url}
+                alt={book.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <BookOpen className="w-12 h-12 text-text-secondary" />
+              </div>
+            )}
+            <div className="absolute top-2 right-2">
+              <Heart className="w-5 h-5 text-accent-primary fill-accent-primary" />
+            </div>
           </div>
         </HandDrawnBox>
 

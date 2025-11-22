@@ -340,14 +340,22 @@ export function HandDrawnDropdown({
             
             <div className="flex items-center gap-1 flex-shrink-0">
               {!multiple && selectedValues.length > 0 && (
-                <button
-                  type="button"
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={handleClear}
-                  className="p-1 hover:bg-background-surface/50 rounded transition-colors"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleClear(e as any);
+                    }
+                  }}
+                  className="p-1 hover:bg-background-surface/50 rounded transition-colors cursor-pointer"
                   aria-label="Clear selection"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </div>
               )}
               
               {multiple && selectedValues.length > 0 && (

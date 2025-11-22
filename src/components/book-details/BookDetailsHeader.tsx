@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { BookDto } from '@/hooks/useBooks';
+import { BookDto, updateBook, UpdateBookCommand } from '@/hooks/useBooks';
 import { Heading, Paragraph, MetaText } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, Archive, RotateCcw, Edit } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
 import { toast } from '@/utils/toast';
 
 interface BookDetailsHeaderProps {
@@ -16,11 +15,16 @@ export function BookDetailsHeader({ book, onRefresh }: BookDetailsHeaderProps) {
 
   const handleArchiveToggle = async () => {
     try {
-      const updatedBook = {
-        ...book,
+      if (!book.id) {
+        throw new Error('Book ID is required');
+      }
+
+      const command: UpdateBookCommand = {
+        id: book.id,
         is_archived: !book.is_archived,
       };
-      await invoke('update_book', { bookDto: updatedBook });
+      
+      await updateBook(command);
       toast.success(book.is_archived ? 'Book restored to library' : 'Book archived');
       onRefresh();
     } catch (err) {

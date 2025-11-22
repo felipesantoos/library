@@ -25,7 +25,20 @@ import {
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const bookId = id ? parseInt(id) : null;
+  const bookId = id ? parseInt(id, 10) : null;
+  
+  // Validate that bookId is a valid number
+  if (id && (isNaN(bookId as number) || bookId === null)) {
+    return (
+      <Container>
+        <div className="py-8">
+          <Paragraph variant="secondary" className="text-semantic-error">
+            Error: Invalid book ID
+          </Paragraph>
+        </div>
+      </Container>
+    );
+  }
 
   const { book, loading, error, refresh } = useBook(bookId);
   const { sessions } = useSessions({ book_id: bookId ?? undefined });
@@ -54,6 +67,7 @@ export function BookDetailsPage() {
     return sortedSessions.filter(s => s.reading_id === selectedReadingId);
   }, [sortedSessions, selectedReadingId]);
 
+  // Calculate progress data (hook handles null book)
   const progressData = useBookProgressData(book, sessions);
 
   if (loading) {
@@ -66,7 +80,7 @@ export function BookDetailsPage() {
     );
   }
 
-  if (error || !book) {
+  if (error || !book || !book.id) {
     return (
       <Container>
         <div className="py-8">

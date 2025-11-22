@@ -13,6 +13,7 @@ export function WishlistPage() {
   const navigate = useNavigate();
   const { books, loading, error, refresh } = useBooks({
     is_wishlist: true,
+    is_archived: false,
   });
 
   const { handleMoveToLibrary } = useWishlistActions({ onRefresh: refresh });

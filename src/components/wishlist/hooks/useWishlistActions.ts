@@ -1,4 +1,4 @@
-import { updateBook, BookDto } from '@/hooks/useBooks';
+import { updateBook, BookDto, UpdateBookCommand } from '@/hooks/useBooks';
 import { toast } from '@/utils/toast';
 
 interface UseWishlistActionsProps {
@@ -8,10 +8,16 @@ interface UseWishlistActionsProps {
 export function useWishlistActions({ onRefresh }: UseWishlistActionsProps) {
   const handleMoveToLibrary = async (book: BookDto) => {
     try {
-      await updateBook({
-        ...book,
+      if (!book.id) {
+        throw new Error('Book ID is required');
+      }
+
+      const command: UpdateBookCommand = {
+        id: book.id,
         is_wishlist: false,
-      });
+      };
+      
+      await updateBook(command);
       toast.success('Book moved to library successfully');
       onRefresh();
     } catch (err) {

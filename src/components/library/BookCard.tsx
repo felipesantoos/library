@@ -42,19 +42,21 @@ export function BookCard({ book, tagFilter, collectionFilter }: BookCardProps) {
           borderRadius={6}
           strokeWidth={1}
           linearCorners={true}
-          className="aspect-[3/4] bg-background-surface dark:bg-dark-background-surface border border-background-border dark:border-dark-background-border rounded-md overflow-hidden"
+          className="aspect-[3/4] bg-background-surface dark:bg-dark-background-surface rounded-md"
         >
-          {book.cover_url ? (
-            <img
-              src={book.cover_url}
-              alt={book.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <BookOpen className="w-12 h-12 text-text-secondary dark:text-dark-text-secondary" />
-            </div>
-          )}
+          <div className="w-full h-full overflow-hidden rounded-md">
+            {book.cover_url ? (
+              <img
+                src={book.cover_url}
+                alt={book.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <BookOpen className="w-12 h-12 text-text-secondary dark:text-dark-text-secondary" />
+              </div>
+            )}
+          </div>
         </HandDrawnBox>
 
         <div>

@@ -60,6 +60,30 @@ impl SqliteBookRepository {
         }
     }
 
+    // Helper function to parse datetime from SQLite (supports both SQLite format and RFC3339)
+    fn parse_datetime(s: &str) -> Result<chrono::DateTime<chrono::Utc>, rusqlite::Error> {
+        // Try RFC3339 first (used when saving)
+        if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(s) {
+            return Ok(dt.with_timezone(&chrono::Utc));
+        }
+        
+        // Try SQLite datetime format (YYYY-MM-DD HH:MM:SS)
+        if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S") {
+            return Ok(dt.and_utc());
+        }
+        
+        // Try SQLite datetime format with microseconds (YYYY-MM-DD HH:MM:SS.ffffff)
+        if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f") {
+            return Ok(dt.and_utc());
+        }
+        
+        Err(rusqlite::Error::InvalidColumnType(
+            0,
+            format!("Invalid datetime format: {}", s),
+            rusqlite::types::Type::Text,
+        ))
+    }
+
     fn row_to_book(row: &rusqlite::Row) -> Result<Book, rusqlite::Error> {
         Ok(Book {
             id: Some(row.get(0)?),
@@ -80,17 +104,10 @@ impl SqliteBookRepository {
             is_wishlist: row.get::<_, i32>(13)? != 0,
             cover_url: row.get(14)?,
             url: row.get(15)?,
-            added_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(16)?)
-                .map_err(|_| rusqlite::Error::InvalidColumnType(16, "Invalid datetime".to_string(), rusqlite::types::Type::Text))?
-                .with_timezone(&chrono::Utc),
-            updated_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(17)?)
-                .map_err(|_| rusqlite::Error::InvalidColumnType(17, "Invalid datetime".to_string(), rusqlite::types::Type::Text))?
-                .with_timezone(&chrono::Utc),
+            added_at: Self::parse_datetime(&row.get::<_, String>(16)?)?,
+            updated_at: Self::parse_datetime(&row.get::<_, String>(17)?)?,
             status_changed_at: row.get::<_, Option<String>>(18)?
-                .map(|s| chrono::DateTime::parse_from_rfc3339(&s)
-                    .map(|dt| dt.with_timezone(&chrono::Utc))
-                    .ok())
-                .flatten(),
+                .and_then(|s| Self::parse_datetime(&s).ok()),
         })
     }
 }
@@ -299,33 +316,36 @@ impl BookRepository for SqliteBookRepository {
         is_archived: Option<bool>,
         is_wishlist: Option<bool>,
     ) -> Result<Vec<Book>, String> {
-        // Build dynamic query
+        // Build dynamic query and collect parameters
         let mut query = "SELECT id, title, author, genre, type, isbn, publication_year,
                          total_pages, total_minutes, current_page_text, current_minutes_audio,
                          status, is_archived, is_wishlist, cover_url, url,
                          added_at, updated_at, status_changed_at
                          FROM books WHERE 1=1".to_string();
         
-        let mut params_vec: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+        let mut status_str: Option<String> = None;
+        let mut type_str: Option<String> = None;
+        let mut archived_val: Option<i32> = None;
+        let mut wishlist_val: Option<i32> = None;
 
         if let Some(status) = status {
             query.push_str(" AND status = ?");
-            params_vec.push(Box::new(Self::status_to_string(&status)));
+            status_str = Some(Self::status_to_string(&status));
         }
 
         if let Some(book_type) = book_type {
             query.push_str(" AND type = ?");
-            params_vec.push(Box::new(Self::type_to_string(&book_type)));
+            type_str = Some(Self::type_to_string(&book_type));
         }
 
         if let Some(archived) = is_archived {
             query.push_str(" AND is_archived = ?");
-            params_vec.push(Box::new(if archived { 1 } else { 0 }));
+            archived_val = Some(if archived { 1 } else { 0 });
         }
 
         if let Some(wishlist) = is_wishlist {
             query.push_str(" AND is_wishlist = ?");
-            params_vec.push(Box::new(if wishlist { 1 } else { 0 }));
+            wishlist_val = Some(if wishlist { 1 } else { 0 });
         }
 
         query.push_str(" ORDER BY added_at DESC");
@@ -336,16 +356,122 @@ impl BookRepository for SqliteBookRepository {
             .prepare(&query)
             .map_err(|e| format!("Failed to prepare statement: {}", e))?;
 
-        // Convert params to rusqlite params
-        let rusqlite_params: Vec<&dyn rusqlite::ToSql> = params_vec.iter().map(|p| p.as_ref()).collect();
-        
-        let book_iter = stmt
-            .query_map(&rusqlite_params[..], |row| Self::row_to_book(row))
-            .map_err(|e| format!("Failed to query books: {}", e))?;
-
+        // Execute query based on parameters and collect results immediately
         let mut books = Vec::new();
-        for book_result in book_iter {
-            books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+        
+        match (status_str.as_ref(), type_str.as_ref(), archived_val.as_ref(), wishlist_val.as_ref()) {
+            (None, None, None, None) => {
+                let book_iter = stmt.query_map([], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), None, None, None) => {
+                let book_iter = stmt.query_map(params![s], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, Some(t), None, None) => {
+                let book_iter = stmt.query_map(params![t], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, None, Some(a), None) => {
+                let book_iter = stmt.query_map(params![a], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, None, None, Some(w)) => {
+                let book_iter = stmt.query_map(params![w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), Some(t), None, None) => {
+                let book_iter = stmt.query_map(params![s, t], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), None, Some(a), None) => {
+                let book_iter = stmt.query_map(params![s, a], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), None, None, Some(w)) => {
+                let book_iter = stmt.query_map(params![s, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, Some(t), Some(a), None) => {
+                let book_iter = stmt.query_map(params![t, a], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, Some(t), None, Some(w)) => {
+                let book_iter = stmt.query_map(params![t, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, None, Some(a), Some(w)) => {
+                let book_iter = stmt.query_map(params![a, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), Some(t), Some(a), None) => {
+                let book_iter = stmt.query_map(params![s, t, a], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), Some(t), None, Some(w)) => {
+                let book_iter = stmt.query_map(params![s, t, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), None, Some(a), Some(w)) => {
+                let book_iter = stmt.query_map(params![s, a, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (None, Some(t), Some(a), Some(w)) => {
+                let book_iter = stmt.query_map(params![t, a, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
+            (Some(s), Some(t), Some(a), Some(w)) => {
+                let book_iter = stmt.query_map(params![s, t, a, w], |row| Self::row_to_book(row))
+                    .map_err(|e| format!("Failed to query books: {}", e))?;
+                for book_result in book_iter {
+                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                }
+            }
         }
 
         Ok(books)

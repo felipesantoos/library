@@ -26,6 +26,7 @@ export function LibraryPage() {
   const { collections } = useCollections();
   const { books: allBooks, loading, error } = useBooks({
     is_archived: false,
+    is_wishlist: false,
   });
 
   const books = useLibraryFilters({

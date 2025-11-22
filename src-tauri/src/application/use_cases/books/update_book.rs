@@ -74,10 +74,18 @@ impl<'a> UpdateBookUseCase<'a> {
 
         if let Some(is_archived) = command.is_archived {
             book.is_archived = is_archived;
+            // If archiving, remove from wishlist
+            if is_archived {
+                book.is_wishlist = false;
+            }
         }
 
         if let Some(is_wishlist) = command.is_wishlist {
             book.is_wishlist = is_wishlist;
+            // If adding to wishlist, unarchive
+            if is_wishlist {
+                book.is_archived = false;
+            }
         }
 
         if let Some(cover_url) = command.cover_url {

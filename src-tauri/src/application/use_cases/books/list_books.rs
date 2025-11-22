@@ -19,6 +19,36 @@ impl<'a> ListBooksUseCase<'a> {
         is_archived: Option<bool>,
         is_wishlist: Option<bool>,
     ) -> Result<Vec<BookDto>, String> {
+        // First, fix any inconsistent data (books that are both archived and in wishlist)
+        // This needs to happen before filtering to catch all inconsistent books
+        let all_books = self.book_repository.find_all()?;
+        let mut needs_update = Vec::new();
+        for book in &all_books {
+            if book.is_archived && book.is_wishlist {
+                if let Some(book_id) = book.id {
+                    needs_update.push(book_id);
+                }
+            }
+        }
+        
+        // Fix books that are both archived and in wishlist
+        // Business rule: a book cannot be both archived and in wishlist
+        // Strategy: Always unarchive (wishlist takes priority) unless we're specifically filtering archived=true
+        for book_id in &needs_update {
+            if let Ok(Some(mut book)) = self.book_repository.find_by_id(*book_id) {
+                // If we're specifically looking at archived books (is_archived=true and not filtering wishlist=true),
+                // keep it archived and remove from wishlist
+                // Otherwise, always unarchive (wishlist takes priority)
+                if is_archived == Some(true) && is_wishlist != Some(true) {
+                    book.is_wishlist = false;
+                } else {
+                    // Default: unarchive (wishlist takes priority)
+                    book.is_archived = false;
+                }
+                let _ = self.book_repository.update(&book);
+            }
+        }
+
         let status_enum = status
             .as_ref()
             .map(|s| string_to_book_status(s))

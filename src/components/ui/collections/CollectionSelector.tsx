@@ -45,6 +45,7 @@ export function CollectionSelector({
 
   const handleCreateCollection = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event from bubbling to parent form
     if (!newCollectionName.trim()) return;
 
     setCreating(true);
@@ -113,10 +114,19 @@ export function CollectionSelector({
         </button>
       </HandDrawnBox>
 
+      {/* Backdrop to close */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[5]"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* Dropdown */}
       {isOpen && (
         <div
           className="absolute z-10 mt-2 w-full shadow-lg"
+          onClick={(e) => e.stopPropagation()}
         >
           <div
             className="relative"
@@ -154,7 +164,11 @@ export function CollectionSelector({
             )}
 
             {/* Create New Collection */}
-            <form onSubmit={handleCreateCollection} className="pt-1 mt-1">
+            <form 
+              onSubmit={handleCreateCollection} 
+              onClick={(e) => e.stopPropagation()}
+              className="pt-1 mt-1"
+            >
               <div className="text-sm font-medium text-text-secondary mb-2 px-2">Create new collection</div>
               <div className="space-y-2">
                 <HandDrawnBox
@@ -188,7 +202,8 @@ export function CollectionSelector({
                 />
                 </HandDrawnBox>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleCreateCollection}
                   disabled={!newCollectionName.trim() || creating}
                   className="w-full px-3 py-1.5 text-sm rounded-md bg-accent-primary text-dark-text-primary hover:bg-accent-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
@@ -200,14 +215,6 @@ export function CollectionSelector({
             </HandDrawnBox>
           </div>
         </div>
-      )}
-
-      {/* Backdrop to close */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setIsOpen(false)}
-        />
       )}
     </div>
   );

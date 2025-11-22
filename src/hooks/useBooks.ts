@@ -61,12 +61,23 @@ export function useBooks(filters?: {
       try {
         setLoading(true);
         setError(null);
-        const result = await invoke<BookDto[]>('list_books', {
-          status: status || null,
-          book_type: bookType || null,
-          is_archived: isArchived ?? null,
-          is_wishlist: isWishlist ?? null,
-        });
+        const filters: {
+          status?: string;
+          book_type?: string;
+          is_archived?: boolean;
+          is_wishlist?: boolean;
+        } = {};
+        if (status) filters.status = status;
+        if (bookType) filters.book_type = bookType;
+        // Always include boolean params if they are explicitly set (including false)
+        if (isArchived !== undefined) {
+          filters.is_archived = isArchived;
+        }
+        if (isWishlist !== undefined) {
+          filters.is_wishlist = isWishlist;
+        }
+        
+        const result = await invoke<BookDto[]>('list_books', { filters: Object.keys(filters).length > 0 ? filters : undefined });
         if (!cancelled) {
           setBooks(result);
         }
@@ -92,12 +103,23 @@ export function useBooks(filters?: {
     try {
       setLoading(true);
       setError(null);
-      const result = await invoke<BookDto[]>('list_books', {
-        status: status || null,
-        book_type: bookType || null,
-        is_archived: isArchived ?? null,
-        is_wishlist: isWishlist ?? null,
-      });
+      const filters: {
+        status?: string;
+        book_type?: string;
+        is_archived?: boolean;
+        is_wishlist?: boolean;
+      } = {};
+      if (status) filters.status = status;
+      if (bookType) filters.book_type = bookType;
+      // Always include boolean params if they are explicitly set (including false)
+      if (isArchived !== undefined) {
+        filters.is_archived = isArchived;
+      }
+      if (isWishlist !== undefined) {
+        filters.is_wishlist = isWishlist;
+      }
+      
+      const result = await invoke<BookDto[]>('list_books', { filters: Object.keys(filters).length > 0 ? filters : undefined });
       setBooks(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load books');

@@ -42,7 +42,17 @@ export function useBookFormSubmit({
       if (isEditing && bookId) {
         const updateCommand: UpdateBookCommand = {
           id: parseInt(bookId),
-          ...formData,
+          title: formData.title,
+          author: formData.author,
+          genre: formData.genre,
+          book_type: formData.book_type,
+          isbn: formData.isbn,
+          publication_year: formData.publication_year,
+          total_pages: formData.total_pages,
+          total_minutes: formData.total_minutes,
+          cover_url: formData.cover_url,
+          url: formData.url,
+          is_wishlist: formData.is_wishlist,
         };
         await updateBook(updateCommand);
         savedBookId = parseInt(bookId);
