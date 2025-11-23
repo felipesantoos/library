@@ -148,11 +148,23 @@ impl CollectionRepository for SqliteCollectionRepository {
     fn add_book(&self, book_id: i64, collection_id: i64) -> Result<(), String> {
         let conn = self.connection.lock().map_err(|e| format!("Lock error: {}", e))?;
         
-        conn.execute(
+        eprintln!("[SqliteCollectionRepository::add_book] Adding book_id={} to collection_id={}", book_id, collection_id);
+        
+        let rows_affected = conn.execute(
             "INSERT OR IGNORE INTO book_collections (book_id, collection_id) VALUES (?1, ?2)",
             params![book_id, collection_id],
         )
         .map_err(|e| format!("Failed to add book to collection: {}", e))?;
+
+        eprintln!("[SqliteCollectionRepository::add_book] Insert completed, rows_affected={}", rows_affected);
+        
+        // Verify the insertion
+        let verify_query = "SELECT COUNT(*) FROM book_collections WHERE book_id = ?1 AND collection_id = ?2";
+        if let Ok(mut verify_stmt) = conn.prepare(verify_query) {
+            if let Ok(count) = verify_stmt.query_row(params![book_id, collection_id], |row| row.get::<_, i64>(0)) {
+                eprintln!("[SqliteCollectionRepository::add_book] Verification: {} record(s) found for book_id={}, collection_id={}", count, book_id, collection_id);
+            }
+        }
 
         Ok(())
     }

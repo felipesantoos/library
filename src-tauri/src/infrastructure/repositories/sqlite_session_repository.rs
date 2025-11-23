@@ -287,5 +287,39 @@ impl SessionRepository for SqliteSessionRepository {
 
         Ok(sessions)
     }
+
+    fn find_by_book_id_and_date_range(
+        &self,
+        book_id: i64,
+        start_date: chrono::NaiveDate,
+        end_date: chrono::NaiveDate,
+    ) -> Result<Vec<ReadingSession>, String> {
+        let conn = self.connection.lock().map_err(|e| format!("Lock error: {}", e))?;
+        
+        let start_str = start_date.format("%Y-%m-%d").to_string();
+        let end_str = end_date.format("%Y-%m-%d").to_string();
+
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, book_id, reading_id, session_date, start_time, end_time,
+                 start_page, end_page, pages_read, minutes_read, duration_seconds,
+                 photo_path, created_at, updated_at
+                 FROM reading_sessions 
+                 WHERE book_id = ?1 AND session_date >= ?2 AND session_date <= ?3
+                 ORDER BY session_date DESC, created_at DESC"
+            )
+            .map_err(|e| format!("Failed to prepare statement: {}", e))?;
+
+        let session_iter = stmt
+            .query_map(params![book_id, start_str, end_str], |row| Self::row_to_session(row))
+            .map_err(|e| format!("Failed to query sessions: {}", e))?;
+
+        let mut sessions = Vec::new();
+        for session_result in session_iter {
+            sessions.push(session_result.map_err(|e| format!("Failed to parse session: {}", e))?);
+        }
+
+        Ok(sessions)
+    }
 }
 

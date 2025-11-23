@@ -1,6 +1,6 @@
 use crate::domain::entities::{Book, BookStatus, BookType};
 use crate::ports::repositories::BookRepository;
-use rusqlite::params;
+use rusqlite::{params, types::Value};
 use std::sync::{Arc, Mutex};
 
 /// SQLite implementation of BookRepository
@@ -315,40 +315,82 @@ impl BookRepository for SqliteBookRepository {
         book_type: Option<BookType>,
         is_archived: Option<bool>,
         is_wishlist: Option<bool>,
+        collection_id: Option<i64>,
     ) -> Result<Vec<Book>, String> {
         // Build dynamic query and collect parameters
-        let mut query = "SELECT id, title, author, genre, type, isbn, publication_year,
+        // If filtering by collection, we need to JOIN with book_collections
+        let needs_collection_join = collection_id.is_some();
+        eprintln!("[SqliteBookRepository::find_with_filters] Filters: status={:?}, book_type={:?}, is_archived={:?}, is_wishlist={:?}, collection_id={:?}, needs_join={}",
+                  status, book_type, is_archived, is_wishlist, collection_id, needs_collection_join);
+        
+        let mut query = if needs_collection_join {
+            "SELECT DISTINCT b.id, b.title, b.author, b.genre, b.type, b.isbn, b.publication_year,
+                         b.total_pages, b.total_minutes, b.current_page_text, b.current_minutes_audio,
+                         b.status, b.is_archived, b.is_wishlist, b.cover_url, b.url,
+                         b.added_at, b.updated_at, b.status_changed_at
+                         FROM books b
+                         INNER JOIN book_collections bc ON b.id = bc.book_id
+                         WHERE 1=1".to_string()
+        } else {
+            "SELECT id, title, author, genre, type, isbn, publication_year,
                          total_pages, total_minutes, current_page_text, current_minutes_audio,
                          status, is_archived, is_wishlist, cover_url, url,
                          added_at, updated_at, status_changed_at
-                         FROM books WHERE 1=1".to_string();
+                         FROM books WHERE 1=1".to_string()
+        };
         
-        let mut status_str: Option<String> = None;
-        let mut type_str: Option<String> = None;
-        let mut archived_val: Option<i32> = None;
-        let mut wishlist_val: Option<i32> = None;
+        // Build parameters vector dynamically using Value enum
+        let mut param_values: Vec<Value> = Vec::new();
 
         if let Some(status) = status {
-            query.push_str(" AND status = ?");
-            status_str = Some(Self::status_to_string(&status));
+            if needs_collection_join {
+                query.push_str(" AND b.status = ?");
+            } else {
+                query.push_str(" AND status = ?");
+            }
+            param_values.push(Value::Text(Self::status_to_string(&status)));
         }
 
         if let Some(book_type) = book_type {
-            query.push_str(" AND type = ?");
-            type_str = Some(Self::type_to_string(&book_type));
+            if needs_collection_join {
+                query.push_str(" AND b.type = ?");
+            } else {
+                query.push_str(" AND type = ?");
+            }
+            param_values.push(Value::Text(Self::type_to_string(&book_type)));
         }
 
         if let Some(archived) = is_archived {
-            query.push_str(" AND is_archived = ?");
-            archived_val = Some(if archived { 1 } else { 0 });
+            if needs_collection_join {
+                query.push_str(" AND b.is_archived = ?");
+            } else {
+                query.push_str(" AND is_archived = ?");
+            }
+            param_values.push(Value::Integer(if archived { 1 } else { 0 }));
         }
 
         if let Some(wishlist) = is_wishlist {
-            query.push_str(" AND is_wishlist = ?");
-            wishlist_val = Some(if wishlist { 1 } else { 0 });
+            if needs_collection_join {
+                query.push_str(" AND b.is_wishlist = ?");
+            } else {
+                query.push_str(" AND is_wishlist = ?");
+            }
+            param_values.push(Value::Integer(if wishlist { 1 } else { 0 }));
         }
 
-        query.push_str(" ORDER BY added_at DESC");
+        if let Some(coll_id) = collection_id {
+            query.push_str(" AND bc.collection_id = ?");
+            param_values.push(Value::Integer(coll_id));
+        }
+
+        if needs_collection_join {
+            query.push_str(" ORDER BY b.added_at DESC");
+        } else {
+            query.push_str(" ORDER BY added_at DESC");
+        }
+
+        eprintln!("[SqliteBookRepository::find_with_filters] SQL Query: {}", query);
+        eprintln!("[SqliteBookRepository::find_with_filters] Parameters: {:?}", param_values);
 
         let conn = self.connection.lock().map_err(|e| format!("Lock error: {}", e))?;
         
@@ -356,120 +398,96 @@ impl BookRepository for SqliteBookRepository {
             .prepare(&query)
             .map_err(|e| format!("Failed to prepare statement: {}", e))?;
 
-        // Execute query based on parameters and collect results immediately
+        // Execute query with dynamic parameters
         let mut books = Vec::new();
         
-        match (status_str.as_ref(), type_str.as_ref(), archived_val.as_ref(), wishlist_val.as_ref()) {
-            (None, None, None, None) => {
-                let book_iter = stmt.query_map([], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
+        if param_values.is_empty() {
+            let book_iter = stmt.query_map([], Self::row_to_book)
+                .map_err(|e| format!("Failed to query books: {}", e))?;
+            for book_result in book_iter {
+                books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
             }
-            (Some(s), None, None, None) => {
-                let book_iter = stmt.query_map(params![s], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
+        } else {
+            let book_iter = stmt.query_map(rusqlite::params_from_iter(param_values.iter()), Self::row_to_book)
+                .map_err(|e| format!("Failed to query books: {}", e))?;
+            for book_result in book_iter {
+                books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
             }
-            (None, Some(t), None, None) => {
-                let book_iter = stmt.query_map(params![t], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+        }
+
+        eprintln!("[SqliteBookRepository::find_with_filters] Query returned {} books", books.len());
+        
+        // Debug: Check if there are any books in this collection when filter returns empty
+        if needs_collection_join && books.is_empty() {
+            if let Some(coll_id) = collection_id {
+                eprintln!("[SqliteBookRepository::find_with_filters] WARNING: No books found with collection_id={}. Checking book_collections table...", coll_id);
+                
+                // Check if collection exists
+                let coll_check = "SELECT id, name FROM collections WHERE id = ?1";
+                if let Ok(mut coll_stmt) = conn.prepare(coll_check) {
+                    match coll_stmt.query_row(params![coll_id], |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?))) {
+                        Ok((id, name)) => {
+                            eprintln!("[SqliteBookRepository::find_with_filters] Collection exists: id={}, name={}", id, name);
+                        }
+                        Err(_) => {
+                            eprintln!("[SqliteBookRepository::find_with_filters] ERROR: Collection with id={} does NOT exist!", coll_id);
+                        }
+                    }
                 }
-            }
-            (None, None, Some(a), None) => {
-                let book_iter = stmt.query_map(params![a], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                
+                // Check all collections
+                let all_colls = "SELECT id, name FROM collections";
+                if let Ok(mut all_colls_stmt) = conn.prepare(all_colls) {
+                    let collections: Result<Vec<(i64, String)>, _> = all_colls_stmt.query_map([], |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?))).unwrap().collect();
+                    if let Ok(colls) = collections {
+                        eprintln!("[SqliteBookRepository::find_with_filters] All collections in DB: {:?}", colls);
+                    }
                 }
-            }
-            (None, None, None, Some(w)) => {
-                let book_iter = stmt.query_map(params![w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), Some(t), None, None) => {
-                let book_iter = stmt.query_map(params![s, t], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), None, Some(a), None) => {
-                let book_iter = stmt.query_map(params![s, a], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), None, None, Some(w)) => {
-                let book_iter = stmt.query_map(params![s, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (None, Some(t), Some(a), None) => {
-                let book_iter = stmt.query_map(params![t, a], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (None, Some(t), None, Some(w)) => {
-                let book_iter = stmt.query_map(params![t, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (None, None, Some(a), Some(w)) => {
-                let book_iter = stmt.query_map(params![a, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), Some(t), Some(a), None) => {
-                let book_iter = stmt.query_map(params![s, t, a], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), Some(t), None, Some(w)) => {
-                let book_iter = stmt.query_map(params![s, t, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), None, Some(a), Some(w)) => {
-                let book_iter = stmt.query_map(params![s, a, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (None, Some(t), Some(a), Some(w)) => {
-                let book_iter = stmt.query_map(params![t, a, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
-                }
-            }
-            (Some(s), Some(t), Some(a), Some(w)) => {
-                let book_iter = stmt.query_map(params![s, t, a, w], |row| Self::row_to_book(row))
-                    .map_err(|e| format!("Failed to query books: {}", e))?;
-                for book_result in book_iter {
-                    books.push(book_result.map_err(|e| format!("Failed to parse book: {}", e))?);
+                
+                // Check book_collections table
+                let debug_query = "SELECT COUNT(*) as count FROM book_collections WHERE collection_id = ?1";
+                if let Ok(mut debug_stmt) = conn.prepare(debug_query) {
+                    if let Ok(count) = debug_stmt.query_row(params![coll_id], |row| row.get::<_, i64>(0)) {
+                        eprintln!("[SqliteBookRepository::find_with_filters] Found {} book(s) in collection_id={}", count, coll_id);
+                        if count > 0 {
+                            // Check which books are in this collection
+                            let books_query = "SELECT book_id FROM book_collections WHERE collection_id = ?1";
+                            if let Ok(mut books_stmt) = conn.prepare(books_query) {
+                                let book_ids: Result<Vec<i64>, _> = books_stmt.query_map(params![coll_id], |row| row.get(0)).unwrap().collect();
+                                if let Ok(ids) = book_ids {
+                                    eprintln!("[SqliteBookRepository::find_with_filters] Book IDs in collection: {:?}", ids);
+                                    
+                                    // Check if these books match the other filters
+                                    for book_id in ids {
+                                        let book_check = "SELECT id, title, status, is_archived, is_wishlist FROM books WHERE id = ?1";
+                                        if let Ok(mut book_check_stmt) = conn.prepare(book_check) {
+                                            match book_check_stmt.query_row(
+                                                params![book_id],
+                                                |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?, row.get::<_, i32>(3)?, row.get::<_, i32>(4)?))
+                                            ) {
+                                                Ok((id, title, status, archived, wishlist)) => {
+                                                    eprintln!("[SqliteBookRepository::find_with_filters]   Book {}: title={}, status={}, archived={}, wishlist={}", 
+                                                             id, title, status, archived, wishlist);
+                                                }
+                                                Err(e) => {
+                                                    eprintln!("[SqliteBookRepository::find_with_filters]   Error checking book {}: {:?}", book_id, e);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // Check all book_collections entries
+                            let all_bc = "SELECT book_id, collection_id FROM book_collections";
+                            if let Ok(mut all_bc_stmt) = conn.prepare(all_bc) {
+                                let all_entries: Result<Vec<(i64, i64)>, _> = all_bc_stmt.query_map([], |row| Ok((row.get::<_, i64>(0)?, row.get::<_, i64>(1)?))).unwrap().collect();
+                                if let Ok(entries) = all_entries {
+                                    eprintln!("[SqliteBookRepository::find_with_filters] All book_collections entries: {:?}", entries);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

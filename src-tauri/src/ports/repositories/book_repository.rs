@@ -30,6 +30,7 @@ pub trait BookRepository: Send + Sync {
         book_type: Option<crate::domain::entities::BookType>,
         is_archived: Option<bool>,
         is_wishlist: Option<bool>,
+        collection_id: Option<i64>,
     ) -> Result<Vec<Book>, String>;
 }
 

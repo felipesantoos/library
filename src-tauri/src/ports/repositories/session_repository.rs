@@ -29,5 +29,13 @@ pub trait SessionRepository: Send + Sync {
         start_date: chrono::NaiveDate,
         end_date: chrono::NaiveDate,
     ) -> Result<Vec<ReadingSession>, String>;
+
+    /// Finds sessions by book ID and date range
+    fn find_by_book_id_and_date_range(
+        &self,
+        book_id: i64,
+        start_date: chrono::NaiveDate,
+        end_date: chrono::NaiveDate,
+    ) -> Result<Vec<ReadingSession>, String>;
 }
 

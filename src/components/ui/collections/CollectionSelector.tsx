@@ -19,7 +19,9 @@ export function CollectionSelector({
   multiSelect = true,
 }: CollectionSelectorProps) {
   const { theme } = useTheme();
-  const { collections, refresh } = useCollections(bookId);
+  // Always load all collections, not just the ones for this book
+  // bookId is only used for context, not for filtering
+  const { collections, refresh } = useCollections();
   const [isOpen, setIsOpen] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionDescription, setNewCollectionDescription] = useState('');

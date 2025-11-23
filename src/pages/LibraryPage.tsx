@@ -25,21 +25,26 @@ export function LibraryPage() {
   
   const { tags } = useTags();
   const { collections } = useCollections();
+  // Use backend filter for collection when collectionFilter is active
   const { books: allBooks, loading, error } = useBooks({
     is_archived: false,
     is_wishlist: false,
+    collection_id: collectionFilter ?? undefined,
   });
+
+  // Get all book IDs to load their collections (before filtering)
+  // Only needed for tag filter now, since collection filter is done on backend
+  const allBookIds = useMemo(() => allBooks.map((b) => b.id!).filter((id): id is number => id !== undefined), [allBooks]);
+  const { bookCollections } = useBookCollections(allBookIds);
 
   const books = useLibraryFilters({
     books: allBooks,
     statusFilter,
     typeFilter,
     searchQuery,
+    collectionFilter: null, // Collection filter is now done on backend
+    bookCollections,
   });
-
-  // Get all book IDs to load their collections
-  const bookIds = useMemo(() => books.map((b) => b.id!).filter((id): id is number => id !== undefined), [books]);
-  const { bookCollections } = useBookCollections(bookIds);
 
   const clearFilters = () => {
     setStatusFilter('');

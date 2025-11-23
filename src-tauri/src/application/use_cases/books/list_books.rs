@@ -18,6 +18,7 @@ impl<'a> ListBooksUseCase<'a> {
         book_type: Option<String>,
         is_archived: Option<bool>,
         is_wishlist: Option<bool>,
+        collection_id: Option<i64>,
     ) -> Result<Vec<BookDto>, String> {
         // First, fix any inconsistent data (books that are both archived and in wishlist)
         // This needs to happen before filtering to catch all inconsistent books
@@ -59,12 +60,18 @@ impl<'a> ListBooksUseCase<'a> {
             .map(|t| string_to_book_type(t))
             .transpose()?;
 
+        eprintln!("[ListBooksUseCase] Calling find_with_filters with: status={:?}, book_type={:?}, is_archived={:?}, is_wishlist={:?}, collection_id={:?}",
+                  status_enum, book_type_enum, is_archived, is_wishlist, collection_id);
+
         let books = self.book_repository.find_with_filters(
             status_enum,
             book_type_enum,
             is_archived,
             is_wishlist,
+            collection_id,
         )?;
+
+        eprintln!("[ListBooksUseCase] Found {} books from repository", books.len());
 
         Ok(books.into_iter().map(BookDto::from).collect())
     }

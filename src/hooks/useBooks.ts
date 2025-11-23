@@ -43,6 +43,7 @@ export function useBooks(filters?: {
   book_type?: string;
   is_archived?: boolean;
   is_wishlist?: boolean;
+  collection_id?: number;
 }) {
   const [books, setBooks] = useState<BookDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +54,7 @@ export function useBooks(filters?: {
   const bookType = filters?.book_type;
   const isArchived = filters?.is_archived;
   const isWishlist = filters?.is_wishlist;
+  const collectionId = filters?.collection_id;
 
   useEffect(() => {
     let cancelled = false;
@@ -66,6 +68,7 @@ export function useBooks(filters?: {
           book_type?: string;
           is_archived?: boolean;
           is_wishlist?: boolean;
+          collection_id?: number;
         } = {};
         if (status) filters.status = status;
         if (bookType) filters.book_type = bookType;
@@ -75,6 +78,9 @@ export function useBooks(filters?: {
         }
         if (isWishlist !== undefined) {
           filters.is_wishlist = isWishlist;
+        }
+        if (collectionId !== undefined && collectionId !== null) {
+          filters.collection_id = collectionId;
         }
         
         const result = await invoke<BookDto[]>('list_books', { filters: Object.keys(filters).length > 0 ? filters : undefined });
@@ -97,7 +103,7 @@ export function useBooks(filters?: {
     return () => {
       cancelled = true;
     };
-  }, [status, bookType, isArchived, isWishlist]);
+  }, [status, bookType, isArchived, isWishlist, collectionId]);
 
   const refresh = useCallback(async () => {
     try {
@@ -108,6 +114,7 @@ export function useBooks(filters?: {
         book_type?: string;
         is_archived?: boolean;
         is_wishlist?: boolean;
+        collection_id?: number;
       } = {};
       if (status) filters.status = status;
       if (bookType) filters.book_type = bookType;
@@ -118,6 +125,9 @@ export function useBooks(filters?: {
       if (isWishlist !== undefined) {
         filters.is_wishlist = isWishlist;
       }
+      if (collectionId !== undefined && collectionId !== null) {
+        filters.collection_id = collectionId;
+      }
       
       const result = await invoke<BookDto[]>('list_books', { filters: Object.keys(filters).length > 0 ? filters : undefined });
       setBooks(result);
@@ -126,7 +136,7 @@ export function useBooks(filters?: {
     } finally {
       setLoading(false);
     }
-  }, [status, bookType, isArchived, isWishlist]);
+  }, [status, bookType, isArchived, isWishlist, collectionId]);
 
   return { books, loading, error, refresh };
 }

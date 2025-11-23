@@ -33,8 +33,10 @@ export function useBookCollections(bookIds: number[]) {
 
       const results = await Promise.all(promises);
       const map: BookCollectionMap = {};
-      results.forEach(({ bookId, collectionIds }) => {
-        map[bookId] = collectionIds;
+      // Ensure all books are in the map, even if they have no collections
+      bookIds.forEach((bookId) => {
+        const result = results.find((r) => r.bookId === bookId);
+        map[bookId] = result ? result.collectionIds : [];
       });
       setBookCollections(map);
     } catch (err) {
@@ -50,5 +52,6 @@ export function useBookCollections(bookIds: number[]) {
 
   return { bookCollections, loading, error, refresh };
 }
+
 
 

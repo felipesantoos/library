@@ -41,6 +41,8 @@ pub struct ListBooksFilters {
     pub is_archived: Option<bool>,
     #[serde(default)]
     pub is_wishlist: Option<bool>,
+    #[serde(default)]
+    pub collection_id: Option<i64>,
 }
 
 /// Tauri command: List all books with optional filters
@@ -55,11 +57,19 @@ pub fn list_books(
     
     let use_case = ListBooksUseCase::new(&repository);
     
-    if let Some(f) = filters {
-        use_case.execute(f.status, f.book_type, f.is_archived, f.is_wishlist)
+    // Extract filter values, defaulting to None if filters is None
+    let (status, book_type, is_archived, is_wishlist, collection_id) = if let Some(f) = filters {
+        eprintln!("[list_books] Received filters: status={:?}, book_type={:?}, is_archived={:?}, is_wishlist={:?}, collection_id={:?}", 
+                  f.status, f.book_type, f.is_archived, f.is_wishlist, f.collection_id);
+        (f.status, f.book_type, f.is_archived, f.is_wishlist, f.collection_id)
     } else {
-        use_case.execute(None, None, None, None)
-    }
+        eprintln!("[list_books] No filters provided");
+        (None, None, None, None, None)
+    };
+    
+    let result = use_case.execute(status, book_type, is_archived, is_wishlist, collection_id);
+    eprintln!("[list_books] Returning {} books", result.as_ref().map(|books| books.len()).unwrap_or(0));
+    result
 }
 
 /// Tauri command: Update an existing book
