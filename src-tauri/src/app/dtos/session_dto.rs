@@ -89,3 +89,11 @@ pub struct UpdateSessionCommand {
     pub minutes_read: Option<i32>,
 }
 
+/// Filters for listing sessions
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListSessionsFilters {
+    pub book_id: Option<i64>,
+    pub start_date: Option<String>, // ISO date format: YYYY-MM-DD
+    pub end_date: Option<String>,   // ISO date format: YYYY-MM-DD
+}
+

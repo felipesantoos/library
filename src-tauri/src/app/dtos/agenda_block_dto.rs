@@ -40,6 +40,15 @@ pub struct MarkBlockCompletedCommand {
     pub session_id: i64,
 }
 
+/// Filters for listing agenda blocks
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListAgendaBlocksFilters {
+    pub book_id: Option<i64>,
+    pub start_date: Option<String>, // ISO date format: YYYY-MM-DD
+    pub end_date: Option<String>,   // ISO date format: YYYY-MM-DD
+    pub is_completed: Option<bool>,
+}
+
 impl From<AgendaBlock> for AgendaBlockDto {
     fn from(block: AgendaBlock) -> Self {
         AgendaBlockDto {

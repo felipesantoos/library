@@ -1,5 +1,6 @@
 use crate::app::dtos::agenda_block_dto::{
     CreateAgendaBlockCommand, UpdateAgendaBlockCommand, MarkBlockCompletedCommand, AgendaBlockDto,
+    ListAgendaBlocksFilters,
 };
 use crate::core::domains::agenda_block::AgendaBlock;
 use crate::core::filters::AgendaBlockFilters;
@@ -56,31 +57,25 @@ impl<'a> AgendaService for AgendaServiceImpl<'a> {
         Ok(block.into())
     }
 
-    fn list(
-        &self,
-        book_id: Option<i64>,
-        start_date: Option<String>,
-        end_date: Option<String>,
-        is_completed: Option<bool>,
-    ) -> Result<Vec<AgendaBlockDto>, String> {
-        let start_date_parsed = start_date
+    fn list(&self, filters: ListAgendaBlocksFilters) -> Result<Vec<AgendaBlockDto>, String> {
+        let start_date_parsed = filters.start_date
             .map(|d| chrono::NaiveDate::parse_from_str(&d, "%Y-%m-%d"))
             .transpose()
             .map_err(|_| "Invalid start_date format. Expected YYYY-MM-DD".to_string())?;
 
-        let end_date_parsed = end_date
+        let end_date_parsed = filters.end_date
             .map(|d| chrono::NaiveDate::parse_from_str(&d, "%Y-%m-%d"))
             .transpose()
             .map_err(|_| "Invalid end_date format. Expected YYYY-MM-DD".to_string())?;
 
-        let filters = AgendaBlockFilters {
-            book_id,
+        let domain_filters = AgendaBlockFilters {
+            book_id: filters.book_id,
             start_date: start_date_parsed,
             end_date: end_date_parsed,
-            is_completed,
+            is_completed: filters.is_completed,
         };
 
-        let blocks = self.agenda_repository.find_all(&filters)?;
+        let blocks = self.agenda_repository.find_all(&domain_filters)?;
 
         Ok(blocks.into_iter().map(|b| b.into()).collect())
     }

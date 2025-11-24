@@ -1,4 +1,4 @@
-use crate::app::dtos::tag_dto::{TagDto, CreateTagCommand, AddTagsToBookCommand};
+use crate::app::dtos::tag_dto::{TagDto, CreateTagCommand, AddTagsToBookCommand, ListTagsFilters};
 use crate::core::domains::tag::Tag;
 use crate::core::interfaces::primary::TagService;
 use crate::core::interfaces::secondary::{TagRepository, BookRepository};
@@ -50,7 +50,7 @@ impl<'a> TagService for TagServiceImpl<'a> {
         Ok(())
     }
 
-    fn list(&self) -> Result<Vec<TagDto>, String> {
+    fn list(&self, _filters: ListTagsFilters) -> Result<Vec<TagDto>, String> {
         let tags = self.tag_repository.find_all()?;
         Ok(tags.into_iter().map(TagDto::from).collect())
     }

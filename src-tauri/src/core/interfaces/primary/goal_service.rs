@@ -1,4 +1,4 @@
-use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, UpdateGoalCommand};
+use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, UpdateGoalCommand, ListGoalsFilters};
 
 /// Primary interface for goal service operations
 pub trait GoalService: Send + Sync {
@@ -6,6 +6,6 @@ pub trait GoalService: Send + Sync {
     fn update(&self, command: UpdateGoalCommand) -> Result<GoalDto, String>;
     fn delete(&self, id: i64) -> Result<(), String>;
     fn get(&self, id: i64) -> Result<GoalDto, String>;
-    fn list(&self, include_inactive: bool) -> Result<Vec<GoalDto>, String>;
+    fn list(&self, filters: ListGoalsFilters) -> Result<Vec<GoalDto>, String>;
 }
 

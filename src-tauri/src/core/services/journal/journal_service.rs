@@ -1,5 +1,5 @@
 use crate::app::dtos::journal_entry_dto::{
-    JournalEntryDto, CreateJournalEntryCommand, UpdateJournalEntryCommand,
+    JournalEntryDto, CreateJournalEntryCommand, UpdateJournalEntryCommand, ListJournalEntriesFilters,
 };
 use crate::core::domains::journal_entry::JournalEntry;
 use crate::core::interfaces::primary::JournalService;
@@ -54,24 +54,19 @@ impl<'a> JournalService for JournalServiceImpl<'a> {
         Ok(entry.into())
     }
 
-    fn list(
-        &self,
-        start_date: Option<String>,
-        end_date: Option<String>,
-        book_id: Option<i64>,
-    ) -> Result<Vec<JournalEntryDto>, String> {
-        let start_date_parsed = start_date
+    fn list(&self, filters: ListJournalEntriesFilters) -> Result<Vec<JournalEntryDto>, String> {
+        let start_date_parsed = filters.start_date
             .map(|d| NaiveDate::parse_from_str(&d, "%Y-%m-%d"))
             .transpose()
             .map_err(|_| "Invalid start_date format. Expected YYYY-MM-DD".to_string())?;
 
-        let end_date_parsed = end_date
+        let end_date_parsed = filters.end_date
             .map(|d| NaiveDate::parse_from_str(&d, "%Y-%m-%d"))
             .transpose()
             .map_err(|_| "Invalid end_date format. Expected YYYY-MM-DD".to_string())?;
 
         let entries = self.journal_repository.find_all(
-            book_id,
+            filters.book_id,
             start_date_parsed,
             end_date_parsed,
         )?;

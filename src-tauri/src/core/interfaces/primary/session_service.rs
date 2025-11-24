@@ -1,4 +1,4 @@
-use crate::app::dtos::session_dto::{SessionDto, CreateSessionCommand, UpdateSessionCommand};
+use crate::app::dtos::session_dto::{SessionDto, CreateSessionCommand, UpdateSessionCommand, ListSessionsFilters};
 
 /// Primary interface for session service operations
 pub trait SessionService: Send + Sync {
@@ -6,11 +6,6 @@ pub trait SessionService: Send + Sync {
     fn update(&self, command: UpdateSessionCommand) -> Result<SessionDto, String>;
     fn delete(&self, id: i64) -> Result<(), String>;
     fn get(&self, id: i64) -> Result<SessionDto, String>;
-    fn list(
-        &self,
-        book_id: Option<i64>,
-        start_date: Option<String>,
-        end_date: Option<String>,
-    ) -> Result<Vec<SessionDto>, String>;
+    fn list(&self, filters: ListSessionsFilters) -> Result<Vec<SessionDto>, String>;
 }
 

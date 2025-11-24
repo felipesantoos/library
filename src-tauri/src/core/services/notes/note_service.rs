@@ -1,4 +1,4 @@
-use crate::app::dtos::{NoteDto, CreateNoteCommand, UpdateNoteCommand};
+use crate::app::dtos::{NoteDto, CreateNoteCommand, UpdateNoteCommand, ListNotesFilters};
 use crate::core::domains::note::Note;
 use crate::core::interfaces::primary::NoteService;
 use crate::core::interfaces::secondary::{NoteRepository, BookRepository};
@@ -104,8 +104,8 @@ impl<'a> NoteService for NoteServiceImpl<'a> {
         Ok(NoteDto::from(note))
     }
 
-    fn list(&self, book_id: Option<i64>) -> Result<Vec<NoteDto>, String> {
-        let notes = if let Some(b_id) = book_id {
+    fn list(&self, filters: ListNotesFilters) -> Result<Vec<NoteDto>, String> {
+        let notes = if let Some(b_id) = filters.book_id {
             // Filter by book
             self.note_repository.find_by_book_id(b_id)?
         } else {

@@ -1,4 +1,4 @@
-use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto};
+use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto, ListBooksFilters};
 
 /// Primary interface for book service operations
 pub trait BookService: Send + Sync {
@@ -6,14 +6,7 @@ pub trait BookService: Send + Sync {
     fn update(&self, command: UpdateBookCommand) -> Result<BookDto, String>;
     fn delete(&self, id: i64) -> Result<(), String>;
     fn get(&self, id: i64) -> Result<BookDto, String>;
-    fn list(
-        &self,
-        status: Option<String>,
-        book_type: Option<String>,
-        is_archived: Option<bool>,
-        is_wishlist: Option<bool>,
-        collection_id: Option<i64>,
-    ) -> Result<Vec<BookDto>, String>;
+    fn list(&self, filters: ListBooksFilters) -> Result<Vec<BookDto>, String>;
     fn generate_summary(&self, book_id: i64) -> Result<BookSummaryDto, String>;
 }
 

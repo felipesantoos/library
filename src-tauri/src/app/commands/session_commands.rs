@@ -1,4 +1,4 @@
-use crate::app::dtos::{SessionDto, CreateSessionCommand, UpdateSessionCommand};
+use crate::app::dtos::{SessionDto, CreateSessionCommand, UpdateSessionCommand, ListSessionsFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::SessionService;
 
@@ -25,13 +25,11 @@ pub fn get_session(
 /// Tauri command: List all sessions with optional filters
 #[tauri::command]
 pub fn list_sessions(
-    book_id: Option<i64>,
-    start_date: Option<String>,
-    end_date: Option<String>,
+    filters: Option<ListSessionsFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<SessionDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    container.session_service().list(book_id, start_date, end_date)
+    container.session_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Update an existing session

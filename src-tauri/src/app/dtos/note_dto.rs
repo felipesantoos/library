@@ -126,3 +126,9 @@ impl UpdateNoteCommand {
     }
 }
 
+/// Filters for listing notes
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListNotesFilters {
+    pub book_id: Option<i64>,
+}
+

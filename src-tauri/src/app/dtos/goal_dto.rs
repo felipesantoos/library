@@ -79,6 +79,12 @@ pub struct StatisticsDto {
     pub pages_per_month: Vec<MonthlyPagesDto>,
 }
 
+/// Filters for listing goals
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListGoalsFilters {
+    pub include_inactive: Option<bool>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonthlyPagesDto {
     pub year: i32,

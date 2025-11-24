@@ -1,4 +1,4 @@
-use crate::app::dtos::{NoteDto, CreateNoteCommand, UpdateNoteCommand};
+use crate::app::dtos::{NoteDto, CreateNoteCommand, UpdateNoteCommand, ListNotesFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::NoteService;
 
@@ -25,14 +25,11 @@ pub fn get_note(
 /// Tauri command: List all notes with optional filters
 #[tauri::command]
 pub fn list_notes(
-    book_id: Option<i64>,
-    search_query: Option<String>,
+    filters: Option<ListNotesFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<NoteDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    // Note: search_query is not in the trait, so we'll just use book_id for now
-    // TODO: Add search_query to NoteService trait if needed
-    container.note_service().list(book_id)
+    container.note_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Update an existing note

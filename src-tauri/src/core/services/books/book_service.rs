@@ -1,4 +1,4 @@
-use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto};
+use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto, ListBooksFilters};
 use crate::core::domains::book::{Book, BookStatus, BookType};
 use crate::core::interfaces::primary::BookService;
 use crate::core::interfaces::secondary::{BookRepository, NoteRepository};
@@ -179,14 +179,7 @@ impl<'a> BookService for BookServiceImpl<'a> {
         Ok(BookDto::from(book))
     }
 
-    fn list(
-        &self,
-        status: Option<String>,
-        book_type: Option<String>,
-        is_archived: Option<bool>,
-        is_wishlist: Option<bool>,
-        collection_id: Option<i64>,
-    ) -> Result<Vec<BookDto>, String> {
+    fn list(&self, filters: ListBooksFilters) -> Result<Vec<BookDto>, String> {
         // First, fix any inconsistent data (books that are both archived and in wishlist)
         // This needs to happen before filtering to catch all inconsistent books
         let all_books = self.book_repository.find_all()?;
@@ -207,7 +200,7 @@ impl<'a> BookService for BookServiceImpl<'a> {
                 // If we're specifically looking at archived books (is_archived=true and not filtering wishlist=true),
                 // keep it archived and remove from wishlist
                 // Otherwise, always unarchive (wishlist takes priority)
-                if is_archived == Some(true) && is_wishlist != Some(true) {
+                if filters.is_archived == Some(true) && filters.is_wishlist != Some(true) {
                     book.is_wishlist = false;
                 } else {
                     // Default: unarchive (wishlist takes priority)
@@ -217,25 +210,25 @@ impl<'a> BookService for BookServiceImpl<'a> {
             }
         }
 
-        let status_enum = status
+        let status_enum = filters.status
             .as_ref()
             .map(|s| string_to_book_status(s))
             .transpose()?;
 
-        let book_type_enum = book_type
+        let book_type_enum = filters.book_type
             .as_ref()
             .map(|t| string_to_book_type(t))
             .transpose()?;
 
         eprintln!("[BookService] Calling find_with_filters with: status={:?}, book_type={:?}, is_archived={:?}, is_wishlist={:?}, collection_id={:?}",
-                  status_enum, book_type_enum, is_archived, is_wishlist, collection_id);
+                  status_enum, book_type_enum, filters.is_archived, filters.is_wishlist, filters.collection_id);
 
         let books = self.book_repository.find_with_filters(
             status_enum,
             book_type_enum,
-            is_archived,
-            is_wishlist,
-            collection_id,
+            filters.is_archived,
+            filters.is_wishlist,
+            filters.collection_id,
         )?;
 
         eprintln!("[BookService] Found {} books from repository", books.len());

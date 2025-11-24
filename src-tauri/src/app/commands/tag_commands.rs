@@ -1,4 +1,4 @@
-use crate::app::dtos::{TagDto, CreateTagCommand, AddTagsToBookCommand};
+use crate::app::dtos::{TagDto, CreateTagCommand, AddTagsToBookCommand, ListTagsFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::TagService;
 
@@ -15,13 +15,11 @@ pub fn create_tag(
 /// Tauri command: List all tags, optionally filtered by book
 #[tauri::command]
 pub fn list_tags(
-    book_id: Option<i64>,
+    filters: Option<ListTagsFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<TagDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    // Note: book_id filter is not in the trait, so we'll just list all for now
-    // TODO: Add book_id filter to TagService trait if needed
-    container.tag_service().list()
+    container.tag_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Delete a tag by ID

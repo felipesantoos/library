@@ -70,3 +70,11 @@ impl TryFrom<UpdateJournalEntryCommand> for JournalEntry {
     }
 }
 
+/// Filters for listing journal entries
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListJournalEntriesFilters {
+    pub book_id: Option<i64>,
+    pub start_date: Option<String>, // ISO date format: YYYY-MM-DD
+    pub end_date: Option<String>,   // ISO date format: YYYY-MM-DD
+}
+

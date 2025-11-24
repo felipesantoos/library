@@ -1,4 +1,4 @@
-use crate::app::dtos::note_dto::{NoteDto, CreateNoteCommand, UpdateNoteCommand};
+use crate::app::dtos::note_dto::{NoteDto, CreateNoteCommand, UpdateNoteCommand, ListNotesFilters};
 
 /// Primary interface for note service operations
 pub trait NoteService: Send + Sync {
@@ -6,6 +6,6 @@ pub trait NoteService: Send + Sync {
     fn update(&self, command: UpdateNoteCommand) -> Result<NoteDto, String>;
     fn delete(&self, id: i64) -> Result<(), String>;
     fn get(&self, id: i64) -> Result<NoteDto, String>;
-    fn list(&self, book_id: Option<i64>) -> Result<Vec<NoteDto>, String>;
+    fn list(&self, filters: ListNotesFilters) -> Result<Vec<NoteDto>, String>;
 }
 

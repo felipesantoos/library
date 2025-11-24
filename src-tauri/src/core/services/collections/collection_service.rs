@@ -1,5 +1,6 @@
 use crate::app::dtos::collection_dto::{
     CollectionDto, CreateCollectionCommand, UpdateCollectionCommand, AddBooksToCollectionCommand,
+    ListCollectionsFilters,
 };
 use crate::core::domains::collection::Collection;
 use crate::core::interfaces::primary::CollectionService;
@@ -77,7 +78,7 @@ impl<'a> CollectionService for CollectionServiceImpl<'a> {
         Ok(())
     }
 
-    fn list(&self) -> Result<Vec<CollectionDto>, String> {
+    fn list(&self, _filters: ListCollectionsFilters) -> Result<Vec<CollectionDto>, String> {
         let collections = self.collection_repository.find_all()?;
         Ok(collections.into_iter().map(CollectionDto::from).collect())
     }

@@ -1,4 +1,4 @@
-use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, UpdateGoalCommand};
+use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, UpdateGoalCommand, ListGoalsFilters};
 use crate::core::domains::goal::{Goal, GoalType};
 use crate::core::interfaces::primary::GoalService;
 use crate::core::interfaces::secondary::{GoalRepository, SessionRepository, BookRepository};
@@ -115,7 +115,8 @@ impl<'a> GoalService for GoalServiceImpl<'a> {
         Ok(GoalDto::from(goal))
     }
 
-    fn list(&self, include_inactive: bool) -> Result<Vec<GoalDto>, String> {
+    fn list(&self, filters: ListGoalsFilters) -> Result<Vec<GoalDto>, String> {
+        let include_inactive = filters.include_inactive.unwrap_or(false);
         let goals = if include_inactive {
             self.goal_repository.find_all()?
         } else {

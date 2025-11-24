@@ -43,3 +43,9 @@ pub struct AddTagsToBookCommand {
     pub tag_ids: Vec<i64>,
 }
 
+/// Filters for listing tags
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListTagsFilters {
+    // Currently no filters, but structure is ready for future additions
+}
+

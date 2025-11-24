@@ -51,3 +51,9 @@ impl From<Reading> for ReadingDto {
     }
 }
 
+/// Filters for listing readings
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListReadingsFilters {
+    pub book_id: Option<i64>,
+}
+

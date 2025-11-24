@@ -174,3 +174,13 @@ pub struct UpdateBookCommand {
     pub url: Option<String>,
 }
 
+/// Filters for listing books
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListBooksFilters {
+    pub status: Option<String>,
+    pub book_type: Option<String>,
+    pub is_archived: Option<bool>,
+    pub is_wishlist: Option<bool>,
+    pub collection_id: Option<i64>,
+}
+

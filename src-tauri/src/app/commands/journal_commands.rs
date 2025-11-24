@@ -1,5 +1,5 @@
 use crate::app::dtos::journal_entry_dto::{
-    CreateJournalEntryCommand, UpdateJournalEntryCommand, JournalEntryDto,
+    CreateJournalEntryCommand, UpdateJournalEntryCommand, JournalEntryDto, ListJournalEntriesFilters,
 };
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::JournalService;
@@ -47,12 +47,10 @@ pub fn get_journal_entry(
 /// Tauri command: List journal entries with optional filters
 #[tauri::command]
 pub fn list_journal_entries(
-    book_id: Option<i64>,
-    start_date: Option<String>,
-    end_date: Option<String>,
+    filters: Option<ListJournalEntriesFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<JournalEntryDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    container.journal_service().list(start_date, end_date, book_id)
+    container.journal_service().list(filters.unwrap_or_default())
 }
 

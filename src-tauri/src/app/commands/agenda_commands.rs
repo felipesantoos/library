@@ -1,5 +1,6 @@
 use crate::app::dtos::agenda_block_dto::{
     AgendaBlockDto, CreateAgendaBlockCommand, MarkBlockCompletedCommand, UpdateAgendaBlockCommand,
+    ListAgendaBlocksFilters,
 };
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::AgendaService;
@@ -47,14 +48,11 @@ pub fn get_agenda_block(
 /// Tauri command: List agenda blocks with optional filters
 #[tauri::command]
 pub fn list_agenda_blocks(
-    book_id: Option<i64>,
-    start_date: Option<String>,
-    end_date: Option<String>,
-    is_completed: Option<bool>,
+    filters: Option<ListAgendaBlocksFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<AgendaBlockDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    container.agenda_service().list(book_id, start_date, end_date, is_completed)
+    container.agenda_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Mark an agenda block as completed and link it to a session

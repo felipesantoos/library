@@ -45,3 +45,9 @@ pub struct AddBooksToCollectionCommand {
     pub book_ids: Vec<i64>,
 }
 
+/// Filters for listing collections
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ListCollectionsFilters {
+    // Currently no filters, but structure is ready for future additions
+}
+

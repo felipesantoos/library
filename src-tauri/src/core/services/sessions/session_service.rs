@@ -1,4 +1,4 @@
-use crate::app::dtos::{SessionDto, CreateSessionCommand, UpdateSessionCommand};
+use crate::app::dtos::{SessionDto, CreateSessionCommand, UpdateSessionCommand, ListSessionsFilters};
 use crate::core::domains::session::ReadingSession;
 use crate::core::interfaces::primary::SessionService;
 use crate::core::interfaces::secondary::{SessionRepository, BookRepository};
@@ -160,13 +160,8 @@ impl<'a> SessionService for SessionServiceImpl<'a> {
         Ok(SessionDto::from(session))
     }
 
-    fn list(
-        &self,
-        book_id: Option<i64>,
-        start_date: Option<String>,
-        end_date: Option<String>,
-    ) -> Result<Vec<SessionDto>, String> {
-        let sessions = match (book_id, start_date, end_date) {
+    fn list(&self, filters: ListSessionsFilters) -> Result<Vec<SessionDto>, String> {
+        let sessions = match (filters.book_id, filters.start_date, filters.end_date) {
             // Filter by book AND date range
             (Some(b_id), Some(start), Some(end)) => {
                 let start_date = chrono::NaiveDate::parse_from_str(&start, "%Y-%m-%d")

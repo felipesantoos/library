@@ -1,4 +1,4 @@
-use crate::app::dtos::reading_dto::{CreateReadingCommand, ReadingDto};
+use crate::app::dtos::reading_dto::{CreateReadingCommand, ReadingDto, ListReadingsFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::ReadingService;
 
@@ -15,11 +15,11 @@ pub fn create_reading(
 /// Tauri command: Get all reading cycles for a book
 #[tauri::command]
 pub fn list_readings(
-    book_id: i64,
+    filters: Option<ListReadingsFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<ReadingDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    container.reading_service().list(Some(book_id))
+    container.reading_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Get a reading by ID

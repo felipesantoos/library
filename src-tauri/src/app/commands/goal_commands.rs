@@ -1,4 +1,4 @@
-use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, StatisticsDto as GoalStatisticsDto, MonthlyPagesDto};
+use crate::app::dtos::goal_dto::{GoalDto, CreateGoalCommand, StatisticsDto as GoalStatisticsDto, MonthlyPagesDto, ListGoalsFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::GoalService;
 use crate::core::interfaces::secondary::{SessionRepository, BookRepository};
@@ -28,11 +28,11 @@ pub fn get_goal(
 /// Tauri command: List all goals with progress
 #[tauri::command]
 pub fn list_goals(
-    include_inactive: Option<bool>,
+    filters: Option<ListGoalsFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<GoalDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    container.goal_service().list(include_inactive.unwrap_or(false))
+    container.goal_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Delete a goal by ID

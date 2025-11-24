@@ -1,4 +1,4 @@
-use crate::app::dtos::{CollectionDto, CreateCollectionCommand, UpdateCollectionCommand, AddBooksToCollectionCommand};
+use crate::app::dtos::{CollectionDto, CreateCollectionCommand, UpdateCollectionCommand, AddBooksToCollectionCommand, ListCollectionsFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::CollectionService;
 
@@ -15,13 +15,11 @@ pub fn create_collection(
 /// Tauri command: List all collections, optionally filtered by book
 #[tauri::command]
 pub fn list_collections(
-    book_id: Option<i64>,
+    filters: Option<ListCollectionsFilters>,
     state: tauri::State<AppState>,
 ) -> Result<Vec<CollectionDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    // Note: book_id filter is not in the trait, so we'll just list all for now
-    // TODO: Add book_id filter to CollectionService trait if needed
-    container.collection_service().list()
+    container.collection_service().list(filters.unwrap_or_default())
 }
 
 /// Tauri command: Update a collection

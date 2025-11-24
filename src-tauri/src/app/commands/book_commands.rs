@@ -1,7 +1,6 @@
-use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto};
+use crate::app::dtos::{BookDto, CreateBookCommand, UpdateBookCommand, BookSummaryDto, ListBooksFilters};
 use crate::app::state::AppState;
 use crate::core::interfaces::primary::BookService;
-use serde::Deserialize;
 
 /// Tauri command: Create a new book
 #[tauri::command]
@@ -23,19 +22,6 @@ pub fn get_book(
     container.book_service().get(id)
 }
 
-/// Filters for listing books
-#[derive(Debug, Deserialize)]
-pub struct ListBooksFilters {
-    pub status: Option<String>,
-    pub book_type: Option<String>,
-    #[serde(default)]
-    pub is_archived: Option<bool>,
-    #[serde(default)]
-    pub is_wishlist: Option<bool>,
-    #[serde(default)]
-    pub collection_id: Option<i64>,
-}
-
 /// Tauri command: List all books with optional filters
 #[tauri::command]
 pub fn list_books(
@@ -43,18 +29,7 @@ pub fn list_books(
     state: tauri::State<AppState>,
 ) -> Result<Vec<BookDto>, String> {
     let container = state.container.lock().map_err(|e| format!("DI lock error: {}", e))?;
-    
-    // Extract filter values, defaulting to None if filters is None
-    let (status, book_type, is_archived, is_wishlist, collection_id) = if let Some(f) = filters {
-        eprintln!("[list_books] Received filters: status={:?}, book_type={:?}, is_archived={:?}, is_wishlist={:?}, collection_id={:?}", 
-                  f.status, f.book_type, f.is_archived, f.is_wishlist, f.collection_id);
-        (f.status, f.book_type, f.is_archived, f.is_wishlist, f.collection_id)
-    } else {
-        eprintln!("[list_books] No filters provided");
-        (None, None, None, None, None)
-    };
-    
-    let result = container.book_service().list(status, book_type, is_archived, is_wishlist, collection_id);
+    let result = container.book_service().list(filters.unwrap_or_default());
     eprintln!("[list_books] Returning {} books", result.as_ref().map(|books| books.len()).unwrap_or(0));
     result
 }

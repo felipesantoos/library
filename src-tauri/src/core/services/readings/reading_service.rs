@@ -1,4 +1,4 @@
-use crate::app::dtos::reading_dto::{ReadingDto, CreateReadingCommand};
+use crate::app::dtos::reading_dto::{ReadingDto, CreateReadingCommand, ListReadingsFilters};
 use crate::core::domains::reading::Reading;
 use crate::core::domains::book::BookStatus;
 use crate::core::interfaces::primary::ReadingService;
@@ -58,8 +58,8 @@ impl<'a> ReadingService for ReadingServiceImpl<'a> {
         Ok(reading.map(|r| r.into()))
     }
 
-    fn list(&self, book_id: Option<i64>) -> Result<Vec<ReadingDto>, String> {
-        let readings = if let Some(b_id) = book_id {
+    fn list(&self, filters: ListReadingsFilters) -> Result<Vec<ReadingDto>, String> {
+        let readings = if let Some(b_id) = filters.book_id {
             self.reading_repository.find_by_book_id(b_id)?
         } else {
             self.reading_repository.find_all()?
