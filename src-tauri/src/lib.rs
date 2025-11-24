@@ -1,23 +1,17 @@
 // Main library module
 
-// Domain layer
-pub mod domain;
-
-// Ports layer
-pub mod ports;
-
-// Application layer  
-pub mod application;
+// Core layer
+pub mod core;
 
 // Infrastructure layer
-pub mod infrastructure;
+pub mod infra;
 
-// Adapters layer
-pub mod adapters;
+// App layer
+pub mod app;
 
-use infrastructure::database::{DatabaseConnection, Migration};
-use adapters::tauri::AppState;
-use adapters::tauri::commands::{
+use infra::sqlite::database::{DatabaseConnection, Migration};
+use app::state::AppState;
+use app::commands::{
     create_book, get_book, list_books, update_book, delete_book,
     create_session, get_session, list_sessions, update_session, delete_session,
     create_note, get_note, list_notes, update_note, delete_note,
