@@ -44,8 +44,9 @@ export function useNotes(filters?: {
         setLoading(true);
         setError(null);
         const result = await invoke<NoteDto[]>('list_notes', {
-          book_id: bookId ?? null,
-          search_query: searchQuery ?? null,
+          filters: {
+            book_id: bookId ?? null,
+          },
         });
         if (!cancelled) {
           setNotes(result);
@@ -73,8 +74,9 @@ export function useNotes(filters?: {
       setLoading(true);
       setError(null);
       const result = await invoke<NoteDto[]>('list_notes', {
-        book_id: bookId ?? null,
-        search_query: searchQuery ?? null,
+        filters: {
+          book_id: bookId ?? null,
+        },
       });
       setNotes(result);
     } catch (err) {

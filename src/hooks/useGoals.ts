@@ -45,7 +45,9 @@ export function useGoals(includeInactive: boolean = false) {
       setLoading(true);
       setError(null);
       const result = await invoke<GoalDto[]>('list_goals', {
-        include_inactive: includeInactive,
+        filters: {
+          include_inactive: includeInactive ? true : null,
+        },
       });
       setGoals(result);
     } catch (err) {

@@ -62,9 +62,11 @@ export function useSessions(filters?: {
         setLoading(true);
         setError(null);
         const result = await invoke<SessionDto[]>('list_sessions', {
-          book_id: bookId ?? null,
-          start_date: startDate ?? null,
-          end_date: endDate ?? null,
+          filters: {
+            book_id: bookId ?? null,
+            start_date: startDate ?? null,
+            end_date: endDate ?? null,
+          },
         });
         if (!cancelled) {
           setSessions(result);
@@ -92,9 +94,11 @@ export function useSessions(filters?: {
       setLoading(true);
       setError(null);
       const result = await invoke<SessionDto[]>('list_sessions', {
-        book_id: bookId ?? null,
-        start_date: startDate ?? null,
-        end_date: endDate ?? null,
+        filters: {
+          book_id: bookId ?? null,
+          start_date: startDate ?? null,
+          end_date: endDate ?? null,
+        },
       });
       setSessions(result);
     } catch (err) {

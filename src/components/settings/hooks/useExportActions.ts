@@ -27,10 +27,10 @@ export function useExportActions({
       setExporting(true);
       
       const [booksData, sessionsData, notesData, goalsData] = await Promise.all([
-        invoke<any[]>('list_books'),
-        invoke<any[]>('list_sessions'),
-        invoke<any[]>('list_notes'),
-        invoke<any[]>('list_goals', { include_inactive: true }),
+        invoke<any[]>('list_books', { filters: null }),
+        invoke<any[]>('list_sessions', { filters: null }),
+        invoke<any[]>('list_notes', { filters: null }),
+        invoke<any[]>('list_goals', { filters: { include_inactive: true } }),
       ]);
 
       const backupData = {
