@@ -1,15 +1,15 @@
 use crate::core::services::{
-    agenda::AgendaServiceImpl,
-    books::BookServiceImpl,
-    goals::GoalServiceImpl,
-    sessions::SessionServiceImpl,
-    notes::NoteServiceImpl,
-    journal::JournalServiceImpl,
-    collections::CollectionServiceImpl,
-    tags::TagServiceImpl,
-    readings::ReadingServiceImpl,
-    settings::SettingsServiceImpl,
-    statistics::StatisticsServiceImpl,
+    AgendaServiceImpl,
+    BookServiceImpl,
+    GoalServiceImpl,
+    SessionServiceImpl,
+    NoteServiceImpl,
+    JournalServiceImpl,
+    CollectionServiceImpl,
+    TagServiceImpl,
+    ReadingServiceImpl,
+    SettingsServiceImpl,
+    StatisticsServiceImpl,
 };
 use crate::infra::sqlite::database::DatabaseConnection;
 use crate::infra::sqlite::repositories::{
