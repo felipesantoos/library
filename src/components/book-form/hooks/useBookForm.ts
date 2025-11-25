@@ -30,6 +30,7 @@ export function useBookForm({
     cover_url: '',
     url: '',
     is_wishlist: isWishlist,
+    status: 'not_started',
   });
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
@@ -51,6 +52,7 @@ export function useBookForm({
         url: book.url || '',
         is_wishlist: book.is_wishlist,
         is_archived: book.is_archived,
+        status: book.status,
       });
     } else if (!isEditing && isWishlist) {
       setFormData((prev) => ({ ...prev, is_wishlist: true }));

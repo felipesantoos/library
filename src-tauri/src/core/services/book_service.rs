@@ -112,6 +112,38 @@ impl<'a> BookService for BookServiceImpl<'a> {
             book.update_current_minutes_audio(current_minutes)?;
         }
 
+        // Auto-update status based on progress (only if status wasn't explicitly provided)
+        if command.status.is_none() {
+            // Check if book is completed
+            let is_completed = match book.book_type {
+                crate::core::domains::book::BookType::Audiobook => {
+                    if let Some(total) = book.total_minutes {
+                        book.current_minutes_audio >= total
+                    } else {
+                        false
+                    }
+                }
+                _ => {
+                    if let Some(total) = book.total_pages {
+                        book.current_page_text >= total
+                    } else {
+                        false
+                    }
+                }
+            };
+
+            if is_completed && book.status != crate::core::domains::book::BookStatus::Completed {
+                book.mark_as_completed();
+            } else if !is_completed {
+                // Check if book should be marked as reading
+                let has_progress = book.current_page_text > 0 || book.current_minutes_audio > 0;
+                if has_progress && book.status == crate::core::domains::book::BookStatus::NotStarted {
+                    book.mark_as_reading();
+                }
+            }
+        }
+
+        // Manual status update (if explicitly provided)
         if let Some(status_str) = command.status {
             let old_status = book.status.clone();
             book.status = string_to_book_status(&status_str)?;

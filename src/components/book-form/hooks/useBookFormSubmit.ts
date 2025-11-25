@@ -53,6 +53,7 @@ export function useBookFormSubmit({
           cover_url: formData.cover_url,
           url: formData.url,
           is_wishlist: formData.is_wishlist,
+          status: formData.status,
         };
         await updateBook(updateCommand);
         savedBookId = parseInt(bookId);

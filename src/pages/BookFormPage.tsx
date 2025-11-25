@@ -85,6 +85,7 @@ export function BookFormPage() {
                 <BookFormBasicFields
                   formData={formData}
                   onChange={handleChange}
+                  isEditing={isEditing}
                 />
 
                 <BookFormProgressFields

@@ -36,6 +36,7 @@ export interface CreateBookCommand {
   cover_url?: string;
   url?: string;
   is_wishlist?: boolean;
+  status?: string;
 }
 
 export function useBooks(filters?: {

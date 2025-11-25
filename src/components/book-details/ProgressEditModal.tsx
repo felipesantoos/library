@@ -171,6 +171,18 @@ export function ProgressEditModal({
             updateCommand.current_minutes_audio = currentMinutes;
           }
 
+          // Status will be auto-updated by backend based on progress
+          // But we can also explicitly update it if needed
+          const isCompleted = (book.total_pages && currentPage >= book.total_pages) ||
+                             (book.total_minutes && currentMinutes >= book.total_minutes);
+          const hasProgress = currentPage > 0 || currentMinutes > 0;
+
+          if (isCompleted && book.status !== 'completed') {
+            updateCommand.status = 'completed';
+          } else if (hasProgress && book.status === 'not_started') {
+            updateCommand.status = 'reading';
+          }
+
           await updateBook(updateCommand);
           toast.success('Progress updated (session creation failed)');
           onUpdate();

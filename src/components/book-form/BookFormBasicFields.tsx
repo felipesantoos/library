@@ -11,12 +11,22 @@ const BOOK_TYPES: DropdownOption[] = [
   { value: 'comic', label: 'Comic' },
 ];
 
+const BOOK_STATUSES: DropdownOption[] = [
+  { value: 'not_started', label: 'Not Started' },
+  { value: 'reading', label: 'Reading' },
+  { value: 'paused', label: 'Paused' },
+  { value: 'abandoned', label: 'Abandoned' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'rereading', label: 'Rereading' },
+];
+
 interface BookFormBasicFieldsProps {
   formData: CreateBookCommand;
   onChange: (field: keyof CreateBookCommand, value: any) => void;
+  isEditing?: boolean;
 }
 
-export function BookFormBasicFields({ formData, onChange }: BookFormBasicFieldsProps) {
+export function BookFormBasicFields({ formData, onChange, isEditing = false }: BookFormBasicFieldsProps) {
   return (
     <>
       {/* Title and Author */}
@@ -56,6 +66,17 @@ export function BookFormBasicFields({ formData, onChange }: BookFormBasicFieldsP
           placeholder="Enter genre"
         />
       </div>
+
+      {/* Status (only when editing) */}
+      {isEditing && (
+        <BookFormField
+          label="Status"
+          options={BOOK_STATUSES}
+          dropdownValue={formData.status}
+          onDropdownChange={(value) => onChange('status', value as string)}
+          placeholder="Select status..."
+        />
+      )}
     </>
   );
 }
